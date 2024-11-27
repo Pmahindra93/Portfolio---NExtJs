@@ -22,7 +22,7 @@ export default function LandingPage() {
       setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [slides.length])
 
   return (
     <div className={`min-h-screen ${is90sStyle ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]' : 'bg-background text-foreground font-sans'}`}>
