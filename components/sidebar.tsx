@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useTheme } from "@/lib/hooks/useTheme"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 import {
   LayoutDashboard,
   User,
@@ -12,7 +13,9 @@ import {
   Settings,
 } from "lucide-react"
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+  className?: string;
+}
 
 export function Sidebar({ className }: SidebarProps) {
   const { is90sStyle } = useTheme()
@@ -99,9 +102,11 @@ export function Sidebar({ className }: SidebarProps) {
                 🌟 Welcome to my radical website! 🌟
               </p>
               <div className="mt-2 flex justify-center">
-                <img
+                <Image
                   src="/construction.gif"
                   alt="Under Construction"
+                  width={64}
+                  height={64}
                   className="w-16 h-16"
                 />
               </div>

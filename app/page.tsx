@@ -23,7 +23,7 @@ export default function LandingPage() {
       setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [slides.length])
 
   return (
     <div className="flex min-h-screen">
