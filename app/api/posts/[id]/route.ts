@@ -1,16 +1,16 @@
 // app/api/posts/[id]/route.ts
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const { data: post, error } = await supabase
       .from('posts')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', context.params.id)
       .single()
 
     if (error) {
@@ -28,8 +28,8 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const body = await request.json()
@@ -40,7 +40,7 @@ export async function PUT(
         content: body.content,
         published: body.published
       })
-      .eq('id', params.id)
+      .eq('id', context.params.id)
       .select()
       .single()
 
@@ -54,18 +54,18 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: { id: string } }
 ) {
   try {
     const { error } = await supabase
       .from('posts')
       .delete()
-      .eq('id', params.id)
+      .eq('id', context.params.id)
 
     if (error) throw error
 
-    return NextResponse.json({ message: 'Post deleted successfully' })
+    return new NextResponse(null, { status: 204 })
   } catch (error: unknown) {
     console.error('Error deleting post:', error)
     return NextResponse.json({ error: 'Error deleting post' }, { status: 500 })

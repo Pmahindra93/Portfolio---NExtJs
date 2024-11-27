@@ -1,8 +1,8 @@
 // app/api/posts/route.ts
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const { data: posts, error } = await supabase
       .from('posts')
@@ -18,7 +18,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { data: post, error } = await supabase
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     if (error) throw error
 
-    return NextResponse.json(post)
+    return NextResponse.json(post, { status: 201 })
   } catch (error: unknown) {
     console.error('Error creating post:', error)
     return NextResponse.json({ error: 'Error creating post' }, { status: 500 })
