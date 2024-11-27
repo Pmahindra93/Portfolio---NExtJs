@@ -21,7 +21,8 @@ export async function GET(
     }
 
     return NextResponse.json(post)
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error('Error fetching post:', error)
     return NextResponse.json({ error: 'Error fetching post' }, { status: 500 })
   }
 }
@@ -46,7 +47,8 @@ export async function PUT(
     if (error) throw error
 
     return NextResponse.json(post)
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error('Error updating post:', error)
     return NextResponse.json({ error: 'Error updating post' }, { status: 500 })
   }
 }
@@ -64,7 +66,8 @@ export async function DELETE(
     if (error) throw error
 
     return NextResponse.json({ message: 'Post deleted successfully' })
-  } catch (error) {
+  } catch (error: unknown) {
+    console.error('Error deleting post:', error)
     return NextResponse.json({ error: 'Error deleting post' }, { status: 500 })
   }
 }
