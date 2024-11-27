@@ -5,9 +5,23 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-import BlogPosts from '@/components/BlogPosts'
+import { PostCarousel } from '@/components/PostCarousel'
+import { supabase } from '@/lib/supabase'
 import { useTheme } from '@/lib/hooks/useTheme'
 import { Sidebar } from '@/components/sidebar'
+
+async function getPosts() {
+  const { data: posts } = await supabase
+    .from('posts')
+    .select(`
+      *,
+      author:users(email)
+    `)
+    .eq('published', true)
+    .order('created_at', { ascending: false })
+
+  return posts || []
+}
 
 export default function LandingPage() {
   const { is90sStyle, toggleStyle } = useTheme()
@@ -17,6 +31,15 @@ export default function LandingPage() {
     '/placeholder.svg?height=400&width=600',
     '/placeholder.svg?height=400&width=600'
   ]
+  const [posts, setPosts] = useState<any[]>([])
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      const posts = await getPosts()
+      setPosts(posts)
+    }
+    loadPosts()
+  }, [])
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -95,7 +118,7 @@ export default function LandingPage() {
             <h2 className={`text-3xl font-bold mb-4 text-center ${is90sStyle ? 'text-[#0000FF]' : 'text-primary'}`}>
               {is90sStyle ? 'Latest Updates' : 'Recent Posts'}
             </h2>
-            <BlogPosts is90sStyle={is90sStyle} />
+            <PostCarousel posts={posts} />
           </div>
 
           <div className="text-center">

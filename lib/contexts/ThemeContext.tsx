@@ -1,33 +1,59 @@
 // contexts/ThemeContext.tsx
 "use client"
 
-import { createContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
-export interface ThemeContextType {
+type Theme = 'modern' | '90s'
+
+interface ThemeContextType {
+  theme: Theme
+  toggleTheme: () => void
   is90sStyle: boolean
   toggleStyle: () => void
 }
 
-export const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [is90sStyle, setIs90sStyle] = useState(false)
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false)
+  const [theme, setTheme] = useState<Theme>('modern')
 
   useEffect(() => {
-    const saved = localStorage.getItem('is90sStyle')
-    if (saved) {
-      setIs90sStyle(JSON.parse(saved))
+    const savedTheme = localStorage.getItem('theme') as Theme
+    if (savedTheme && (savedTheme === 'modern' || savedTheme === '90s')) {
+      setTheme(savedTheme)
     }
+    setMounted(true)
   }, [])
 
-  const toggleStyle = () => {
-    setIs90sStyle(!is90sStyle)
-    localStorage.setItem('is90sStyle', JSON.stringify(!is90sStyle))
+  const toggleTheme = () => {
+    const newTheme = theme === 'modern' ? '90s' : 'modern'
+    setTheme(newTheme)
+    localStorage.setItem('theme', newTheme)
+  }
+
+  if (!mounted) {
+    return null
   }
 
   return (
-    <ThemeContext.Provider value={{ is90sStyle, toggleStyle }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        toggleTheme,
+        is90sStyle: theme === '90s',
+        toggleStyle: toggleTheme
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   )
+}
+
+export function useTheme() {
+  const context = useContext(ThemeContext)
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider')
+  }
+  return context
 }
