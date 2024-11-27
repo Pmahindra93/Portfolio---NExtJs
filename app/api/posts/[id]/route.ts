@@ -1,17 +1,19 @@
 // app/api/posts/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { Post, UpdatePostInput } from '@/types/post'
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   context: { params: { id: string } }
-) {
+): Promise<NextResponse<Post | { error: string }>> {
   try {
     const { data: post, error } = await supabase
       .from('posts')
       .select('*')
       .eq('id', context.params.id)
       .single()
+      .returns<Post>()
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -30,19 +32,29 @@ export async function GET(
 export async function PUT(
   request: NextRequest,
   context: { params: { id: string } }
-) {
+): Promise<NextResponse<Post | { error: string }>> {
   try {
-    const body = await request.json()
+    const body = await request.json() as UpdatePostInput
+    
+    // Validate that at least one field is being updated
+    if (!body.title && !body.content && typeof body.published !== 'boolean') {
+      return NextResponse.json(
+        { error: 'No valid fields to update' },
+        { status: 400 }
+      )
+    }
+
     const { data: post, error } = await supabase
       .from('posts')
       .update({
-        title: body.title,
-        content: body.content,
-        published: body.published
+        ...(body.title && { title: body.title }),
+        ...(body.content && { content: body.content }),
+        ...(typeof body.published === 'boolean' && { published: body.published })
       })
       .eq('id', context.params.id)
       .select()
       .single()
+      .returns<Post>()
 
     if (error) throw error
 
@@ -54,9 +66,9 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
+  _request: NextRequest,
   context: { params: { id: string } }
-) {
+): Promise<NextResponse> {
   try {
     const { error } = await supabase
       .from('posts')

@@ -1,13 +1,15 @@
 // app/api/posts/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { Post, CreatePostInput } from '@/types/post'
 
-export async function GET() {
+export async function GET(): Promise<NextResponse<Post[] | { error: string }>> {
   try {
     const { data: posts, error } = await supabase
       .from('posts')
       .select('*')
       .order('created_at', { ascending: false })
+      .returns<Post[]>()
 
     if (error) throw error
 
@@ -18,9 +20,20 @@ export async function GET() {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest
+): Promise<NextResponse<Post | { error: string }>> {
   try {
-    const body = await request.json()
+    const body = await request.json() as CreatePostInput
+    
+    // Validate required fields
+    if (!body.title || !body.content) {
+      return NextResponse.json(
+        { error: 'Title and content are required' },
+        { status: 400 }
+      )
+    }
+
     const { data: post, error } = await supabase
       .from('posts')
       .insert([
@@ -32,6 +45,7 @@ export async function POST(request: NextRequest) {
       ])
       .select()
       .single()
+      .returns<Post>()
 
     if (error) throw error
 
