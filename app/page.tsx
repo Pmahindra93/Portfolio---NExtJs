@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
 import { PostCarousel } from '@/components/PostCarousel'
 import { supabase } from '@/lib/supabase'
 import { useTheme } from '@/lib/hooks/useTheme'
@@ -23,7 +21,7 @@ async function getPosts() {
 }
 
 export default function LandingPage() {
-  const { is90sStyle, toggleStyle } = useTheme()
+  const { is90sStyle } = useTheme()
   const [currentSlide, setCurrentSlide] = useState(0)
   const slides = [
     '/placeholder.svg?height=400&width=600',
@@ -48,30 +46,7 @@ export default function LandingPage() {
   }, [slides.length])
 
   return (
-    <div className={`flex-1 ${is90sStyle ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]' : 'bg-background text-foreground font-sans'}`}>
-      <header className={`p-4 ${is90sStyle ? 'bg-[#000080] text-[#FFFF00]' : 'bg-primary text-primary-foreground'}`}>
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className={`${is90sStyle ? 'text-4xl font-bold animate-pulse' : 'text-2xl font-semibold'}`}>
-            {is90sStyle ? "Welcome to Prateek's Cyber Space!" : "Prateek Mahindra"}
-          </h1>
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="style-toggle" className="text-sm font-medium">
-              Website Style:
-            </Label>
-            <div className="flex items-center space-x-2">
-              <span className={`text-sm ${is90sStyle ? 'font-bold' : ''}`}>90s</span>
-              <Switch
-                id="style-toggle"
-                checked={!is90sStyle}
-                onCheckedChange={toggleStyle}
-                aria-label="Toggle between 90s and modern style"
-              />
-              <span className={`text-sm ${!is90sStyle ? 'font-bold' : ''}`}>Modern</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className={`flex-1 pt-16 ${is90sStyle ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]' : 'bg-background text-foreground font-sans'}`}>
       <main className="container mx-auto p-4">
         <div className={`p-4 mb-8 ${is90sStyle ? 'bg-[#FFFFFF] border-4 border-[#000000]' : 'bg-card text-card-foreground rounded-lg shadow-md'}`}>
           <h2 className={`text-3xl font-bold mb-4 text-center ${is90sStyle ? 'text-[#FF00FF]' : 'text-primary'}`}>

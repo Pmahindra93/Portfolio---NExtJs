@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { useTheme } from '@/lib/hooks/useTheme'
 import { cn } from '@/lib/utils'
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 export function NavBar() {
-  const { is90sStyle } = useTheme()
+  const { is90sStyle, toggleStyle } = useTheme()
 
   return (
     <nav
@@ -24,10 +26,25 @@ export function NavBar() {
             is90sStyle && "font-['Comic_Sans_MS',_cursive] text-[#FF00FF]"
           )}
         >
-          Prateek Mahindra
+          {is90sStyle ? "Prateek's Cyber Space" : "Prateek Mahindra"}
         </Link>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-2">
+            <Label htmlFor="style-toggle" className="text-sm font-medium">
+              Style:
+            </Label>
+            <div className="flex items-center space-x-2">
+              <span className={`text-sm ${is90sStyle ? 'font-bold' : ''}`}>90s</span>
+              <Switch
+                id="style-toggle"
+                checked={!is90sStyle}
+                onCheckedChange={toggleStyle}
+                aria-label="Toggle between 90s and modern style"
+              />
+              <span className={`text-sm ${!is90sStyle ? 'font-bold' : ''}`}>Modern</span>
+            </div>
+          </div>
           <Link href="/profile" className="text-sm">
             Profile
           </Link>
