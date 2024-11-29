@@ -6,6 +6,14 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
 
+  // Refresh session if expired - required for Server Components
+  await supabase.auth.getSession()
+
+  // Skip auth check for callback route
+  if (req.nextUrl.pathname.startsWith('/auth/callback')) {
+    return res
+  }
+
   const {
     data: { session },
   } = await supabase.auth.getSession()
@@ -21,5 +29,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*']
+  matcher: ['/admin/:path*', '/auth/callback']
 }

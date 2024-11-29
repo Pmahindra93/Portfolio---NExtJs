@@ -95,10 +95,14 @@ export function NavBar() {
           </div>
           <Button
             onClick={handleAdminAccess}
-            variant={is90sStyle ? "secondary" : "outline"}
+            variant={is90sStyle ? "secondary" : "default"}
             className={cn(
-              "text-sm",
-              is90sStyle && "border-2 border-[#FFFF00] bg-[#000080] text-[#FFFF00] hover:bg-[#000080]/90"
+              "text-sm font-medium",
+              is90sStyle
+                ? "border-2 border-[#FFFF00] bg-[#000080] text-[#FFFF00] hover:bg-[#000080]/90"
+                : isAdmin
+                  ? "bg-green-600 hover:bg-green-700 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
             )}
           >
             {isLoading ? "Loading..." : isAdmin ? "New Post" : "Admin Sign In"}
