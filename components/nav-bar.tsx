@@ -9,25 +9,50 @@ import { cn } from '@/lib/utils'
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
 
 export function NavBar() {
   const { is90sStyle, toggleStyle } = useTheme()
   const { isAdmin, isLoading } = useAdmin()
   const router = useRouter()
+  const { toast } = useToast()
 
   const handleAdminAccess = async () => {
-    if (isAdmin) {
-      router.push('/admin/posts/new')
-    } else {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'github',
-        options: {
-          redirectTo: `${window.location.origin}/admin/posts/new`
+    try {
+      if (isAdmin) {
+        router.push('/admin/posts/new')
+      } else {
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'github',
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback`,
+            scopes: 'user:email'
+          }
+        })
+
+        if (error) {
+          console.error('Auth error:', error)
+          toast({
+            title: "Authentication Error",
+            description: error.message,
+            variant: "destructive"
+          })
+        } else if (!data) {
+          console.error('No data returned from auth')
+          toast({
+            title: "Authentication Error",
+            description: "No response from authentication service",
+            variant: "destructive"
+          })
         }
-      })
-      if (error) {
-        console.error('Error signing in:', error.message)
       }
+    } catch (error) {
+      console.error('Unexpected error:', error)
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive"
+      })
     }
   }
 
