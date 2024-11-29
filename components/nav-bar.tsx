@@ -97,12 +97,10 @@ export function NavBar() {
             onClick={handleAdminAccess}
             variant={is90sStyle ? "secondary" : "default"}
             className={cn(
-              "text-sm font-medium",
+              "text-sm font-medium transition-all",
               is90sStyle
                 ? "border-2 border-[#FFFF00] bg-[#000080] text-[#FFFF00] hover:bg-[#000080]/90"
-                : isAdmin
-                  ? "bg-green-600 hover:bg-green-700 text-white"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-black text-white border border-white/20 hover:bg-black/80 hover:border-white/40"
             )}
           >
             {isLoading ? "Loading..." : isAdmin ? "New Post" : "Admin Sign In"}
