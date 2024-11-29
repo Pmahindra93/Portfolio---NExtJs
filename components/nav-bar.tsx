@@ -1,13 +1,35 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTheme } from '@/lib/hooks/useTheme'
+import { useAdmin } from '@/lib/hooks/useAdmin'
+import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 
 export function NavBar() {
   const { is90sStyle, toggleStyle } = useTheme()
+  const { isAdmin, isLoading } = useAdmin()
+  const router = useRouter()
+
+  const handleAdminAccess = async () => {
+    if (isAdmin) {
+      router.push('/admin/posts/new')
+    } else {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/admin/posts/new`
+        }
+      })
+      if (error) {
+        console.error('Error signing in:', error.message)
+      }
+    }
+  }
 
   return (
     <nav
@@ -46,9 +68,16 @@ export function NavBar() {
               <span className={`text-sm ${!is90sStyle ? 'font-bold' : ''}`}>Modern</span>
             </div>
           </div>
-          <Link href="/profile" className="text-sm hover:underline">
-            Profile
-          </Link>
+          <Button
+            onClick={handleAdminAccess}
+            variant={is90sStyle ? "secondary" : "outline"}
+            className={cn(
+              "text-sm",
+              is90sStyle && "border-2 border-[#FFFF00] bg-[#000080] text-[#FFFF00] hover:bg-[#000080]/90"
+            )}
+          >
+            {isLoading ? "Loading..." : isAdmin ? "New Post" : "Admin Sign In"}
+          </Button>
         </div>
       </div>
     </nav>

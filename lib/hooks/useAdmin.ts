@@ -1,28 +1,17 @@
 import { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabase'
+
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL
 
 export function useAdmin() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
-  const supabase = createClientComponentClient()
 
   useEffect(() => {
-    async function checkAdminStatus() {
+    async function checkAdmin() {
       try {
         const { data: { session } } = await supabase.auth.getSession()
-        
-        if (!session) {
-          setIsAdmin(false)
-          return
-        }
-
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single()
-
-        setIsAdmin(profile?.role === 'admin')
+        setIsAdmin(session?.user?.email === ADMIN_EMAIL)
       } catch (error) {
         console.error('Error checking admin status:', error)
         setIsAdmin(false)
@@ -31,8 +20,16 @@ export function useAdmin() {
       }
     }
 
-    checkAdminStatus()
-  }, [supabase])
+    checkAdmin()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setIsAdmin(session?.user?.email === ADMIN_EMAIL)
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [])
 
   return { isAdmin, isLoading }
 }
