@@ -92,19 +92,6 @@ export default function LandingPage() {
           </h2>
           <PostCarousel posts={posts} />
         </div>
-
-        <div className="text-center">
-          <Link
-            href="#"
-            className={`inline-block px-6 py-2 font-bold transition-colors ${
-              is90sStyle
-                ? 'bg-[#00FF00] text-[#000000] border-4 border-[#000000] hover:bg-[#00FF00]/80'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90 rounded-md'
-            }`}
-          >
-            {is90sStyle ? 'Enter My Cyber Realm' : 'View My Portfolio'}
-          </Link>
-        </div>
       </main>
     </div>
   )

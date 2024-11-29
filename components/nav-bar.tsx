@@ -12,27 +12,28 @@ export function NavBar() {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 border-b h-16 flex items-center px-4',
+        'fixed top-0 left-0 right-0 z-50 border-b h-16 flex items-center',
         is90sStyle
-          ? 'bg-[#C0C0C0] border-[#000000] border-4'
-          : 'bg-background border-border'
+          ? 'bg-[#000080] text-[#FFFF00] border-[#000000] border-4'
+          : 'bg-primary text-primary-foreground'
       )}
     >
-      <div className="flex items-center justify-between w-full max-w-7xl mx-auto">
+      <div className="container mx-auto flex justify-between items-center px-4">
         <Link
           href="/"
           className={cn(
-            'text-xl font-bold',
-            is90sStyle && "font-['Comic_Sans_MS',_cursive] text-[#FF00FF]"
+            is90sStyle
+              ? 'text-4xl font-bold animate-pulse text-[#FFFF00]'
+              : 'text-2xl font-semibold text-primary-foreground'
           )}
         >
-          {is90sStyle ? "Prateek's Cyber Space" : "Prateek Mahindra"}
+          {is90sStyle ? "Welcome to Prateek's Cyber Space!" : "Prateek Mahindra"}
         </Link>
 
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2">
             <Label htmlFor="style-toggle" className="text-sm font-medium">
-              Style:
+              Website Style:
             </Label>
             <div className="flex items-center space-x-2">
               <span className={`text-sm ${is90sStyle ? 'font-bold' : ''}`}>90s</span>
@@ -45,7 +46,7 @@ export function NavBar() {
               <span className={`text-sm ${!is90sStyle ? 'font-bold' : ''}`}>Modern</span>
             </div>
           </div>
-          <Link href="/profile" className="text-sm">
+          <Link href="/profile" className="text-sm hover:underline">
             Profile
           </Link>
         </div>
