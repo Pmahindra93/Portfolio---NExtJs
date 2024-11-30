@@ -21,36 +21,49 @@ export function NavBar() {
     try {
       if (isAdmin) {
         router.push('/admin/posts/new')
-      } else {
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'github',
-          options: {
-            redirectTo: `${window.location.origin}/auth/callback`,
-            scopes: 'user:email'
-          }
-        })
-
-        if (error) {
-          console.error('Auth error:', error)
-          toast({
-            title: "Authentication Error",
-            description: error.message,
-            variant: "destructive"
-          })
-        } else if (!data) {
-          console.error('No data returned from auth')
-          toast({
-            title: "Authentication Error",
-            description: "No response from authentication service",
-            variant: "destructive"
-          })
-        }
+        return
       }
+
+      console.log('Starting GitHub auth flow...')
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          scopes: 'user:email',
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
+        }
+      })
+
+      if (error) {
+        console.error('GitHub auth error:', error)
+        toast({
+          title: "Authentication Error",
+          description: `Failed to sign in with GitHub: ${error.message}`,
+          variant: "destructive"
+        })
+        return
+      }
+
+      if (!data) {
+        console.error('No data returned from GitHub auth')
+        toast({
+          title: "Authentication Error",
+          description: "No response from GitHub authentication",
+          variant: "destructive"
+        })
+        return
+      }
+
+      console.log('GitHub auth successful:', data)
+
     } catch (error) {
-      console.error('Unexpected error:', error)
+      console.error('Unexpected error during GitHub auth:', error)
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "An unexpected error occurred during authentication",
         variant: "destructive"
       })
     }
