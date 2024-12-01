@@ -20,7 +20,7 @@ export async function middleware(req: NextRequest) {
 
   // Check if we're on an admin route
   if (req.nextUrl.pathname.startsWith('/admin')) {
-    if (!session?.user?.email || session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+    if (!session?.user?.email || session.user.email !== process.env.ADMIN_EMAIL) {
       return NextResponse.redirect(new URL('/', req.url))
     }
   }

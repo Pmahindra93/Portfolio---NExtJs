@@ -45,7 +45,7 @@ export async function GET(request: Request) {
     }
 
     // Check if the user is an admin
-    if (session.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+    if (session.user?.email === process.env.ADMIN_EMAIL) {
       console.log('Admin login successful:', session.user.email)
       return NextResponse.redirect(`${requestUrl.origin}/admin/posts/new`)
     }
