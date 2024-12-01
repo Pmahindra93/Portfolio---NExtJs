@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '@/lib/hooks/useTheme'
 import { useAdmin } from '@/lib/hooks/useAdmin'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
