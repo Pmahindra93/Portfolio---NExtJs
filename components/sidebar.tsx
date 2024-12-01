@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useTheme } from "@/lib/hooks/useTheme"
+import { useAdmin } from "@/lib/hooks/useAdmin"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
@@ -11,6 +12,8 @@ import {
   FolderKanban,
   MessageSquare,
   Settings,
+  BookOpen,
+  PenSquare,
 } from "lucide-react"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -19,6 +22,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Sidebar({ className }: SidebarProps) {
   const { is90sStyle } = useTheme()
+  const { isAdmin } = useAdmin()
 
   const menuItems = [
     {
@@ -35,6 +39,11 @@ export function Sidebar({ className }: SidebarProps) {
       title: "Projects",
       icon: FolderKanban,
       href: "#projects",
+    },
+    {
+      title: "Blog",
+      icon: BookOpen,
+      href: "/blog",
     },
     {
       title: is90sStyle ? "Guestbook" : "Contact",
@@ -99,18 +108,28 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="px-7 py-4">
             <div className="rounded border-2 border-[#000000] bg-[#FFFFFF] p-4">
               <p className="text-[#FF00FF] font-['Comic_Sans_MS',_cursive] text-center text-sm">
-                🌟 Welcome to my radical website! 🌟
+                Welcome to my cyber realm! 🌐✨
               </p>
-              <div className="mt-2 flex justify-center">
-                <Image
-                  src="/construction.gif"
-                  alt="Under Construction"
-                  width={64}
-                  height={64}
-                  className="w-16 h-16"
-                />
-              </div>
             </div>
+          </div>
+        )}
+        
+        {isAdmin && (
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <Link href="/admin/posts/new">
+              <Button
+                variant={is90sStyle ? "outline" : "default"}
+                className={cn(
+                  "w-full",
+                  is90sStyle
+                    ? "bg-[#00FF00] text-[#000000] border-2 border-[#000000] hover:bg-[#00CC00] font-['Comic_Sans_MS',_cursive]"
+                    : ""
+                )}
+              >
+                <PenSquare className={cn("mr-2 h-4 w-4", is90sStyle ? "text-[#000000]" : "")} />
+                {is90sStyle ? "✍️ New Post ✍️" : "Create Post"}
+              </Button>
+            </Link>
           </div>
         )}
       </div>

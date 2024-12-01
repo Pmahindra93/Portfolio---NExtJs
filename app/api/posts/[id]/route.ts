@@ -13,7 +13,6 @@ export async function GET(
       .select('*')
       .eq('id', context.params.id)
       .single()
-      .returns<Post>()
 
     if (error) {
       if (error.code === 'PGRST116') {
@@ -54,7 +53,6 @@ export async function PUT(
       .eq('id', context.params.id)
       .select()
       .single()
-      .returns<Post>()
 
     if (error) throw error
 
