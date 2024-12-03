@@ -11,6 +11,13 @@ export async function GET(request: Request) {
     const error = requestUrl.searchParams.get('error')
     const error_description = requestUrl.searchParams.get('error_description')
 
+    console.log('Auth callback received:', {
+      code: code ? 'present' : 'missing',
+      error,
+      error_description,
+      url: requestUrl.toString()
+    })
+
     // Handle OAuth errors
     if (error) {
       console.error('OAuth error:', error, error_description)

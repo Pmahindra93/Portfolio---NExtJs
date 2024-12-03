@@ -24,11 +24,13 @@ export function NavBar() {
         return
       }
 
-      console.log('Starting GitHub auth flow...')
+      const redirectUrl = `${window.location.origin}/auth/callback`
+      console.log('Starting GitHub auth flow...', { redirectUrl })
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: redirectUrl,
           scopes: 'user:email',
           queryParams: {
             access_type: 'offline',
@@ -61,6 +63,7 @@ export function NavBar() {
       toast({
         title: "Authentication Started",
         description: "Redirecting to GitHub...",
+        duration: 2000
       })
 
     } catch (error) {
