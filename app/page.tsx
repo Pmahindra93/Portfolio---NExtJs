@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { PostCarousel } from '@/components/PostCarousel'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 import { useTheme } from '@/lib/hooks/useTheme'
 
 async function getPosts() {
