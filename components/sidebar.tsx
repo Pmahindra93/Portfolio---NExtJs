@@ -31,11 +31,6 @@ export function Sidebar({ className }: SidebarProps) {
       href: "/",
     },
     {
-      title: "About",
-      icon: User,
-      href: "#about",
-    },
-    {
       title: "Projects",
       icon: FolderKanban,
       href: "#projects",
@@ -48,38 +43,23 @@ export function Sidebar({ className }: SidebarProps) {
     {
       title: is90sStyle ? "Guestbook" : "Contact",
       icon: MessageSquare,
-      href: "#contact",
-    },
-    {
-      title: "Settings",
-      icon: Settings,
-      href: "#settings",
+      href: "mailto:prateekmahindra9@gmail.com",
     },
   ]
 
   return (
     <div
       className={cn(
-        "relative hidden h-screen border-r pt-16 md:block",
+        "relative hidden h-screen border-r md:block",
         is90sStyle
           ? "w-64 border-[#000000] border-4 bg-[#C0C0C0]"
           : "w-72 border-border bg-background",
         className
       )}
     >
-      <div className="space-y-4 py-4">
+      <div className="space-y-4">
         <div className="px-3 py-2">
           <div className="space-y-1">
-            <h2
-              className={cn(
-                "mb-4 px-4",
-                is90sStyle
-                  ? "text-[#FF00FF] font-['Comic_Sans_MS',_cursive] text-2xl animate-pulse"
-                  : "text-lg font-semibold tracking-tight"
-              )}
-            >
-              {is90sStyle ? "Cyber Navigation" : "Navigation"}
-            </h2>
             <nav className="space-y-2">
               {menuItems.map((item) => (
                 <Link

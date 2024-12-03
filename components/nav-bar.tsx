@@ -79,22 +79,27 @@ export function NavBar() {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 border-b h-16 flex items-center',
+        'fixed top-0 left-0 right-0 z-50 border-b h-16 flex items-center w-screen',
         is90sStyle
-          ? 'bg-[#000080] text-[#FFFF00] border-[#000000] border-4'
+          ? 'bg-[#000080] text-[#FFFF00] border-[#000000] border-4 border-x-0 border-t-0'
           : 'bg-primary text-primary-foreground'
       )}
     >
-      <div className="container mx-auto flex justify-between items-center px-4">
-        <Link
-          href="/"
-          className={cn(
+      <div className="w-full px-4 flex justify-between items-center">
+        <Link href="/" className="flex items-center space-x-2">
+          <span className={cn(
+            "font-bold inline-block",
             is90sStyle
-              ? 'text-4xl font-bold animate-pulse text-[#FFFF00]'
-              : 'text-2xl font-semibold text-primary-foreground'
-          )}
-        >
-          {is90sStyle ? "Welcome to Prateek's Cyber Space!" : "Prateek Mahindra"}
+              ? "text-[#FFFF00] font-['Comic_Sans_MS',_cursive] animate-pulse text-2xl"
+              : ""
+          )}>
+            <span className="hidden md:inline">
+              {is90sStyle ? "Welcome to Prateek's Cyber Space!" : "Prateek Mahindra"}
+            </span>
+            <span className="md:hidden">
+              {is90sStyle ? "Prateek's Space" : "Prateek M."}
+            </span>
+          </span>
         </Link>
 
         <div className="flex items-center space-x-6">

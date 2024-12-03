@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 import { Post } from '@/types/post'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
@@ -14,16 +14,24 @@ export default function BlogPage() {
 
   useEffect(() => {
     async function fetchPosts() {
-      const { data } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          author:users(email)
-        `)
-        .eq('published', true)
-        .order('created_at', { ascending: false })
+      try {
+        console.log('Fetching posts...');
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('published', true)
+          .order('created_at', { ascending: false });
 
-      setPosts(data || [])
+        if (error) {
+          console.error('Error fetching posts:', error);
+          return;
+        }
+
+        console.log('Posts fetched:', data);
+        setPosts(data || []);
+      } catch (error) {
+        console.error('Exception while fetching posts:', error);
+      }
     }
 
     fetchPosts()
@@ -31,13 +39,13 @@ export default function BlogPage() {
 
   return (
     <main className={`flex-1 p-8 ${
-      is90sStyle 
+      is90sStyle
         ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]'
         : 'bg-background text-foreground'
     }`}>
       <div className="max-w-4xl mx-auto">
         <h1 className={`text-3xl font-bold mb-8 ${
-          is90sStyle 
+          is90sStyle
             ? 'text-[#FF00FF] animate-pulse text-center'
             : 'text-primary'
         }`}>
@@ -47,7 +55,7 @@ export default function BlogPage() {
         <div className="grid gap-6">
           {posts.map((post) => (
             <Card key={post.id} className={`p-6 ${
-              is90sStyle 
+              is90sStyle
                 ? 'bg-[#FFFFFF] border-4 border-[#000000]'
                 : 'bg-card'
             }`}>
@@ -67,7 +75,7 @@ export default function BlogPage() {
                 </span>
                 <Link href={`/blog/${post.id}`}>
                   <Button variant={is90sStyle ? 'outline' : 'default'} className={
-                    is90sStyle 
+                    is90sStyle
                       ? 'bg-[#00FF00] text-[#000000] border-2 border-[#000000] hover:bg-[#00CC00]'
                       : ''
                   }>
