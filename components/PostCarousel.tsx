@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,27 +12,16 @@ interface PostCarouselProps {
 }
 
 export function PostCarousel({ posts }: PostCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentSlide, setCurrentSlide] = useState(0)
 
-  const nextSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === posts.length - 1 ? 0 : prevIndex + 1
-    )
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex === 0 ? posts.length - 1 : prevIndex - 1
-    )
-  }
+  const nextSlide = useCallback(() => {
+    setCurrentSlide((prev) => (prev + 1) % posts.length)
+  }, [posts.length])
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      nextSlide()
-    }, 5000)
-
+    const timer = setInterval(nextSlide, 5000)
     return () => clearInterval(timer)
-  }, [currentIndex])
+  }, [nextSlide])
 
   if (!posts.length) {
     return null
@@ -43,7 +32,7 @@ export function PostCarousel({ posts }: PostCarouselProps) {
       <div
         className="absolute w-full h-full transition-transform duration-500 ease-out"
         style={{
-          transform: `translateX(-${currentIndex * 100}%)`,
+          transform: `translateX(-${currentSlide * 100}%)`,
         }}
       >
         {posts.map((post, index) => (
@@ -59,7 +48,7 @@ export function PostCarousel({ posts }: PostCarouselProps) {
                   alt={post.title}
                   fill
                   className="object-cover"
-                  priority={index === currentIndex}
+                  priority={index === currentSlide}
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -81,7 +70,7 @@ export function PostCarousel({ posts }: PostCarouselProps) {
         variant="ghost"
         size="icon"
         className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/20 hover:bg-black/40 text-white"
-        onClick={prevSlide}
+        onClick={() => setCurrentSlide((prev) => (prev - 1 + posts.length) % posts.length)}
       >
         <ChevronLeft className="h-6 w-6" />
       </Button>
@@ -100,9 +89,9 @@ export function PostCarousel({ posts }: PostCarouselProps) {
           <button
             key={index}
             className={`w-2 h-2 rounded-full transition-colors ${
-              index === currentIndex ? 'bg-white' : 'bg-white/50'
+              index === currentSlide ? 'bg-white' : 'bg-white/50'
             }`}
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => setCurrentSlide(index)}
           />
         ))}
       </div>
