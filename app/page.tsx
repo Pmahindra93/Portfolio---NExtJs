@@ -8,16 +8,23 @@ import { supabase } from '@/lib/supabase/client'
 import { useTheme } from '@/lib/hooks/useTheme'
 
 async function getPosts() {
-  const { data: posts } = await supabase
-    .from('posts')
-    .select(`
-      *,
-      author:users(email)
-    `)
-    .eq('published', true)
-    .order('created_at', { ascending: false })
+  try {
+    const { data: posts, error } = await supabase
+      .from('posts')
+      .select('id, title, content, cover_image, created_at, published, author:profiles(email)')
+      .eq('published', true)
+      .order('created_at', { ascending: false })
 
-  return posts || []
+    if (error) {
+      console.error('Error fetching posts:', error)
+      return []
+    }
+
+    return posts || []
+  } catch (error) {
+    console.error('Error in getPosts:', error)
+    return []
+  }
 }
 
 export default function LandingPage() {
@@ -29,11 +36,19 @@ export default function LandingPage() {
     '/placeholder.svg?height=400&width=600'
   ]
   const [posts, setPosts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadPosts = async () => {
-      const posts = await getPosts()
-      setPosts(posts)
+      try {
+        setLoading(true)
+        const posts = await getPosts()
+        setPosts(posts)
+      } catch (error) {
+        console.error('Error loading posts:', error)
+      } finally {
+        setLoading(false)
+      }
     }
     loadPosts()
   }, [])
