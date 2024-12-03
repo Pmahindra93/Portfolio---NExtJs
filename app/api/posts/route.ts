@@ -1,22 +1,30 @@
 // app/api/posts/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/server'
 import { Post, CreatePostInput } from '@/types/post'
+import { cookies } from 'next/headers'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<Post[] | { error: string }>> {
   try {
     const { data: posts, error } = await supabase
       .from('posts')
-      .select('*')
+      .select('*, author:users(email)')
       .order('created_at', { ascending: false })
-      .returns<Post[]>()
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
 
     return NextResponse.json(posts)
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('Error fetching posts:', error)
-    return NextResponse.json({ error: 'Error fetching posts' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }
 
@@ -24,8 +32,31 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<Post | { error: string }>> {
   try {
+    const supabase = createRouteHandlerClient({ cookies })
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const { data: userData } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', session.user.id)
+      .single()
+
+    if (!userData || userData.role !== 'admin') {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json() as CreatePostInput
-    
+
     // Validate required fields
     if (!body.title || !body.content) {
       return NextResponse.json(
@@ -34,24 +65,33 @@ export async function POST(
       )
     }
 
-    const { data: post, error } = await supabase
+    const { data, error } = await supabase
       .from('posts')
       .insert([
         {
           title: body.title,
           content: body.content,
-          published: body.published ?? false
+          cover_image: body.cover_image,
+          published: body.published ?? false,
+          author_id: session.user.id,
         }
       ])
       .select()
       .single()
-      .returns<Post>()
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      )
+    }
 
-    return NextResponse.json(post, { status: 201 })
+    return NextResponse.json(data, { status: 201 })
   } catch (error: unknown) {
     console.error('Error creating post:', error)
-    return NextResponse.json({ error: 'Error creating post' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
+    )
   }
 }

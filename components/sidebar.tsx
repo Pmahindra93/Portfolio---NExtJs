@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useTheme } from "@/lib/hooks/useTheme"
+import { useAdmin } from "@/lib/hooks/useAdmin"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
@@ -11,6 +12,8 @@ import {
   FolderKanban,
   MessageSquare,
   Settings,
+  BookOpen,
+  PenSquare,
 } from "lucide-react"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -19,6 +22,7 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Sidebar({ className }: SidebarProps) {
   const { is90sStyle } = useTheme()
+  const { isAdmin } = useAdmin()
 
   const menuItems = [
     {
@@ -27,50 +31,35 @@ export function Sidebar({ className }: SidebarProps) {
       href: "/",
     },
     {
-      title: "About",
-      icon: User,
-      href: "#about",
-    },
-    {
       title: "Projects",
       icon: FolderKanban,
       href: "#projects",
     },
     {
-      title: is90sStyle ? "Guestbook" : "Contact",
-      icon: MessageSquare,
-      href: "#contact",
+      title: "Blog",
+      icon: BookOpen,
+      href: "/blog",
     },
     {
-      title: "Settings",
-      icon: Settings,
-      href: "#settings",
+      title: is90sStyle ? "Guestbook" : "Contact",
+      icon: MessageSquare,
+      href: "mailto:prateekmahindra9@gmail.com",
     },
   ]
 
   return (
     <div
       className={cn(
-        "relative hidden h-screen border-r pt-16 md:block",
+        "relative hidden h-screen border-r md:block",
         is90sStyle
           ? "w-64 border-[#000000] border-4 bg-[#C0C0C0]"
           : "w-72 border-border bg-background",
         className
       )}
     >
-      <div className="space-y-4 py-4">
+      <div className="space-y-4">
         <div className="px-3 py-2">
           <div className="space-y-1">
-            <h2
-              className={cn(
-                "mb-4 px-4",
-                is90sStyle
-                  ? "text-[#FF00FF] font-['Comic_Sans_MS',_cursive] text-2xl animate-pulse"
-                  : "text-lg font-semibold tracking-tight"
-              )}
-            >
-              {is90sStyle ? "Cyber Navigation" : "Navigation"}
-            </h2>
             <nav className="space-y-2">
               {menuItems.map((item) => (
                 <Link
@@ -99,18 +88,28 @@ export function Sidebar({ className }: SidebarProps) {
           <div className="px-7 py-4">
             <div className="rounded border-2 border-[#000000] bg-[#FFFFFF] p-4">
               <p className="text-[#FF00FF] font-['Comic_Sans_MS',_cursive] text-center text-sm">
-                🌟 Welcome to my radical website! 🌟
+                Welcome to my cyber realm! 🌐✨
               </p>
-              <div className="mt-2 flex justify-center">
-                <Image
-                  src="/construction.gif"
-                  alt="Under Construction"
-                  width={64}
-                  height={64}
-                  className="w-16 h-16"
-                />
-              </div>
             </div>
+          </div>
+        )}
+        
+        {isAdmin && (
+          <div className="absolute bottom-0 left-0 right-0 p-4">
+            <Link href="/admin/posts/new">
+              <Button
+                variant={is90sStyle ? "outline" : "default"}
+                className={cn(
+                  "w-full",
+                  is90sStyle
+                    ? "bg-[#00FF00] text-[#000000] border-2 border-[#000000] hover:bg-[#00CC00] font-['Comic_Sans_MS',_cursive]"
+                    : ""
+                )}
+              >
+                <PenSquare className={cn("mr-2 h-4 w-4", is90sStyle ? "text-[#000000]" : "")} />
+                {is90sStyle ? "✍️ New Post ✍️" : "Create Post"}
+              </Button>
+            </Link>
           </div>
         )}
       </div>

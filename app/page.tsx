@@ -3,63 +3,86 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import BlogPosts from '@/components/BlogPosts'
+import { PostCarousel } from '@/components/PostCarousel'
+import { supabase } from '@/lib/supabase/client'
 import { useTheme } from '@/lib/hooks/useTheme'
-import { Sidebar } from '@/components/sidebar'
+
+async function getPosts() {
+  try {
+    const { data: posts, error } = await supabase
+      .from('posts')
+      .select(`
+        id,
+        title,
+        content,
+        cover_image,
+        created_at,
+        published,
+        author_id,
+        profiles (
+          id,
+          email
+        )
+      `)
+      .eq('published', true)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching posts:', error)
+      return []
+    }
+
+    return posts || []
+  } catch (error) {
+    console.error('Error in getPosts:', error)
+    return []
+  }
+}
 
 export default function LandingPage() {
-  const { is90sStyle, toggleStyle } = useTheme()
+  const { is90sStyle } = useTheme()
   const [currentSlide, setCurrentSlide] = useState(0)
-  const slides = [
-    '/placeholder.svg?height=400&width=600',
-    '/placeholder.svg?height=400&width=600',
-    '/placeholder.svg?height=400&width=600'
+  const images = [
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400'
   ]
+  const [posts, setPosts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setLoading(true)
+        const posts = await getPosts()
+        setPosts(posts)
+      } catch (error) {
+        console.error('Error loading posts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadPosts()
+  }, [])
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length)
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % images.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [slides.length])
+  }, [images.length])
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className={`flex-1 ${is90sStyle ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]' : 'bg-background text-foreground font-sans'}`}>
-        <header className={`p-4 ${is90sStyle ? 'bg-[#000080] text-[#FFFF00]' : 'bg-primary text-primary-foreground'}`}>
-          <div className="container mx-auto flex justify-between items-center">
-            <h1 className={`${is90sStyle ? 'text-4xl font-bold animate-pulse' : 'text-2xl font-semibold'}`}>
-              {is90sStyle ? "Welcome to Prateek's Cyber Space!" : "Prateek Mahindra"}
-            </h1>
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="style-toggle" className="text-sm font-medium">
-                Website Style:
-              </Label>
-              <div className="flex items-center space-x-2">
-                <span className={`text-sm ${is90sStyle ? 'font-bold' : ''}`}>90s</span>
-                <Switch
-                  id="style-toggle"
-                  checked={!is90sStyle}
-                  onCheckedChange={toggleStyle}
-                  aria-label="Toggle between 90s and modern style"
-                />
-                <span className={`text-sm ${!is90sStyle ? 'font-bold' : ''}`}>Modern</span>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <main className="container mx-auto p-4">
+    <div className={`min-h-screen flex flex-col ${is90sStyle ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]' : 'bg-background text-foreground font-sans'}`}>
+      <main className={`flex-1 w-full pt-16 ${is90sStyle ? 'bg-[#C0C0C0]' : ''}`}>
+        <div className="container mx-auto p-4">
           <div className={`p-4 mb-8 ${is90sStyle ? 'bg-[#FFFFFF] border-4 border-[#000000]' : 'bg-card text-card-foreground rounded-lg shadow-md'}`}>
             <h2 className={`text-3xl font-bold mb-4 text-center ${is90sStyle ? 'text-[#FF00FF]' : 'text-primary'}`}>
               Who am I?
             </h2>
             <div className="flex flex-col md:flex-row items-center">
               <Image
-                src="/placeholder.svg?height=150&width=150"
+                src="https://placehold.co/150x150"
                 alt="Prateek Mahindra"
                 width={150}
                 height={150}
@@ -77,10 +100,10 @@ export default function LandingPage() {
               {is90sStyle ? 'My Awesome Projects' : 'Featured Projects'}
             </h2>
             <div className="relative h-[200px] w-full max-w-[300px] mx-auto">
-              {slides.map((slide, index) => (
+              {images.map((image, index) => (
                 <Image
                   key={index}
-                  src={slide}
+                  src={image}
                   alt={`Project slide ${index + 1}`}
                   fill
                   className={`object-cover transition-opacity duration-500 ${
@@ -95,23 +118,10 @@ export default function LandingPage() {
             <h2 className={`text-3xl font-bold mb-4 text-center ${is90sStyle ? 'text-[#0000FF]' : 'text-primary'}`}>
               {is90sStyle ? 'Latest Updates' : 'Recent Posts'}
             </h2>
-            <BlogPosts is90sStyle={is90sStyle} />
+            <PostCarousel posts={posts} />
           </div>
-
-          <div className="text-center">
-            <Link
-              href="#"
-              className={`inline-block px-6 py-2 font-bold transition-colors ${
-                is90sStyle
-                  ? 'bg-[#00FF00] text-[#000000] border-4 border-[#000000] hover:bg-[#00FF00]/80'
-                  : 'bg-primary text-primary-foreground hover:bg-primary/90 rounded-md'
-              }`}
-            >
-              {is90sStyle ? 'Enter My Cyber Realm' : 'View My Portfolio'}
-            </Link>
-          </div>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   )
 }
