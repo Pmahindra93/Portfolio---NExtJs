@@ -57,7 +57,11 @@ export function NavBar() {
         return
       }
 
-      console.log('GitHub auth successful:', data)
+      console.log('GitHub auth successful, data:', data)
+      toast({
+        title: "Authentication Started",
+        description: "Redirecting to GitHub...",
+      })
 
     } catch (error) {
       console.error('Unexpected error during GitHub auth:', error)
