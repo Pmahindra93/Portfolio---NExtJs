@@ -1,24 +1,32 @@
+export interface Profile {
+  id: string
+  email: string
+  created_at: string
+  updated_at: string
+}
+
 export interface Post {
   id: string
   title: string
   content: string
+  cover_image?: string
   published: boolean
+  author_id: string
   created_at: string
   updated_at: string
-  author_id: string
+  profiles?: Profile
+}
+
+export interface CreatePostInput {
+  title: string
+  content: string
   cover_image?: string
+  published?: boolean
 }
 
-export interface User {
-  id: string
-  email: string
-  role: 'admin' | 'user'
-  created_at: string
-}
-
-export interface PostImage {
-  id: string
-  post_id: string
-  url: string
-  created_at: string
+export interface UpdatePostInput {
+  title?: string
+  content?: string
+  cover_image?: string
+  published?: boolean
 }

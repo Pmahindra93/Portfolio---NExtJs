@@ -11,7 +11,19 @@ async function getPosts() {
   try {
     const { data: posts, error } = await supabase
       .from('posts')
-      .select('id, title, content, cover_image, created_at, published, author:profiles(email)')
+      .select(`
+        id,
+        title,
+        content,
+        cover_image,
+        created_at,
+        published,
+        author_id,
+        profiles (
+          id,
+          email
+        )
+      `)
       .eq('published', true)
       .order('created_at', { ascending: false })
 
@@ -30,10 +42,10 @@ async function getPosts() {
 export default function LandingPage() {
   const { is90sStyle } = useTheme()
   const [currentSlide, setCurrentSlide] = useState(0)
-  const slides = [
-    '/placeholder.svg?height=400&width=600',
-    '/placeholder.svg?height=400&width=600',
-    '/placeholder.svg?height=400&width=600'
+  const images = [
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400',
+    'https://placehold.co/600x400'
   ]
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
@@ -55,10 +67,10 @@ export default function LandingPage() {
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prevSlide) => (prevSlide + 1) % slides.length)
+      setCurrentSlide((prevSlide) => (prevSlide + 1) % images.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [slides.length])
+  }, [images.length])
 
   return (
     <div className={`min-h-screen flex flex-col ${is90sStyle ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]' : 'bg-background text-foreground font-sans'}`}>
@@ -70,7 +82,7 @@ export default function LandingPage() {
             </h2>
             <div className="flex flex-col md:flex-row items-center">
               <Image
-                src="/placeholder.svg?height=150&width=150"
+                src="https://placehold.co/150x150"
                 alt="Prateek Mahindra"
                 width={150}
                 height={150}
@@ -88,10 +100,10 @@ export default function LandingPage() {
               {is90sStyle ? 'My Awesome Projects' : 'Featured Projects'}
             </h2>
             <div className="relative h-[200px] w-full max-w-[300px] mx-auto">
-              {slides.map((slide, index) => (
+              {images.map((image, index) => (
                 <Image
                   key={index}
-                  src={slide}
+                  src={image}
                   alt={`Project slide ${index + 1}`}
                   fill
                   className={`object-cover transition-opacity duration-500 ${
