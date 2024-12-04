@@ -7,11 +7,11 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(): Promise<NextResponse<Post[] | { error: string }>> {
+export async function GET(): Promise<NextResponse<Post[]  | { error: string }>> {
   try {
     const { data: posts, error } = await supabase
       .from('posts')
-      .select('*, author:auth.users(email)')
+      .select('*, author:users(email)')
       .eq('published', true)
       .order('created_at', { ascending: false })
 
