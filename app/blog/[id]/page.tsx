@@ -17,7 +17,7 @@ export default function BlogPost({ params }: { params: { id: string } }) {
       try {
         const { data, error } = await supabase
           .from('posts')
-          .select('*')
+          .select('*, author:auth.users(email)')
           .eq('id', params.id)
           .single()
 
@@ -49,10 +49,11 @@ export default function BlogPost({ params }: { params: { id: string } }) {
         <div className="max-w-4xl mx-auto">
           <Card className="p-6 animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/4 mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 rounded w-full"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
             </div>
           </Card>
         </div>
@@ -61,8 +62,7 @@ export default function BlogPost({ params }: { params: { id: string } }) {
   }
 
   if (!post) {
-    notFound()
-    return null
+    return notFound()
   }
 
   return (
@@ -73,24 +73,28 @@ export default function BlogPost({ params }: { params: { id: string } }) {
     }`}>
       <div className="max-w-4xl mx-auto">
         <Card className={`p-6 ${
-          is90sStyle
-            ? 'bg-[#FFFFFF] border-4 border-[#000000]'
-            : 'bg-card'
+          is90sStyle ? 'border-4 border-[#FF00FF]' : ''
         }`}>
-          <h1 className={`text-3xl font-bold mb-4 ${
-            is90sStyle ? 'text-[#0000FF]' : 'text-primary'
+          <h1 className={`text-3xl font-bold mb-2 ${
+            is90sStyle ? 'text-[#FF0000]' : ''
           }`}>
             {post.title}
           </h1>
-          <div className="mb-6">
-            <span className={`text-sm ${
-              is90sStyle ? 'text-[#000080]' : 'text-muted-foreground'
-            }`}>
+          <div className={`flex items-center gap-2 mb-8 text-sm ${
+            is90sStyle ? 'text-[#0000FF]' : 'text-muted-foreground'
+          }`}>
+            <span>
               {new Date(post.created_at).toLocaleDateString()}
             </span>
+            {post.author && (
+              <>
+                <span>•</span>
+                <span>By {(post.author as any).email}</span>
+              </>
+            )}
           </div>
           <div className={`prose max-w-none ${
-            is90sStyle ? 'text-[#000080]' : 'text-foreground'
+            is90sStyle ? 'text-[#000080]' : ''
           }`}>
             {post.content}
           </div>

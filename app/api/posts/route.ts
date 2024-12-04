@@ -11,7 +11,8 @@ export async function GET(): Promise<NextResponse<Post[] | { error: string }>> {
   try {
     const { data: posts, error } = await supabase
       .from('posts')
-      .select('*, author:users(email)')
+      .select('*, author:auth.users(email)')
+      .eq('published', true)
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -43,54 +44,40 @@ export async function POST(
     }
 
     const { data: userData } = await supabase
-      .from('users')
-      .select('role')
+      .from('auth.users')
+      .select('admin')
       .eq('id', session.user.id)
       .single()
 
-    if (!userData || userData.role !== 'admin') {
+    if (!userData?.admin) {
       return NextResponse.json(
-        { error: 'Forbidden' },
+        { error: 'Only admins can create posts' },
         { status: 403 }
       )
     }
 
-    const body = await request.json() as CreatePostInput
+    const input: CreatePostInput = await request.json()
 
-    // Validate required fields
-    if (!body.title || !body.content) {
-      return NextResponse.json(
-        { error: 'Title and content are required' },
-        { status: 400 }
-      )
-    }
-
-    const { data, error } = await supabase
+    const { data: post, error } = await supabase
       .from('posts')
       .insert([
         {
-          title: body.title,
-          content: body.content,
-          cover_image: body.cover_image,
-          published: body.published ?? false,
+          ...input,
           author_id: session.user.id,
-        }
+        },
       ])
       .select()
       .single()
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data, { status: 201 })
-  } catch (error: unknown) {
+    return NextResponse.json(post)
+  } catch (error) {
     console.error('Error creating post:', error)
     return NextResponse.json(
-      { error: 'Internal Server Error' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

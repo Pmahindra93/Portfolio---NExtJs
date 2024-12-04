@@ -10,6 +10,8 @@ import { NavBar } from '@/components/nav-bar'
 const inter = Inter({ 
   subsets: ["latin"],
   display: 'swap',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-inter',
 })
 
 export const metadata: Metadata = {
@@ -24,12 +26,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className={`${inter.className} antialiased`}>
         <Providers>
           <div className="min-h-screen">

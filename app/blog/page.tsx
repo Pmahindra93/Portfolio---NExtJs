@@ -18,7 +18,7 @@ export default function BlogPage() {
         console.log('Fetching posts...');
         const { data, error } = await supabase
           .from('posts')
-          .select('*')
+          .select('*, author:auth.users(email)')
           .eq('published', true)
           .order('created_at', { ascending: false });
 

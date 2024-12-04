@@ -20,7 +20,18 @@ export async function middleware(req: NextRequest) {
 
   // Check if we're on an admin route
   if (req.nextUrl.pathname.startsWith('/admin')) {
-    if (!session?.user?.email || session.user.email !== process.env.ADMIN_EMAIL) {
+    if (!session) {
+      return NextResponse.redirect(new URL('/auth/signin', req.url))
+    }
+
+    // Check if user is admin
+    const { data: userData } = await supabase
+      .from('auth.users')
+      .select('admin')
+      .eq('id', session.user.id)
+      .single()
+
+    if (!userData?.admin) {
       return NextResponse.redirect(new URL('/', req.url))
     }
   }

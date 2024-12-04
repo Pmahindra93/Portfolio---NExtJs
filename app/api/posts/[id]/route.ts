@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase/server'
 import { Post, UpdatePostInput } from '@/types/post'
+import { cookies } from 'next/headers'
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,33 +41,56 @@ export async function PUT(
   { params }: { params: { id: string } }
 ): Promise<NextResponse<Post | { error: string }>> {
   try {
-    const body = await request.json() as UpdatePostInput
+    const supabase = createRouteHandlerClient({ cookies })
+    const { data: { session } } = await supabase.auth.getSession()
 
-    // Validate that at least one field is being updated
-    if (!body.title && !body.content && typeof body.published !== 'boolean') {
+    if (!session) {
       return NextResponse.json(
-        { error: 'No valid fields to update' },
-        { status: 400 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       )
     }
 
+    // Check if user is admin
+    const { data: userData } = await supabase
+      .from('auth.users')
+      .select('admin')
+      .eq('id', session.user.id)
+      .single()
+
+    if (!userData?.admin) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 403 }
+      )
+    }
+
+    const body = await request.json() as UpdatePostInput
+    const updateData: Partial<Post> = {}
+
+    if (body.title !== undefined) updateData.title = body.title
+    if (body.content !== undefined) updateData.content = body.content
+    if (body.published !== undefined) updateData.published = body.published
+    if (body.cover_image !== undefined) updateData.cover_image = body.cover_image
+
     const { data: post, error } = await supabase
       .from('posts')
-      .update({
-        ...(body.title && { title: body.title }),
-        ...(body.content && { content: body.content }),
-        ...(typeof body.published === 'boolean' && { published: body.published })
-      })
+      .update(updateData)
       .eq('id', params.id)
       .select()
       .single()
 
-    if (error) throw error
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
 
     return NextResponse.json(post)
-  } catch (error: unknown) {
+  } catch (error) {
     console.error('Error updating post:', error)
-    return NextResponse.json({ error: 'Error updating post' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
   }
 }
 
@@ -74,6 +99,30 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   try {
+    const supabase = createRouteHandlerClient({ cookies })
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    // Check if user is admin
+    const { data: userData } = await supabase
+      .from('auth.users')
+      .select('admin')
+      .eq('id', session.user.id)
+      .single()
+
+    if (!userData?.admin) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Admin access required' },
+        { status: 403 }
+      )
+    }
+
     const { error } = await supabase
       .from('posts')
       .delete()
@@ -83,7 +132,7 @@ export async function DELETE(
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ success: true })
+    return new NextResponse(null, { status: 204 })
   } catch (error) {
     console.error('Error deleting post:', error)
     return NextResponse.json(
