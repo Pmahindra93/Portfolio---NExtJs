@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 
-export function NavBar() {
+export function NavBar({ className }: { className?: string }) {
   const { is90sStyle, toggle90sStyle } = useTheme()
   const { isAdmin, isLoading } = useAdmin()
   const router = useRouter()
@@ -82,7 +82,8 @@ export function NavBar() {
         'fixed top-0 left-0 right-0 z-50 border-b h-16 flex items-center w-screen',
         is90sStyle
           ? 'bg-[#000080] text-[#FFFF00] border-[#000000] border-4 border-x-0 border-t-0'
-          : 'bg-primary text-primary-foreground'
+          : 'bg-primary text-primary-foreground',
+        className
       )}
     >
       <div className="w-full px-4 flex justify-between items-center">
