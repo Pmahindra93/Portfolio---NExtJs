@@ -20,7 +20,10 @@ export default function BlogPage() {
           .from('posts')
           .select('*, author:auth.users(email)')
           .eq('published', true)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false }) as {
+            data: Post[] | null;
+            error: any;
+          };
 
         if (error) {
           console.error('Error fetching posts:', error);

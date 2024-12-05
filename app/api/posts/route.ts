@@ -11,12 +11,16 @@ export async function GET(): Promise<NextResponse<Post[]  | { error: string }>> 
   try {
     const { data: posts, error } = await supabase
       .from('posts')
-      .select('*, author:users(email)')
+      .select('*')
       .eq('published', true)
-      .order('created_at', { ascending: false })
+      .order('created_at', { ascending: false }) as { data: Post[] | null; error: any }
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    if (!posts) {
+      return NextResponse.json({ error: 'No posts found' }, { status: 404 })
     }
 
     return NextResponse.json(posts)
@@ -67,10 +71,14 @@ export async function POST(
         },
       ])
       .select()
-      .single()
+      .single() as { data: Post | null; error: any }
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    if (!post) {
+      return NextResponse.json({ error: 'Failed to create post' }, { status: 500 })
     }
 
     return NextResponse.json(post)

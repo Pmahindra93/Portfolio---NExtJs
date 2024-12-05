@@ -19,7 +19,10 @@ export default function BlogPost({ params }: { params: { id: string } }) {
           .from('posts')
           .select('*, author:auth.users(email)')
           .eq('id', params.id)
-          .single()
+          .single() as { 
+            data: (Post & { author: { email: string } }) | null; 
+            error: any 
+          }
 
         if (error) {
           console.error('Error fetching post:', error)
