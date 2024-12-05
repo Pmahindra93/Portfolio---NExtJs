@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 
 export function NavBar() {
-  const { is90sStyle, toggleStyle } = useTheme()
+  const { is90sStyle, toggle90sStyle } = useTheme()
   const { isAdmin, isLoading } = useAdmin()
   const router = useRouter()
   const { toast } = useToast()
@@ -107,12 +107,12 @@ export function NavBar() {
             <Label htmlFor="style-toggle" className="text-sm font-medium">
               Website Style:
             </Label>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <span className={`text-sm ${is90sStyle ? 'font-bold' : ''}`}>90s</span>
               <Switch
                 id="style-toggle"
                 checked={!is90sStyle}
-                onCheckedChange={toggleStyle}
+                onCheckedChange={toggle90sStyle}
                 aria-label="Toggle between 90s and modern style"
               />
               <span className={`text-sm ${!is90sStyle ? 'font-bold' : ''}`}>Modern</span>
