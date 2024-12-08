@@ -51,24 +51,24 @@ export interface Database {
       }
       users: {
         Row: {
-          id: string
-          email: string
-          admin: boolean | null
+          admin: boolean
           created_at: string | null
+          email: string | null
+          id: string
           updated_at: string | null
         }
         Insert: {
-          id: string
-          email: string
-          admin?: boolean | null
+          admin?: boolean
           created_at?: string | null
+          email?: string | null
+          id: string
           updated_at?: string | null
         }
         Update: {
-          id?: string
-          email?: string
-          admin?: boolean | null
+          admin?: boolean
           created_at?: string | null
+          email?: string | null
+          id?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -85,8 +85,15 @@ export interface Database {
         }
         Returns: void
       }
+      is_admin: {
+        Args: Record<string, never>
+        Returns: boolean
+      }
     }
     Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
       [_ in never]: never
     }
   }
