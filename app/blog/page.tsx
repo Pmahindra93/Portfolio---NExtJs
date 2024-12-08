@@ -10,60 +10,51 @@ import { Button } from '@/components/ui/button'
 
 export default function BlogPage() {
   const [posts, setPosts] = useState<Post[]>([])
+  const [loading, setLoading] = useState(true)
   const { is90sStyle } = useTheme()
 
   useEffect(() => {
     async function fetchPosts() {
       try {
-        console.log('Fetching posts...');
-        // First fetch posts
-        const { data: postsData, error: postsError } = await supabase
+        setLoading(true)
+        console.log('Fetching posts...')
+        
+        const { data, error } = await supabase
           .from('posts')
           .select('*')
           .eq('published', true)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
 
-        if (postsError) {
-          console.error('Error fetching posts:', postsError);
-          return;
+        if (error) {
+          console.error('Error fetching posts:', error)
+          return
         }
 
-        if (!postsData) {
-          console.log('No posts found');
-          setPosts([]);
-          return;
-        }
-
-        // Then fetch authors for these posts
-        const authorIds = [...new Set(postsData.map(post => post.author_id))];
-        const { data: authorsData, error: authorsError } = await supabase
-          .from('users')
-          .select('id, email')
-          .in('id', authorIds);
-
-        if (authorsError) {
-          console.error('Error fetching authors:', authorsError);
-          return;
-        }
-
-        // Create an author lookup map
-        const authorMap = new Map(authorsData?.map(author => [author.id, author]) || []);
-
-        // Combine posts with author data
-        const postsWithAuthors = postsData.map(post => ({
-          ...post,
-          author: authorMap.get(post.author_id)
-        }));
-
-        console.log('Posts fetched:', postsWithAuthors);
-        setPosts(postsWithAuthors);
+        console.log('Posts fetched:', data)
+        setPosts(data || [])
       } catch (error) {
-        console.error('Exception while fetching posts:', error);
+        console.error('Exception while fetching posts:', error)
+      } finally {
+        setLoading(false)
       }
     }
 
     fetchPosts()
   }, [])
+
+  if (loading) {
+    return (
+      <main className={`flex-1 p-8 ${
+        is90sStyle
+          ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]'
+          : 'bg-background text-foreground'
+      }`}>
+        <div className="max-w-4xl mx-auto">
+          <p>Loading posts...</p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className={`flex-1 p-8 ${
@@ -74,46 +65,37 @@ export default function BlogPage() {
       <div className="max-w-4xl mx-auto">
         <h1 className={`text-3xl font-bold mb-8 ${
           is90sStyle
-            ? 'text-[#FF00FF] animate-pulse text-center'
-            : 'text-primary'
-        }`}>
-          {is90sStyle ? '📝 Cyber Chronicles 📝' : 'Blog Posts'}
-        </h1>
-
-        <div className="grid gap-6">
-          {posts.map((post) => (
-            <Card key={post.id} className={`p-6 ${
-              is90sStyle
-                ? 'bg-[#FFFFFF] border-4 border-[#000000]'
-                : 'bg-card'
-            }`}>
-              <h2 className={`text-2xl font-bold mb-2 ${
-                is90sStyle ? 'text-[#0000FF]' : 'text-primary'
-              }`}>
-                {post.title}
-              </h2>
-              <p className={`mb-4 ${
-                is90sStyle ? '' : 'text-muted-foreground'
-              }`}>
-                {post.content.substring(0, 200)}...
-              </p>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">
-                  {new Date(post.created_at).toLocaleDateString()}
-                </span>
-                <Link href={`/blog/${post.id}`}>
-                  <Button variant={is90sStyle ? 'outline' : 'default'} className={
+            ? 'text-[#000080]'
+            : ''
+        }`}>Blog Posts</h1>
+        {posts.length === 0 ? (
+          <p>No posts found.</p>
+        ) : (
+          <div className="grid gap-6">
+            {posts.map((post) => (
+              <Link key={post.id} href={`/blog/${post.id}`}>
+                <Card className={`p-6 hover:shadow-lg transition-shadow ${
+                  is90sStyle
+                    ? 'bg-[#FFFFFF] border-[#808080] border-2'
+                    : ''
+                }`}>
+                  <h2 className={`text-xl font-semibold mb-2 ${
                     is90sStyle
-                      ? 'bg-[#00FF00] text-[#000000] border-2 border-[#000000] hover:bg-[#00CC00]'
+                      ? 'text-[#000080]'
                       : ''
-                  }>
-                    {is90sStyle ? '🚀 Read More 🚀' : 'Read More'}
-                  </Button>
-                </Link>
-              </div>
-            </Card>
-          ))}
-        </div>
+                  }`}>{post.title}</h2>
+                  <p className={`text-sm ${
+                    is90sStyle
+                      ? 'text-[#000080]'
+                      : 'text-muted-foreground'
+                  }`}>
+                    {new Date(post.created_at).toLocaleDateString()}
+                  </p>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   )
