@@ -15,17 +15,27 @@ async function isAdmin(supabase: ReturnType<typeof createRouteHandlerClient<Data
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   
   if (sessionError || !session?.user) {
+    console.error('No session in isAdmin check:', { sessionError });
     return false;
   }
 
-  // Check admin status in public.users table
-  const { data: user, error: userError } = await supabase
+  console.log('Checking admin status for user:', {
+    userId: session.user.id,
+    userEmail: session.user.email,
+    adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL
+  });
+
+  // Check admin status in public.users table using service role
+  const { data: user, error: userError } = await supabaseAdmin
     .from('users')
     .select('admin')
     .eq('id', session.user.id)
     .single();
 
+  console.log('Admin check result:', { user, error: userError });
+
   if (userError || !user) {
+    console.error('Error checking admin status:', userError);
     return false;
   }
 
