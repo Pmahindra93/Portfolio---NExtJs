@@ -1,16 +1,9 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { Database } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
-
-// Create a Supabase client with the service role
-const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
@@ -30,33 +23,48 @@ export async function GET(request: Request) {
       }
 
       if (session?.user?.email) {
+        const isAdmin = session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+
         console.log('Session user:', {
           id: session.user.id,
           email: session.user.email,
-          adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL
+          adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+          isAdmin
         })
 
-        // Upsert user record in public.users table using service role
-        const { error: upsertError } = await supabaseAdmin
+        // First try to update if the user exists
+        const { error: updateError } = await supabase
           .from('users')
-          .upsert({
-            id: session.user.id,
+          .update({ 
             email: session.user.email,
-            admin: session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-          } satisfies Database['public']['Tables']['users']['Insert'])
+            admin: isAdmin
+          })
+          .eq('id', session.user.id)
 
-        if (upsertError) {
-          console.error('Error upserting user:', upsertError)
+        if (updateError?.code === 'PGRST116') { // Record not found
+          // If update fails because user doesn't exist, insert new user
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              admin: isAdmin
+            })
+
+          if (insertError) {
+            console.error('Error inserting user:', insertError)
+          }
+        } else if (updateError) {
+          console.error('Error updating user:', updateError)
         }
       }
+
+      return NextResponse.redirect(new URL(next, requestUrl))
     }
 
-    // URL to redirect to after sign in process completes
-    return NextResponse.redirect(requestUrl.origin + next)
+    return NextResponse.redirect(new URL('/', requestUrl))
   } catch (error) {
-    console.error('Auth callback error:', error)
-    return NextResponse.redirect(
-      requestUrl.origin + '/auth/auth-code-error'
-    )
+    console.error('Error in auth callback:', error)
+    return NextResponse.redirect(new URL('/', requestUrl))
   }
 }
