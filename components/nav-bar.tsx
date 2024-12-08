@@ -20,22 +20,15 @@ export function NavBar({ className }: { className?: string }) {
   const handleAdminAccess = async () => {
     try {
       if (isAdmin) {
-        router.push('/admin/posts/new')
+        router.push('/blog/new')
         return
       }
-
-      const redirectUrl = `${window.location.origin}/auth/callback`
-      console.log('Starting GitHub auth flow...', { redirectUrl })
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: `${window.location.origin}/auth/callback`,
           scopes: 'user:email',
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          }
         }
       })
 
@@ -43,34 +36,28 @@ export function NavBar({ className }: { className?: string }) {
         console.error('GitHub auth error:', error)
         toast({
           title: "Authentication Error",
-          description: `Failed to sign in with GitHub: ${error.message}`,
+          description: error.message,
           variant: "destructive"
         })
         return
       }
 
-      if (!data) {
-        console.error('No data returned from GitHub auth')
+      if (!data.url) {
+        console.error('No auth URL returned')
         toast({
           title: "Authentication Error",
-          description: "No response from GitHub authentication",
+          description: "Failed to start authentication process",
           variant: "destructive"
         })
         return
       }
 
-      console.log('GitHub auth successful, data:', data)
-      toast({
-        title: "Authentication Started",
-        description: "Redirecting to GitHub...",
-        duration: 2000
-      })
-
+      window.location.href = data.url
     } catch (error) {
-      console.error('Unexpected error during GitHub auth:', error)
+      console.error('Admin access error:', error)
       toast({
         title: "Error",
-        description: "An unexpected error occurred during authentication",
+        description: "Failed to access admin features",
         variant: "destructive"
       })
     }
@@ -129,7 +116,7 @@ export function NavBar({ className }: { className?: string }) {
                 : "bg-black text-white border border-white/20 hover:bg-black/80 hover:border-white/40"
             )}
           >
-            {isLoading ? "Loading..." : isAdmin ? "New Post" : "Admin Sign In"}
+            {isLoading ? "Loading..." : isAdmin ? "New Post" : "Admin"}
           </Button>
         </div>
       </div>

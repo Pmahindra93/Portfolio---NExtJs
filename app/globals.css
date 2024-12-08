@@ -67,7 +67,7 @@
 }
 
 [data-theme="90s"] button {
-  background: yellow !important;
+  background: #1e40af !important;
   border: 3px solid black !important;
   box-shadow: 3px 3px 0 black !important;
   font-weight: bold !important;

@@ -6,32 +6,31 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req, res })
 
-  // Refresh session if expired - required for Server Components
-  await supabase.auth.getSession()
+  // Refresh session if expired
+  const { data: { session } } = await supabase.auth.getSession()
 
-  // Skip auth check for callback route
-  if (req.nextUrl.pathname.startsWith('/auth/callback')) {
+  // Allow access to auth-related routes
+  if (req.nextUrl.pathname.startsWith('/auth')) {
     return res
   }
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  // Protected routes that require authentication
+  const protectedPaths = ['/blog/new', '/admin']
+  const isProtectedPath = protectedPaths.some(path => 
+    req.nextUrl.pathname.startsWith(path)
+  )
 
-  // Check if we're on an admin route
-  if (req.nextUrl.pathname.startsWith('/admin')) {
+  if (isProtectedPath) {
     if (!session) {
-      return NextResponse.redirect(new URL('/auth/signin', req.url))
+      // Redirect to sign in page
+      const redirectUrl = req.nextUrl.clone()
+      redirectUrl.pathname = '/auth/signin'
+      redirectUrl.searchParams.set('next', req.nextUrl.pathname)
+      return NextResponse.redirect(redirectUrl)
     }
 
-    // Check if user is admin
-    const { data: userData } = await supabase
-      .from('auth.users')
-      .select('admin')
-      .eq('id', session.user.id)
-      .single()
-
-    if (!userData?.admin) {
+    // Check if user is admin for admin routes
+    if (session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
       return NextResponse.redirect(new URL('/', req.url))
     }
   }
@@ -40,5 +39,9 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/auth/callback']
+  matcher: [
+    '/blog/new',
+    '/admin/:path*',
+    '/auth/:path*'
+  ]
 }

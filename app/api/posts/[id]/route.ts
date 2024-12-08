@@ -1,17 +1,17 @@
 // app/api/posts/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { Post, UpdatePostInput } from '@/types/post'
 import { cookies } from 'next/headers'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse<Post | { error: string }>> {
   try {
+    const supabase = createClient()
     const { data: post, error } = await supabase
       .from('posts')
       .select('*, author:users(email)')
@@ -37,11 +37,11 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse<Post | { error: string }>> {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {
@@ -95,11 +95,11 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ): Promise<NextResponse> {
   try {
-    const supabase = createRouteHandlerClient({ cookies })
+    const supabase = createClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {

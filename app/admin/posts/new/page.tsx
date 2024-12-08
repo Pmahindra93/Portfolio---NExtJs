@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { Card } from '@/components/ui/card'
 import { ImageUpload } from '@/components/ImageUpload'
-import { RichTextEditor } from '@/components/RichTextEditor'
+import RichTextEditor from '@/components/RichTextEditor'
 
 export default function NewPostPage() {
   const router = useRouter()

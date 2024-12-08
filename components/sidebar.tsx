@@ -1,11 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useTheme } from "@/lib/hooks/useTheme"
 import { useAdmin } from "@/lib/hooks/useAdmin"
+import { supabase } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
 import {
   LayoutDashboard,
   Home,
@@ -16,7 +18,8 @@ import {
   Sun,
   Moon,
   MessageSquare,
-  FolderKanban
+  FolderKanban,
+  LogOut
 } from "lucide-react"
 
 interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -25,8 +28,31 @@ interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
+  const { toast } = useToast()
   const { is90sStyle, isDarkMode, toggleDarkMode } = useTheme()
   const { isAdmin } = useAdmin()
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) {
+        throw error
+      }
+      toast({
+        title: "Signed out successfully",
+        description: "You have been signed out of your account",
+      })
+      router.refresh()
+    } catch (error) {
+      console.error('Sign out error:', error)
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive"
+      })
+    }
+  }
 
   const modernMenuItems = [
     {
@@ -123,19 +149,33 @@ export function Sidebar({ className }: SidebarProps) {
 
           {isAdmin && (
             <div className="p-3 border-t-4 border-[#000000]">
-              <Link href="/admin/posts/new">
-                <div
+              <div className="space-y-2">
+                <Button
+                  onClick={handleSignOut}
                   className={cn(
                     "w-full flex items-center gap-2 px-3 py-2 font-bold",
-                    "bg-[#00FF00] text-[#000000] border-2 border-[#000000] hover:bg-[#00CC00] font-['Comic_Sans_MS',_cursive]",
+                    "bg-[#FF0000] text-[#FFFFFF] border-2 border-[#000000] hover:bg-[#CC0000] font-['Comic_Sans_MS',_cursive]",
                     "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
                     "active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]"
                   )}
                 >
-                  <PenSquare className="h-4 w-4 text-[#000000] flex-shrink-0" />
-                  <span className="truncate">✍️ New Post ✍️</span>
-                </div>
-              </Link>
+                  <LogOut className="h-4 w-4 text-[#FFFFFF] flex-shrink-0" />
+                  <span className="truncate">Sign Out</span>
+                </Button>
+                <Link href="/admin/posts/new">
+                  <div
+                    className={cn(
+                      "w-full flex items-center gap-2 px-3 py-2 font-bold",
+                      "bg-[#00FF00] text-[#000000] border-2 border-[#000000] hover:bg-[#00CC00] font-['Comic_Sans_MS',_cursive]",
+                      "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+                      "active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px]"
+                    )}
+                  >
+                    <PenSquare className="h-4 w-4 text-[#000000] flex-shrink-0" />
+                    <span className="truncate">✍️ New Post ✍️</span>
+                  </div>
+                </Link>
+              </div>
             </div>
           )}
         </div>
@@ -173,8 +213,18 @@ export function Sidebar({ className }: SidebarProps) {
             </div>
           </div>
         </div>
-        
-        <div className="px-3 py-4 border-t border-slate-200 dark:border-slate-800">
+
+        <div className="px-3 py-2 border-t border-slate-200 dark:border-slate-800">
+          {isAdmin && (
+            <Button
+              onClick={handleSignOut}
+              variant="outline"
+              className="w-full mb-2 justify-start"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          )}
           <div className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-800 p-2">
             <Button
               variant="ghost"

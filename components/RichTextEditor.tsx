@@ -30,9 +30,10 @@ const modules = {
 interface RichTextEditorProps {
   value: string
   onChange: (value: string) => void
+  className?: string
 }
 
-export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
+export default function RichTextEditor({ value, onChange, className }: RichTextEditorProps) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   }
 
   return (
-    <div className="bg-background">
+    <div className={`bg-background ${className}`}>
       <QuillEditor
         theme="snow"
         value={value}
