@@ -15,17 +15,25 @@ export default function BlogPost({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchPost() {
       try {
+        console.log('Fetching post:', params.id);
         const { data, error } = await supabase
           .from('posts')
           .select('*, author:users(email)')
           .eq('id', params.id)
+          .eq('published', true)
           .single() as { 
             data: (Post & { author: { email: string } }) | null; 
             error: any 
           }
 
-        if (error || !data) {
+        if (error) {
           console.error('Error fetching post:', error)
+          notFound()
+          return
+        }
+
+        if (!data) {
+          console.error('Post not found or not published')
           notFound()
           return
         }
