@@ -44,29 +44,21 @@ export async function POST(req: Request) {
       adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL
     });
 
-    // Check if user exists in public.users
-    const { data: existingUser, error: userError } = await supabase
-      .from('users')
-      .select('id, email, admin')
-      .eq('id', session.user.id)
-      .single();
-
-    console.log('User check:', { existingUser, error: userError });
-
-    // If user doesn't exist, create them
-    if (!existingUser && session.user.email) {
-      console.log('Creating user record...');
-      const { error: insertError } = await supabase
+    // Upsert user record
+    if (session.user.email) {
+      console.log('Upserting user record...');
+      const { error: upsertError } = await supabase
         .from('users')
-        .insert({
+        .upsert({
           id: session.user.id,
           email: session.user.email,
           admin: session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-        } satisfies Database['public']['Tables']['users']['Insert']);
+        } satisfies Database['public']['Tables']['users']['Insert'],
+        { onConflict: 'id' });
 
-      if (insertError) {
-        console.error('Error creating user:', insertError);
-        return new NextResponse("Error creating user", { status: 500 });
+      if (upsertError) {
+        console.error('Error upserting user:', upsertError);
+        return new NextResponse("Error creating/updating user", { status: 500 });
       }
     }
 

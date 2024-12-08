@@ -1,6 +1,7 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { Database } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +13,7 @@ export async function GET(request: Request) {
 
     if (code) {
       const cookieStore = cookies()
-      const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+      const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
       
       const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
       
@@ -28,47 +29,27 @@ export async function GET(request: Request) {
           adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL
         })
 
-        // First check if user exists
-        const { data: existingUser, error: checkError } = await supabase
-          .from('auth.users')
-          .select('id, email, admin')
-          .eq('id', session.user.id)
-          .single()
-
-        console.log('Existing user check:', { existingUser, error: checkError })
-
-        // Try to create user directly in auth.users
-        const { error: insertError } = await supabase
-          .from('auth.users')
+        // Upsert user record in public.users table
+        const { error: upsertError } = await supabase
+          .from('users')
           .upsert({
             id: session.user.id,
             email: session.user.email,
             admin: session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
           })
-          .select()
-          .single()
 
-        if (insertError) {
-          console.error('Error creating user:', insertError)
-          throw insertError
+        if (upsertError) {
+          console.error('Error upserting user:', upsertError)
         }
-
-        // Verify user was created
-        const { data: verifyUser, error: verifyError } = await supabase
-          .from('auth.users')
-          .select('id, email, admin')
-          .eq('id', session.user.id)
-          .single()
-
-        console.log('Verify user:', { verifyUser, error: verifyError })
       }
     }
 
-    return NextResponse.redirect(new URL(next, requestUrl.origin))
+    // URL to redirect to after sign in process completes
+    return NextResponse.redirect(requestUrl.origin + next)
   } catch (error) {
-    console.error('Callback error:', error)
+    console.error('Auth callback error:', error)
     return NextResponse.redirect(
-      new URL('/auth/signin?error=Unexpected error during sign in', request.url)
+      requestUrl.origin + '/auth/auth-code-error'
     )
   }
 }
