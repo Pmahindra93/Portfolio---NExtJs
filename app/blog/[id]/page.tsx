@@ -16,35 +16,51 @@ export default function BlogPost({ params }: { params: { id: string } }) {
     async function fetchPost() {
       try {
         console.log('Fetching post:', params.id);
-        const { data, error } = await supabase
+        // First fetch the post
+        const { data: postData, error: postError } = await supabase
           .from('posts')
-          .select('*, author:users(email)')
+          .select('*')
           .eq('id', params.id)
           .eq('published', true)
-          .single() as { 
-            data: (Post & { author: { email: string } }) | null; 
-            error: any 
-          }
+          .single();
 
-        if (error) {
-          console.error('Error fetching post:', error)
-          notFound()
-          return
+        if (postError) {
+          console.error('Error fetching post:', postError);
+          notFound();
+          return;
         }
 
-        if (!data) {
-          console.error('Post not found or not published')
-          notFound()
-          return
+        if (!postData) {
+          console.error('Post not found or not published');
+          notFound();
+          return;
         }
 
-        console.log('Post fetched:', data)
-        setPost(data)
+        // Then fetch the author
+        const { data: authorData, error: authorError } = await supabase
+          .from('users')
+          .select('id, email')
+          .eq('id', postData.author_id)
+          .single();
+
+        if (authorError) {
+          console.error('Error fetching author:', authorError);
+          // Don't return here, we can still show the post without author
+        }
+
+        // Combine post with author data
+        const postWithAuthor = {
+          ...postData,
+          author: authorError ? null : authorData
+        };
+
+        console.log('Post fetched:', postWithAuthor);
+        setPost(postWithAuthor);
       } catch (error) {
-        console.error('Exception while fetching post:', error)
-        notFound()
+        console.error('Exception while fetching post:', error);
+        notFound();
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 

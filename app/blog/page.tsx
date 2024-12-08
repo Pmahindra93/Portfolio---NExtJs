@@ -16,22 +16,47 @@ export default function BlogPage() {
     async function fetchPosts() {
       try {
         console.log('Fetching posts...');
-        const { data, error } = await supabase
+        // First fetch posts
+        const { data: postsData, error: postsError } = await supabase
           .from('posts')
-          .select('*, author:users(email)')
+          .select('*')
           .eq('published', true)
-          .order('created_at', { ascending: false }) as {
-            data: Post[] | null;
-            error: any;
-          };
+          .order('created_at', { ascending: false });
 
-        if (error) {
-          console.error('Error fetching posts:', error);
+        if (postsError) {
+          console.error('Error fetching posts:', postsError);
           return;
         }
 
-        console.log('Posts fetched:', data);
-        setPosts(data || []);
+        if (!postsData) {
+          console.log('No posts found');
+          setPosts([]);
+          return;
+        }
+
+        // Then fetch authors for these posts
+        const authorIds = [...new Set(postsData.map(post => post.author_id))];
+        const { data: authorsData, error: authorsError } = await supabase
+          .from('users')
+          .select('id, email')
+          .in('id', authorIds);
+
+        if (authorsError) {
+          console.error('Error fetching authors:', authorsError);
+          return;
+        }
+
+        // Create an author lookup map
+        const authorMap = new Map(authorsData?.map(author => [author.id, author]) || []);
+
+        // Combine posts with author data
+        const postsWithAuthors = postsData.map(post => ({
+          ...post,
+          author: authorMap.get(post.author_id)
+        }));
+
+        console.log('Posts fetched:', postsWithAuthors);
+        setPosts(postsWithAuthors);
       } catch (error) {
         console.error('Exception while fetching posts:', error);
       }
