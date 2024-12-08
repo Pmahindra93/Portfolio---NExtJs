@@ -1,9 +1,16 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { Database } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
+
+// Create a Supabase client with the service role
+const supabaseAdmin = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function GET(request: Request) {
   try {
@@ -29,8 +36,8 @@ export async function GET(request: Request) {
           adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL
         })
 
-        // Upsert user record in public.users table
-        const { error: upsertError } = await supabase
+        // Upsert user record in public.users table using service role
+        const { error: upsertError } = await supabaseAdmin
           .from('users')
           .upsert({
             id: session.user.id,

@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server";
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { Database } from '@/lib/database.types';
+
+// Create a Supabase client with the service role
+const supabaseAdmin = createClient<Database>(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 // Helper function to check if user is admin
 async function isAdmin(supabase: ReturnType<typeof createRouteHandlerClient<Database>>) {
@@ -44,10 +51,10 @@ export async function POST(req: Request) {
       adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL
     });
 
-    // Upsert user record
+    // Upsert user record using service role client
     if (session.user.email) {
       console.log('Upserting user record...');
-      const { error: upsertError } = await supabase
+      const { error: upsertError } = await supabaseAdmin
         .from('users')
         .upsert({
           id: session.user.id,
