@@ -17,19 +17,20 @@ export default function BlogPost({ params }: { params: { id: string } }) {
       try {
         const { data, error } = await supabase
           .from('posts')
-          .select('*, author:auth.users(email)')
+          .select('*, author:users(email)')
           .eq('id', params.id)
           .single() as { 
             data: (Post & { author: { email: string } }) | null; 
             error: any 
           }
 
-        if (error) {
+        if (error || !data) {
           console.error('Error fetching post:', error)
           notFound()
           return
         }
 
+        console.log('Post fetched:', data)
         setPost(data)
       } catch (error) {
         console.error('Exception while fetching post:', error)
@@ -50,15 +51,7 @@ export default function BlogPost({ params }: { params: { id: string } }) {
           : 'bg-background text-foreground'
       }`}>
         <div className="max-w-4xl mx-auto">
-          <Card className="p-6 animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-8"></div>
-            <div className="space-y-4">
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-            </div>
-          </Card>
+          <p>Loading...</p>
         </div>
       </main>
     )
@@ -74,35 +67,33 @@ export default function BlogPost({ params }: { params: { id: string } }) {
         ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]'
         : 'bg-background text-foreground'
     }`}>
-      <div className="max-w-4xl mx-auto">
-        <Card className={`p-6 ${
-          is90sStyle ? 'border-4 border-[#FF00FF]' : ''
+      <article className="max-w-4xl mx-auto">
+        <Card className={`p-8 ${
+          is90sStyle
+            ? 'bg-[#FFFFFF] border-[#808080] border-2'
+            : ''
         }`}>
-          <h1 className={`text-3xl font-bold mb-2 ${
-            is90sStyle ? 'text-[#FF0000]' : ''
+          <h1 className={`text-3xl font-bold mb-4 ${
+            is90sStyle
+              ? 'text-[#000080]'
+              : ''
+          }`}>{post.title}</h1>
+          <div className={`mb-8 ${
+            is90sStyle
+              ? 'text-[#000080]'
+              : 'text-muted-foreground'
           }`}>
-            {post.title}
-          </h1>
-          <div className={`flex items-center gap-2 mb-8 text-sm ${
-            is90sStyle ? 'text-[#0000FF]' : 'text-muted-foreground'
-          }`}>
-            <span>
-              {new Date(post.created_at).toLocaleDateString()}
-            </span>
-            {post.author && (
-              <>
-                <span>•</span>
-                <span>By {(post.author as any).email}</span>
-              </>
-            )}
+            <p className="text-sm">
+              By {post.author?.email || 'Unknown'} on {new Date(post.created_at).toLocaleDateString()}
+            </p>
           </div>
           <div className={`prose max-w-none ${
-            is90sStyle ? 'text-[#000080]' : ''
-          }`}>
-            {post.content}
-          </div>
+            is90sStyle
+              ? 'text-[#000080]'
+              : 'prose-neutral dark:prose-invert'
+          }`} dangerouslySetInnerHTML={{ __html: post.content }} />
         </Card>
-      </div>
+      </article>
     </main>
   )
 }
