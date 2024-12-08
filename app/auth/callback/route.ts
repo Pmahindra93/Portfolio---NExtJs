@@ -13,8 +13,8 @@ const supabaseAdmin = createClient<Database>(
 );
 
 export async function GET(request: Request) {
+  const requestUrl = new URL(request.url)
   try {
-    const requestUrl = new URL(request.url)
     const code = requestUrl.searchParams.get('code')
     const next = requestUrl.searchParams.get('next') || '/'
 
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
         throw sessionError
       }
 
-      if (session?.user) {
+      if (session?.user?.email) {
         console.log('Session user:', {
           id: session.user.id,
           email: session.user.email,
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
             id: session.user.id,
             email: session.user.email,
             admin: session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-          })
+          } satisfies Database['public']['Tables']['users']['Insert'])
 
         if (upsertError) {
           console.error('Error upserting user:', upsertError)
