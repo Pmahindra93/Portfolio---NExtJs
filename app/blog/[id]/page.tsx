@@ -15,10 +15,14 @@ export default function BlogPost({ params }: { params: { id: string } }) {
   useEffect(() => {
     async function fetchPost() {
       try {
+        setLoading(true)
+        console.log('Fetching post:', params.id)
+        
         const { data, error } = await supabase
           .from('posts')
           .select('*')
           .eq('id', params.id)
+          .eq('published', true)
           .single()
 
         if (error) {
@@ -27,6 +31,13 @@ export default function BlogPost({ params }: { params: { id: string } }) {
           return
         }
 
+        if (!data) {
+          console.error('Post not found or not published')
+          notFound()
+          return
+        }
+
+        console.log('Post fetched:', data)
         setPost(data)
       } catch (error) {
         console.error('Exception while fetching post:', error)
@@ -47,22 +58,14 @@ export default function BlogPost({ params }: { params: { id: string } }) {
           : 'bg-background text-foreground'
       }`}>
         <div className="max-w-4xl mx-auto">
-          <Card className="p-6 animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded"></div>
-              <div className="h-4 bg-gray-200 rounded"></div>
-            </div>
-          </Card>
+          <p>Loading post...</p>
         </div>
       </main>
     )
   }
 
   if (!post) {
-    notFound()
-    return null
+    return notFound()
   }
 
   return (
@@ -71,31 +74,33 @@ export default function BlogPost({ params }: { params: { id: string } }) {
         ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]'
         : 'bg-background text-foreground'
     }`}>
-      <div className="max-w-4xl mx-auto">
-        <Card className={`p-6 ${
+      <article className="max-w-4xl mx-auto">
+        <Card className={`p-8 ${
           is90sStyle
-            ? 'bg-[#FFFFFF] border-4 border-[#000000]'
-            : 'bg-card'
+            ? 'bg-[#FFFFFF] border-[#808080] border-2'
+            : ''
         }`}>
           <h1 className={`text-3xl font-bold mb-4 ${
-            is90sStyle ? 'text-[#0000FF]' : 'text-primary'
+            is90sStyle
+              ? 'text-[#000080]'
+              : ''
+          }`}>{post.title}</h1>
+          <div className={`mb-8 ${
+            is90sStyle
+              ? 'text-[#000080]'
+              : 'text-muted-foreground'
           }`}>
-            {post.title}
-          </h1>
-          <div className="mb-6">
-            <span className={`text-sm ${
-              is90sStyle ? 'text-[#000080]' : 'text-muted-foreground'
-            }`}>
+            <p className="text-sm">
               {new Date(post.created_at).toLocaleDateString()}
-            </span>
+            </p>
           </div>
           <div className={`prose max-w-none ${
-            is90sStyle ? 'text-[#000080]' : 'text-foreground'
-          }`}>
-            {post.content}
-          </div>
+            is90sStyle
+              ? 'text-[#000080]'
+              : 'prose-neutral dark:prose-invert'
+          }`} dangerouslySetInnerHTML={{ __html: post.content }} />
         </Card>
-      </div>
+      </article>
     </main>
   )
 }

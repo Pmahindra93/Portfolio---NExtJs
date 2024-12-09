@@ -7,6 +7,9 @@ export interface Post {
   updated_at: string;
   author_id: string;
   cover_image?: string;
+  author?: {
+    email: string;
+  };
 }
 
 export interface CreatePostInput {

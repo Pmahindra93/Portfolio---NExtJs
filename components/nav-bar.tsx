@@ -11,8 +11,8 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 
-export function NavBar() {
-  const { is90sStyle, toggleStyle } = useTheme()
+export function NavBar({ className }: { className?: string }) {
+  const { is90sStyle, toggle90sStyle } = useTheme()
   const { isAdmin, isLoading } = useAdmin()
   const router = useRouter()
   const { toast } = useToast()
@@ -20,22 +20,15 @@ export function NavBar() {
   const handleAdminAccess = async () => {
     try {
       if (isAdmin) {
-        router.push('/admin/posts/new')
+        router.push('/blog/new')
         return
       }
-
-      const redirectUrl = `${window.location.origin}/auth/callback`
-      console.log('Starting GitHub auth flow...', { redirectUrl })
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
-          redirectTo: redirectUrl,
+          redirectTo: `${window.location.origin}/auth/callback`,
           scopes: 'user:email',
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent'
-          }
         }
       })
 
@@ -43,34 +36,28 @@ export function NavBar() {
         console.error('GitHub auth error:', error)
         toast({
           title: "Authentication Error",
-          description: `Failed to sign in with GitHub: ${error.message}`,
+          description: error.message,
           variant: "destructive"
         })
         return
       }
 
-      if (!data) {
-        console.error('No data returned from GitHub auth')
+      if (!data.url) {
+        console.error('No auth URL returned')
         toast({
           title: "Authentication Error",
-          description: "No response from GitHub authentication",
+          description: "Failed to start authentication process",
           variant: "destructive"
         })
         return
       }
 
-      console.log('GitHub auth successful, data:', data)
-      toast({
-        title: "Authentication Started",
-        description: "Redirecting to GitHub...",
-        duration: 2000
-      })
-
+      window.location.href = data.url
     } catch (error) {
-      console.error('Unexpected error during GitHub auth:', error)
+      console.error('Admin access error:', error)
       toast({
         title: "Error",
-        description: "An unexpected error occurred during authentication",
+        description: "Failed to access admin features",
         variant: "destructive"
       })
     }
@@ -82,7 +69,8 @@ export function NavBar() {
         'fixed top-0 left-0 right-0 z-50 border-b h-16 flex items-center w-screen',
         is90sStyle
           ? 'bg-[#000080] text-[#FFFF00] border-[#000000] border-4 border-x-0 border-t-0'
-          : 'bg-primary text-primary-foreground'
+          : 'bg-primary text-primary-foreground',
+        className
       )}
     >
       <div className="w-full px-4 flex justify-between items-center">
@@ -107,12 +95,12 @@ export function NavBar() {
             <Label htmlFor="style-toggle" className="text-sm font-medium">
               Website Style:
             </Label>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <span className={`text-sm ${is90sStyle ? 'font-bold' : ''}`}>90s</span>
               <Switch
                 id="style-toggle"
                 checked={!is90sStyle}
-                onCheckedChange={toggleStyle}
+                onCheckedChange={toggle90sStyle}
                 aria-label="Toggle between 90s and modern style"
               />
               <span className={`text-sm ${!is90sStyle ? 'font-bold' : ''}`}>Modern</span>
@@ -128,7 +116,7 @@ export function NavBar() {
                 : "bg-black text-white border border-white/20 hover:bg-black/80 hover:border-white/40"
             )}
           >
-            {isLoading ? "Loading..." : isAdmin ? "New Post" : "Admin Sign In"}
+            {isLoading ? "Loading..." : isAdmin ? "New Post" : "Admin"}
           </Button>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { ThemeProvider } from '@/lib/contexts/ThemeContext'
+import { ThemeProvider } from '@/lib/hooks/useTheme'
 import { Toaster } from '@/components/ui/toaster'
 
 interface ProvidersProps {

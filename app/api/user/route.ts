@@ -12,8 +12,16 @@ export async function GET() {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
+  // Get admin status from auth.users
+  const { data: userData } = await supabase
+    .from('auth.users')
+    .select('admin')
+    .eq('id', user.id)
+    .single()
+
   return NextResponse.json({ 
     id: user.id,
-    email: user.email
+    email: user.email,
+    admin: userData?.admin ?? false
   })
 }
