@@ -1,70 +1,70 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { Database } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
+  const requestUrl = new URL(request.url)
   try {
-    const requestUrl = new URL(request.url)
     const code = requestUrl.searchParams.get('code')
-    const error = requestUrl.searchParams.get('error')
-    const error_description = requestUrl.searchParams.get('error_description')
+    const next = requestUrl.searchParams.get('next') || '/'
 
-    console.log('Auth callback received:', {
-      code: code ? 'present' : 'missing',
-      error,
-      error_description,
-      url: requestUrl.toString()
-    })
+    if (code) {
+      const cookieStore = cookies()
+      const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
+      
+      const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError)
+        throw sessionError
+      }
 
-    // Handle OAuth errors
-    if (error) {
-      console.error('OAuth error:', error, error_description)
-      return NextResponse.redirect(`${requestUrl.origin}?error=${encodeURIComponent(error_description || error)}`)
+      if (session?.user?.email) {
+        const isAdmin = session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+
+        console.log('Session user:', {
+          id: session.user.id,
+          email: session.user.email,
+          adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+          isAdmin
+        })
+
+        // First try to update if the user exists
+        const { error: updateError } = await supabase
+          .from('users')
+          .update({ 
+            email: session.user.email,
+            admin: isAdmin
+          })
+          .eq('id', session.user.id)
+
+        if (updateError?.code === 'PGRST116') { // Record not found
+          // If update fails because user doesn't exist, insert new user
+          const { error: insertError } = await supabase
+            .from('users')
+            .insert({
+              id: session.user.id,
+              email: session.user.email,
+              admin: isAdmin
+            })
+
+          if (insertError) {
+            console.error('Error inserting user:', insertError)
+          }
+        } else if (updateError) {
+          console.error('Error updating user:', updateError)
+        }
+      }
+
+      return NextResponse.redirect(new URL(next, requestUrl))
     }
 
-    if (!code) {
-      console.error('No code provided in callback')
-      return NextResponse.redirect(`${requestUrl.origin}?error=No authorization code provided`)
-    }
-
-    const cookieStore = cookies()
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-
-    // Exchange the code for a session
-    const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
-
-    if (sessionError) {
-      console.error('Session error:', sessionError)
-      return NextResponse.redirect(`${requestUrl.origin}?error=${encodeURIComponent(sessionError.message)}`)
-    }
-
-    // Get the user's session
-    const { data: { session }, error: getSessionError } = await supabase.auth.getSession()
-
-    if (getSessionError) {
-      console.error('Get session error:', getSessionError)
-      return NextResponse.redirect(`${requestUrl.origin}?error=${encodeURIComponent(getSessionError.message)}`)
-    }
-
-    if (!session) {
-      console.error('No session after successful code exchange')
-      return NextResponse.redirect(`${requestUrl.origin}?error=Failed to create session`)
-    }
-
-    // Check if the user is an admin
-    if (session.user?.email === process.env.ADMIN_EMAIL) {
-      console.log('Admin login successful:', session.user.email)
-      return NextResponse.redirect(`${requestUrl.origin}/admin/posts/new`)
-    }
-
-    console.log('Non-admin login:', session.user?.email)
-    return NextResponse.redirect(requestUrl.origin)
-
+    return NextResponse.redirect(new URL('/', requestUrl))
   } catch (error) {
-    console.error('Unexpected error in callback:', error)
-    const requestUrl = new URL(request.url)
-    return NextResponse.redirect(`${requestUrl.origin}?error=An unexpected error occurred`)
+    console.error('Error in auth callback:', error)
+    return NextResponse.redirect(new URL('/', requestUrl))
   }
 }
