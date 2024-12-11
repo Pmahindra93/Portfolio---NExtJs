@@ -66,9 +66,9 @@ export function Sidebar({ className }: SidebarProps) {
       icon: BookOpen,
     },
     {
-      title: "Profile",
-      href: "/profile",
-      icon: User2,
+      title: "Get in touch",
+      href: "mailto:prateekmahindra9@gmail.com",
+      icon: MessageSquare,
     },
   ]
 
@@ -79,17 +79,12 @@ export function Sidebar({ className }: SidebarProps) {
       icon: Home,
     },
     {
-      title: "Projects",
-      href: "#projects",
-      icon: FolderKanban,
-    },
-    {
       title: "Blog",
       href: "/blog",
       icon: BookOpen,
     },
     {
-      title: "Guestbook",
+      title: "Get in touch",
       href: "mailto:prateekmahindra9@gmail.com",
       icon: MessageSquare,
     },

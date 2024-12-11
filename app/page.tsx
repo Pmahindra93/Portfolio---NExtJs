@@ -101,7 +101,7 @@ export default function LandingPage() {
       <ThemeToggle />
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">Welcome to My Portfolio</h1>
+          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white"></h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
             A showcase of my journey, projects, and thoughts.
           </p>
@@ -110,6 +110,21 @@ export default function LandingPage() {
         <section className="mb-16">
           <h2 className="text-2xl font-bold mb-8 text-slate-900 dark:text-white">My Journey</h2>
           <Timeline />
+        </section>
+
+        <section className="mb-16">
+          <h2 className="text-2xl font-bold mb-8 text-slate-900 dark:text-white">Featured Projects</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="relative h-48 rounded-lg overflow-hidden">
+              <div className="h-full w-full bg-slate-200 dark:bg-slate-700"></div>
+            </div>
+            <div className="relative h-48 rounded-lg overflow-hidden">
+              <div className="h-full w-full bg-slate-200 dark:bg-slate-700"></div>
+            </div>
+            <div className="relative h-48 rounded-lg overflow-hidden">
+              <div className="h-full w-full bg-slate-200 dark:bg-slate-700"></div>
+            </div>
+          </div>
         </section>
 
         <section className="mb-16">
