@@ -92,7 +92,7 @@ export function NavBar({ className }: { className?: string }) {
 
         <div className="flex items-center space-x-6">
           <div className="flex items-center space-x-2">
-            <Label htmlFor="style-toggle" className="text-sm font-medium">
+            <Label htmlFor="style-toggle" className="hidden md:inline-block text-sm font-medium">
               Website Style:
             </Label>
             <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ export function NavBar({ className }: { className?: string }) {
             onClick={handleAdminAccess}
             variant={is90sStyle ? "secondary" : "default"}
             className={cn(
-              "text-sm font-medium transition-all",
+              "hidden md:inline-flex text-sm font-medium transition-all",
               is90sStyle
                 ? "border-2 border-[#FFFF00] bg-[#000080] text-[#FFFF00] hover:bg-[#000080]/90"
                 : "bg-black text-white border border-white/20 hover:bg-black/80 hover:border-white/40"
