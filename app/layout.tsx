@@ -25,11 +25,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" suppressHydrationWarning className="light">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
+    <html lang="en" suppressHydrationWarning>
       <body className={cn(
         "min-h-screen antialiased transition-colors",
         "bg-background text-foreground",

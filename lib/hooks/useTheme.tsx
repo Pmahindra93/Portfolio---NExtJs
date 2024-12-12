@@ -2,6 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 
+type Theme = 'dark' | 'light'
+
 interface ThemeContextType {
   isDarkMode: boolean
   is90sStyle: boolean
@@ -21,26 +23,27 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
+  const [theme, setTheme] = useState<Theme>('light')
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [is90sStyle, setIs90sStyle] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   // Update the theme
   const updateTheme = (darkMode: boolean, style90s: boolean) => {
-    // Handle dark mode
-    if (darkMode) {
-      document.documentElement.classList.remove('light')
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      document.documentElement.classList.add('light')
-    }
+    const root = document.documentElement
+    const theme = darkMode ? 'dark' : 'light'
+    
+    // Remove both classes first
+    root.classList.remove('light', 'dark')
+    // Add the appropriate class
+    root.classList.add(theme)
+    setTheme(theme)
 
     // Handle 90s style
     if (style90s) {
-      document.documentElement.setAttribute('data-theme', '90s')
+      root.setAttribute('data-theme', '90s')
     } else {
-      document.documentElement.removeAttribute('data-theme')
+      root.removeAttribute('data-theme')
     }
   }
 
@@ -81,25 +84,28 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     })
   }
 
+  // Prevent flash of wrong theme while loading
   if (!mounted) {
-    return null
+    return <div style={{ visibility: 'hidden' }}>{children}</div>
   }
 
   return (
-    <ThemeContext.Provider value={{
-      isDarkMode,
-      is90sStyle,
-      toggleDarkMode,
-      toggle90sStyle,
-    }}>
+    <ThemeContext.Provider 
+      value={{
+        isDarkMode,
+        is90sStyle,
+        toggleDarkMode,
+        toggle90sStyle,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   )
 }
 
-export function useTheme() {
+export const useTheme = () => {
   const context = useContext(ThemeContext)
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useTheme must be used within a ThemeProvider')
   }
   return context

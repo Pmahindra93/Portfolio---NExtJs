@@ -98,7 +98,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900">
-      <ThemeToggle />
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
           <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white"></h1>
