@@ -47,9 +47,9 @@ export default function LandingPage() {
 
   if (is90sStyle) {
     return (
-      <div className="min-h-screen bg-[#C0C0C0] text-[#000080] font-['Comic_Sans_MS',_cursive]">
-        <main className="md:pl-[9rem] pt-16 bg-[#C0C0C0]">
-          <div className="p-4">
+      <div className="min-h-screen bg-[#C0C0C0] text-[#000080] font-['Comic_Sans_MS',_cursive] md:pr-20">
+        <main className="md:ml-64 pt-16 bg-[#C0C0C0]">
+          <div className="p-4 md:pl-4">
             <div className="p-4 mb-8 bg-[#FFFFFF] border-4 border-[#000000]">
               <h2 className="text-3xl font-bold mb-4 text-center text-[#FF00FF]">
                 Who am I?
@@ -100,7 +100,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white dark:bg-slate-900">
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white"></h1>
+          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">Prateek Mahindra: Innovating at the Intersection of Tech, Business, and Aerospace”</h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
             A showcase of my journey, projects, and thoughts.
           </p>

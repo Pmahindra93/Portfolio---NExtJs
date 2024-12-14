@@ -147,7 +147,7 @@ export function Sidebar({ className }: SidebarProps) {
   if (is90sStyle) {
     return (
       <div className={cn(
-        "h-screen w-64 pt-16 border-[#000000] border-4 bg-[#C0C0C0]",
+        "fixed top-0 left-0 h-screen w-64 pt-16 border-[#000000] border-4 bg-[#C0C0C0]",
         className
       )}>
         <div className="h-full flex flex-col">
