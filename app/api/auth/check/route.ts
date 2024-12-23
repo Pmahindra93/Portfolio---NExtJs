@@ -1,28 +1,42 @@
-import { NextResponse } from "next/server";
-import { createClient } from '@/lib/supabase/server';
-import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const supabase = createClient();
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const supabase = createClient()
+    const { data: { session }, error } = await supabase.auth.getSession()
 
-    if (sessionError || !session) {
+    if (error) {
+      console.error('Session error:', error)
       return NextResponse.json({ 
-        error: 'Not authenticated',
-        session: null
-      }, { status: 401 });
+        isAuthenticated: false,
+        isAdmin: false,
+        error: 'Session error'
+      }, { status: 401 })
     }
 
-    return NextResponse.json({
-      authenticated: true,
-      email: session.user.email,
-      id: session.user.id,
-      adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
-      isAdmin: session.user.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
-    });
+    if (!session) {
+      return NextResponse.json({ 
+        isAuthenticated: false,
+        isAdmin: false 
+      })
+    }
+
+    const isAdmin = session.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+
+    return NextResponse.json({ 
+      isAuthenticated: true,
+      isAdmin,
+      email: session.user?.email
+    })
   } catch (error) {
-    console.error('Auth check error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Auth check error:', error)
+    return NextResponse.json({ 
+      isAuthenticated: false,
+      isAdmin: false,
+      error: 'Internal server error'
+    }, { status: 500 })
   }
 }

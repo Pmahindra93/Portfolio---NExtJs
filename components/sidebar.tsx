@@ -7,6 +7,7 @@ import { useAdmin } from "@/lib/hooks/useAdmin"
 import { supabase } from "@/lib/supabase/client"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import { useToast } from "@/components/ui/use-toast"
 import {
   LayoutDashboard,
@@ -35,20 +36,55 @@ export function Sidebar({ className }: SidebarProps) {
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        throw error
+      // Check session first
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        // If no session, just clean up and redirect
+        localStorage.clear()
+        router.push('/')
+        router.refresh()
+        toast({
+          title: "Already signed out",
+          description: "No active session found",
+        })
+        return
       }
+
+      // Sign out from Supabase
+      await supabase.auth.signOut({
+        scope: 'local'
+      })
+
+      // Clear local storage and cookies
+      localStorage.clear()
+
+      // Show success message
       toast({
         title: "Signed out successfully",
         description: "You have been signed out of your account",
       })
+
+      // Navigate to home page and refresh
+      router.push('/')
       router.refresh()
     } catch (error) {
       console.error('Sign out error:', error)
+      // If we get an auth session missing error, just clean up and redirect
+      if (error instanceof Error && error.message.includes('Auth session missing')) {
+        localStorage.clear()
+        router.push('/')
+        router.refresh()
+        toast({
+          title: "Signed out",
+          description: "You have been signed out of your account",
+        })
+        return
+      }
+
       toast({
         title: "Error",
-        description: "Failed to sign out",
+        description: "Failed to sign out. Please try again.",
         variant: "destructive"
       })
     }
@@ -66,9 +102,9 @@ export function Sidebar({ className }: SidebarProps) {
       icon: BookOpen,
     },
     {
-      title: "Profile",
-      href: "/profile",
-      icon: User2,
+      title: "Get in touch",
+      href: "mailto:prateekmahindra9@gmail.com",
+      icon: MessageSquare,
     },
   ]
 
@@ -79,17 +115,12 @@ export function Sidebar({ className }: SidebarProps) {
       icon: Home,
     },
     {
-      title: "Projects",
-      href: "#projects",
-      icon: FolderKanban,
-    },
-    {
       title: "Blog",
       href: "/blog",
       icon: BookOpen,
     },
     {
-      title: "Guestbook",
+      title: "Get in touch",
       href: "mailto:prateekmahindra9@gmail.com",
       icon: MessageSquare,
     },
@@ -115,7 +146,10 @@ export function Sidebar({ className }: SidebarProps) {
 
   if (is90sStyle) {
     return (
-      <div className="fixed top-0 left-0 h-screen w-64 md:block pt-16 border-[#000000] border-4 bg-[#C0C0C0] z-30">
+      <div className={cn(
+        "fixed top-0 left-0 h-screen w-64 pt-16 border-[#000000] border-4 bg-[#C0C0C0]",
+        className
+      )}>
         <div className="h-full flex flex-col">
           <div className="flex-1 space-y-4 p-3">
             <nav className="space-y-2">
@@ -192,7 +226,7 @@ export function Sidebar({ className }: SidebarProps) {
       )}
     >
       <div className="h-full flex flex-col">
-        <div className="flex-1 space-y-4 py-4">
+        <div className="flex-1 py-4">
           <div className="px-3">
             <div className="space-y-1">
               {modernMenuItems.map((item) => (
@@ -206,7 +240,7 @@ export function Sidebar({ className }: SidebarProps) {
                     )}
                   >
                     <item.icon className="h-4 w-4" />
-                    {item.title}
+                    <span>{item.title}</span>
                   </div>
                 </Link>
               ))}
@@ -214,43 +248,32 @@ export function Sidebar({ className }: SidebarProps) {
           </div>
         </div>
 
-        <div className="px-3 py-2 border-t border-slate-200 dark:border-slate-800">
+        <div className="py-4 px-3 space-y-3 border-t border-slate-200 dark:border-slate-800">
+          <div className="flex items-center justify-between rounded-lg px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-800">
+            <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400">
+              {isDarkMode ? (
+                <Moon className="h-4 w-4" />
+              ) : (
+                <Sun className="h-4 w-4" />
+              )}
+              <span>{isDarkMode ? 'Dark' : 'Light'} Mode</span>
+            </div>
+            <Switch
+              checked={isDarkMode}
+              onCheckedChange={toggleDarkMode}
+              aria-label="Toggle theme"
+            />
+          </div>
+
           {isAdmin && (
             <Button
               onClick={handleSignOut}
-              variant="outline"
-              className="w-full mb-2 justify-start"
+              className="w-full flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white"
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <LogOut className="h-4 w-4" />
               Sign Out
             </Button>
           )}
-          <div className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-800 p-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                'w-8 h-8',
-                !isDarkMode && 'bg-slate-100 dark:bg-slate-800'
-              )}
-              onClick={toggleDarkMode}
-              aria-label="Light mode"
-            >
-              <Sun className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className={cn(
-                'w-8 h-8',
-                isDarkMode && 'bg-slate-100 dark:bg-slate-800'
-              )}
-              onClick={toggleDarkMode}
-              aria-label="Dark mode"
-            >
-              <Moon className="h-4 w-4" />
-            </Button>
-          </div>
         </div>
       </div>
     </aside>
