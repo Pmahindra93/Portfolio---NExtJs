@@ -48,7 +48,6 @@ export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold mb-4">Recent Posts</h2>
       <div className="space-y-2">
         {posts.map((post) => (
           <div key={post.id} className="flex items-center justify-between p-4 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -74,7 +73,7 @@ export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
                     <Edit className="mr-2 h-4 w-4" />
                     <span>Edit</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={() => handleDelete(post.id)}
                     className="text-red-600 focus:text-red-600"
                   >

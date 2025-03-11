@@ -1,5 +1,6 @@
 // app/layout.tsx
 import { Inter } from "next/font/google"
+import { Caveat } from "next/font/google"
 import { Metadata } from "next"
 import { Providers } from '@/components/providers'
 import { Sidebar } from '@/components/sidebar'
@@ -7,8 +8,13 @@ import { NavBar } from '@/components/nav-bar'
 import { cn } from "@/lib/utils"
 import './globals.css'
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
+})
+
+const caveat = Caveat({
+  subsets: ["latin"],
+  variable: "--font-caveat",
 })
 
 export const metadata: Metadata = {
@@ -29,7 +35,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <body className={cn(
         "min-h-screen antialiased transition-colors",
         "bg-background text-foreground",
-        inter.className
+        inter.className,
+        caveat.variable
       )}>
         <Providers>
           <div className="relative flex min-h-screen flex-col">
