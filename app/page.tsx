@@ -7,6 +7,7 @@ import { Timeline } from '@/components/Timeline'
 import { RecentPosts } from '@/components/RecentPosts'
 import { Post } from '@/types/post'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { Linkedin } from 'lucide-react'
 
 async function getPosts() {
   try {
@@ -125,7 +126,7 @@ export default function LandingPage() {
 
             <div className="p-4 mb-8 bg-[#FFA500] border-4 border-[#0000FF]">
               <h2 className="text-3xl font-bold mb-4 text-center text-[#0000FF]">
-                Latest Updates
+                Latest Posts
               </h2>
               {loading ? (
                 <PostsSkeleton is90sStyle={true} />
@@ -135,9 +136,19 @@ export default function LandingPage() {
             </div>
 
             <div className="p-4 mb-8 bg-[#ADD8E6] border-4 border-[#008000]">
-              <h2 className="text-3xl font-bold mb-4 text-center text-[#008000]">
-                My Journey
-              </h2>
+              <div className="flex items-center gap-4 mb-4">
+                <h2 className="text-3xl font-bold text-center text-[#008000]">
+                  My Journey
+                </h2>
+                <a
+                  href="https://www.linkedin.com/in/pmahindra"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group"
+                >
+                  <Linkedin className="w-6 h-6 text-[#0077B5] hover:text-[#00669C]" />
+                </a>
+              </div>
               <Timeline />
             </div>
           </div>
@@ -150,15 +161,33 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white dark:bg-slate-900">
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white"> Work, Ideas, and Perspectives</h1>
+          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">Work, Ideas, and Perspectives</h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-          Welcome to my corner of the internet, where I showcase my CV, projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
-
+            Welcome to my corner of the internet, where I showcase my CV, projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
           </p>
         </section>
 
         <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-8 text-slate-900 dark:text-white">My Journey</h2>
+          <h2 className="text-2xl font-bold mb-8 text-slate-900 dark:text-white">Recent Posts</h2>
+          {loading ? (
+            <PostsSkeleton is90sStyle={false} />
+          ) : (
+            <RecentPosts posts={posts} />
+          )}
+        </section>
+
+        <section className="mb-16">
+          <div className="flex items-center gap-4 mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Journey</h2>
+            <a
+              href="https://www.linkedin.com/in/pmahindra"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center justify-center w-7 h-7 rounded-md border-2 border-blue-600 dark:border-blue-500 hover:border-blue-700 dark:hover:border-blue-400 transition-colors"
+            >
+              <Linkedin className="w-4 h-4 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400" />
+            </a>
+          </div>
           <Timeline />
         </section>
 
@@ -175,14 +204,6 @@ export default function LandingPage() {
               <div className="h-full w-full bg-slate-200 dark:bg-slate-700"></div>
             </div>
           </div>
-        </section>
-
-        <section className="mb-16">
-          {loading ? (
-            <PostsSkeleton is90sStyle={false} />
-          ) : (
-            <RecentPosts posts={posts} />
-          )}
         </section>
       </main>
     </div>
