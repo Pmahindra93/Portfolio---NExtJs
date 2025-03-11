@@ -17,17 +17,17 @@ const timelineEvents: TimelineEvent[] = [
       'Focused on building expertise in machine learning frameworks and large language models.',
       'Contributed to several open-source projects and built personal applications using cutting-edge AI technologies.'
     ],
-    image: '/images/career-2024.jpg'
+    image: '/images/career-2024.JPG'
   },
   {
     year: '2022',
     title: 'Educational Achievement',
     paragraphs: [
       'Earned a Master\'s in Computing, Entrepreneurship, and Innovation from NYU, a joint program between Stern School of Business and Courant Institute of Mathematical Sciences.',
-      'Participated in NYU\’s Startup Bootcamp and Summer Startup Sprint, gaining hands-on experience in venture building.',
+      'Participated in NYU\'s Startup Bootcamp and Summer Startup Sprint, gaining hands-on experience in venture building.',
       'Served on the GSAB Advisory Board and mentored graduate students at GSAS, contributing to the NYU community.'
     ],
-    image: '/images/education-2020.jpg'
+    image: '/images/education-2020.JPG'
   },
   {
     year: '2020',
@@ -47,7 +47,7 @@ const timelineEvents: TimelineEvent[] = [
       'Developed and executed product marketing strategies, aligning global positioning with regional market insights.',
       'Collaborated cross-functionally with sales, engineering, and design teams to optimize sales.'
     ],
-    image: '/images/milestone-2022.jpg'
+    image: '/images/milestone-2022.JPG'
   }
   // Add more events as needed
 ]
