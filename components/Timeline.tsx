@@ -12,13 +12,21 @@ const timelineEvents: TimelineEvent[] = [
   {
     year: '2024',
     title: 'Present Role',
-    description: 'Current position and achievements'
+    description: 'Current position and achievements',
+    image: '/images/career-2024.jpg'
   },
   {
     year: '2022',
     title: 'Career Milestone',
-    description: 'Significant achievement or role'
+    description: 'Significant achievement or role',
+    image: '/images/milestone-2022.jpg'
   },
+  {
+    year: '2020',
+    title: 'Educational Achievement',
+    description: 'Academic accomplishments and learning milestones',
+    image: '/images/education-2020.jpg'
+  }
   // Add more events as needed
 ]
 
@@ -30,7 +38,7 @@ export function Timeline() {
           <div className="absolute left-0 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-slate-300 text-slate-900 shadow">
             {event.year}
           </div>
-          
+
           <Card className="ml-14 w-full">
             <div className="flex flex-col md:flex-row gap-4 p-4">
               {event.image ? (

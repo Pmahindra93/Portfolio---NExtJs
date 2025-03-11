@@ -40,3 +40,190 @@ You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, 
     - Avoid for data fetching or state management.
 
   Follow Next.js docs for Data Fetching, Rendering, and Routing.
+
+
+# Product Requirements Document: Personal Website & Blog
+
+## Overview
+This document outlines the requirements for a personal website and blog that showcases professional accomplishments, career journey, and life experiences. The site will serve as both a professional portfolio and a platform for sharing personal content.
+
+## Objectives
+- Create a cohesive online presence that represents both professional and personal aspects
+- Showcase career achievements, skills, and projects
+- Provide a platform for regular blog content about professional insights and personal experiences
+- Establish a foundation for personal branding
+
+## User Personas
+
+### Primary: Professional Connections
+- Recruiters, potential employers, colleagues
+- Looking for professional background, skills, and work examples
+- Need clear navigation to resume/CV, portfolio, and professional content
+
+### Secondary: Personal Connections
+- Friends, family, personal network
+- Interested in life updates, personal projects, and blog content
+- Value authentic voice and personal stories
+
+### Tertiary: New Visitors
+- People discovering your content through search or referrals
+- Need immediate context about who you are and what you do
+- Require intuitive navigation to relevant sections based on their interests
+
+## Core Features
+
+### 1. Homepage
+- Clean, modern design with personal branding elements
+- Clear introduction statement (who you are, what you do)
+- Featured content highlights (latest projects, recent blog posts)
+- Quick navigation to key sections
+- Contact information or contact form
+- Social media integration
+
+### 2. About Page
+- Professional bio highlighting career journey and philosophy
+- Personal background information (as much as you're comfortable sharing)
+- Professional photo(s)
+- Timeline of key career milestones (optional)
+- Skills and expertise section
+- Education and certifications
+
+### 3. Portfolio/Projects Section
+- Categorized display of professional work and projects
+- Each project should include:
+  - Project title and description
+  - Your role and contributions
+  - Technologies/methods used
+  - Visual elements (images, videos, etc. where applicable)
+  - Outcomes and results
+  - Links to live projects or repositories (if applicable)
+
+### 4. Blog
+- Categorized blog posts with tags for easy filtering
+- Search functionality
+- Date-based archives
+- Recent posts sidebar
+- Comment functionality (optional)
+- Social sharing capabilities
+- RSS feed
+- Email subscription option
+
+### 5. Resume/CV Page
+- Downloadable PDF version
+- Interactive online version
+- Work history with descriptions
+- Skills categorization
+- Education and certifications
+- Professional achievements
+
+### 6. Contact Section
+- Contact form with field validation
+- Email address (consider using a form to reduce spam)
+- Social media profiles
+- Optional: availability for new opportunities or collaborations
+
+## Technical Requirements
+
+### Performance
+- Load time under 2 seconds for all pages
+- Mobile-responsive design with breakpoints for common device sizes
+- Image optimization for fast loading
+- Lazy loading for content below the fold
+
+### SEO
+- Optimized meta titles and descriptions
+- Structured data for rich snippets
+- XML sitemap
+- Clean URL structure
+- Alt text for all images
+
+### Security
+- HTTPS implementation
+- Form validation and security
+- Regular backups
+- Comment moderation system (if comments enabled)
+
+### Analytics
+- Integration with analytics platform (Google Analytics or alternative)
+- Event tracking for key interactions
+- Blog post performance metrics
+- Visitor demographic and behavior tracking
+
+## Content Strategy
+
+### Blog Post Categories
+- Professional insights and industry trends
+- Project deep-dives and case studies
+- Career lessons and personal development
+- Life updates and personal experiences (as desired)
+- Tutorials and how-to guides in your area of expertise
+
+### Content Calendar
+- Regular posting schedule (recommend bi-weekly or monthly minimum)
+- Content themes aligned with professional goals
+- Mix of timely and evergreen content
+
+### Content Standards
+- Professional yet conversational tone
+- Visual elements in all posts (images, diagrams, etc.)
+- Consistent formatting and style
+- Proper attribution for all external resources
+
+## Design Guidelines
+
+### Visual Identity
+- Consistent color palette (3-5 colors)
+- Typography system (2-3 font families maximum)
+- Logo or personal mark
+- Consistent image treatment style
+- UI component library for consistent elements
+
+### User Experience
+- Clear navigation structure
+- Breadcrumb navigation for deeper pages
+- Progress indicators for multi-step processes
+- Accessibility compliance (WCAG 2.1 AA standards)
+- Dark mode option (optional)
+
+## Implementation Plan
+
+### Phase 1: Foundation
+- Domain registration and hosting setup
+- Basic site structure implementation
+- Homepage and About page
+- Contact functionality
+- Basic SEO implementation
+
+### Phase 2: Content Building
+- Portfolio/Projects section
+- Resume/CV page
+- Initial blog setup
+- First set of blog posts (3-5 minimum)
+
+### Phase 3: Enhancement
+- Blog category expansion
+- Newsletter signup integration
+- SEO refinement
+- Analytics review and optimization
+- Additional interactive elements
+
+## Maintenance Plan
+- Regular content updates (blog posts per established calendar)
+- Quarterly design/UX review
+- Monthly technical maintenance (updates, backups, security checks)
+- Semi-annual content audit and SEO review
+
+## Success Metrics
+- Site traffic growth month-over-month
+- Blog post engagement (time on page, comments, shares)
+- Portfolio view duration
+- Contact form submissions
+- Professional opportunities generated through the site
+- Personal brand recognition within your field
+
+## Future Considerations
+- Personalized newsletter
+- Gated content for specialized audiences
+- Podcast or video content integration
+- Online courses or resources
+- Community building features

@@ -29,6 +29,56 @@ async function getPosts() {
   }
 }
 
+function PostsSkeleton({ is90sStyle }: { is90sStyle: boolean }) {
+  if (is90sStyle) {
+    return (
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="p-4 bg-[#FFFFFF] border-4 border-[#000000] animate-pulse">
+            <div className="flex items-start space-x-4">
+              <div className="w-16 h-16 bg-[#C0C0C0] border-2 border-[#000000] flex-shrink-0"></div>
+              <div className="flex-1">
+                <div className="h-5 w-3/4 bg-[#C0C0C0] mb-3 border border-[#808080]"></div>
+                <div className="space-y-2">
+                  <div className="h-4 w-full bg-[#C0C0C0] border border-[#808080]"></div>
+                  <div className="h-4 w-5/6 bg-[#C0C0C0] border border-[#808080]"></div>
+                </div>
+                <div className="mt-3 flex items-center space-x-2">
+                  <div className="h-4 w-24 bg-[#C0C0C0] border border-[#808080]"></div>
+                  <div className="h-4 w-16 bg-[#C0C0C0] border border-[#808080]"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="p-6 bg-white dark:bg-slate-800 rounded-lg shadow-sm animate-pulse">
+          <div className="flex items-start space-x-4">
+            <div className="w-16 h-16 bg-slate-200 dark:bg-slate-700 rounded-md flex-shrink-0"></div>
+            <div className="flex-1">
+              <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mb-3"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full"></div>
+                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6"></div>
+              </div>
+              <div className="mt-3 flex items-center space-x-2">
+                <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                <div className="h-4 w-16 bg-slate-200 dark:bg-slate-700 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function LandingPage() {
   const { is90sStyle } = useTheme()
   const [posts, setPosts] = useState<Post[]>([])
@@ -78,7 +128,7 @@ export default function LandingPage() {
                 Latest Updates
               </h2>
               {loading ? (
-                <p>Loading posts...</p>
+                <PostsSkeleton is90sStyle={true} />
               ) : (
                 <RecentPosts posts={posts} />
               )}
@@ -100,9 +150,10 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white dark:bg-slate-900">
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">Prateek Mahindra: Innovating at the Intersection of Tech, Business, and Aerospace”</h1>
+          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white"> Work, Ideas, and Perspectives</h1>
           <p className="text-lg text-slate-600 dark:text-slate-400">
-            A showcase of my journey, projects, and thoughts.
+          Welcome to my corner of the internet, where I showcase my CV, projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
+
           </p>
         </section>
 
@@ -128,7 +179,7 @@ export default function LandingPage() {
 
         <section className="mb-16">
           {loading ? (
-            <p>Loading posts...</p>
+            <PostsSkeleton is90sStyle={false} />
           ) : (
             <RecentPosts posts={posts} />
           )}
