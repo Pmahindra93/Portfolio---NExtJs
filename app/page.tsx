@@ -193,7 +193,12 @@ export default function LandingPage() {
         </section>
 
         <section className="mb-16">
-          <h2 className="text-2xl font-bold mb-8 text-slate-900 dark:text-white">Featured Projects</h2>
+          <div className="flex items-center gap-3 mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Projects</h2>
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+              Coming Soon
+            </span>
+          </div>
           <FeaturedProjects />
         </section>
       </main>
