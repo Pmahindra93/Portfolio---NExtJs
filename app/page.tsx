@@ -8,6 +8,7 @@ import { RecentPosts } from '@/components/RecentPosts'
 import { Post } from '@/types/post'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Linkedin } from 'lucide-react'
+import { FeaturedProjects } from '@/components/FeaturedProjects'
 
 async function getPosts() {
   try {
@@ -193,17 +194,7 @@ export default function LandingPage() {
 
         <section className="mb-16">
           <h2 className="text-2xl font-bold mb-8 text-slate-900 dark:text-white">Featured Projects</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="relative h-48 rounded-lg overflow-hidden">
-              <div className="h-full w-full bg-slate-200 dark:bg-slate-700"></div>
-            </div>
-            <div className="relative h-48 rounded-lg overflow-hidden">
-              <div className="h-full w-full bg-slate-200 dark:bg-slate-700"></div>
-            </div>
-            <div className="relative h-48 rounded-lg overflow-hidden">
-              <div className="h-full w-full bg-slate-200 dark:bg-slate-700"></div>
-            </div>
-          </div>
+          <FeaturedProjects />
         </section>
       </main>
     </div>

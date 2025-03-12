@@ -18,8 +18,8 @@ const caveat = Caveat({
 })
 
 export const metadata: Metadata = {
-  title: "Prateek Mahindra",
-  description: "My personal portfolio and blog",
+  title: "Prateek Mahindra | AI, LLM Apps & Startup Growth",
+  description: "Exploring AI, product engineering, and startup strategies. Read Prateek Mahindra\’s latest insights on building and scaling tech products.",
   icons: {
     icon: "/favicon.ico",
   },
