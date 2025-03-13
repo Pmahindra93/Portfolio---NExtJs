@@ -159,11 +159,11 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-slate-900 font-sans">
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white">Work, Ideas, and Perspectives</h1>
-          <p className="text-lg text-slate-600 dark:text-slate-400">
+          <h1 className="text-4xl font-bold mb-4 text-slate-900 dark:text-white font-sans">Work, Ideas, and Perspectives</h1>
+          <p className="text-lg text-slate-600 dark:text-slate-400 font-sans">
             Welcome to my corner of the internet, where I showcase my CV, projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
           </p>
         </section>
