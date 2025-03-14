@@ -1,14 +1,13 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState } from 'react'
-
-type Theme = 'dark' | 'light'
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react'
 
 interface ThemeContextType {
   isDarkMode: boolean
   is90sStyle: boolean
   toggleDarkMode: () => void
   toggle90sStyle: () => void
+  isMounted: boolean
 }
 
 const ThemeContext = createContext<ThemeContextType>({
@@ -16,6 +15,7 @@ const ThemeContext = createContext<ThemeContextType>({
   is90sStyle: false,
   toggleDarkMode: () => {},
   toggle90sStyle: () => {},
+  isMounted: false
 })
 
 interface ThemeProviderProps {
@@ -23,79 +23,93 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>('light')
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [is90sStyle, setIs90sStyle] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const initializedRef = useRef(false)
+  const isInitialRenderRef = useRef(true)
 
-  // Update the theme
-  const updateTheme = (darkMode: boolean, style90s: boolean) => {
-    const root = document.documentElement
-    const theme = darkMode ? 'dark' : 'light'
-    
-    // Remove both classes first
-    root.classList.remove('light', 'dark')
-    // Add the appropriate class
-    root.classList.add(theme)
-    setTheme(theme)
+  // Function to update the DOM based on theme state
+  const updateTheme = useCallback(() => {
+    if (!isMounted) return;
 
-    // Handle 90s style
-    if (style90s) {
-      root.setAttribute('data-theme', '90s')
+    // Apply dark mode
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
     } else {
-      root.removeAttribute('data-theme')
+      document.documentElement.classList.remove("dark");
     }
-  }
 
-  // Initialize theme
+    // Apply 90s style
+    if (is90sStyle) {
+      document.documentElement.classList.add("theme-90s");
+      document.documentElement.setAttribute("data-theme", "90s");
+    } else {
+      document.documentElement.classList.remove("theme-90s");
+      document.documentElement.removeAttribute("data-theme");
+    }
+
+    // Dispatch event for other components to react
+    const event = new CustomEvent("themeChanged", {
+      detail: { isDarkMode, is90sStyle }
+    });
+    window.dispatchEvent(event);
+
+    // Force a repaint to ensure styles are applied immediately
+    document.body.style.display = 'none';
+    // This triggers a reflow
+    void document.body.offsetHeight;
+    document.body.style.display = '';
+  }, [isDarkMode, is90sStyle, isMounted]);
+
+  // Initialize theme from localStorage on mount
   useEffect(() => {
-    // Check system preference for dark mode
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    
-    // Get saved preferences or use system preference for dark mode
-    const savedDarkMode = localStorage.getItem('darkMode')
-    const saved90sStyle = localStorage.getItem('90sStyle')
-    
-    const initialDarkMode = savedDarkMode !== null ? savedDarkMode === 'true' : systemPrefersDark
-    const initial90sStyle = saved90sStyle === 'true'
-    
-    setIsDarkMode(initialDarkMode)
-    setIs90sStyle(initial90sStyle)
-    updateTheme(initialDarkMode, initial90sStyle)
-    
-    setMounted(true)
-  }, [])
+    const darkModePreference = localStorage.getItem("darkMode") === "true";
+    const style90sPreference = localStorage.getItem("90sStyle") === "true";
 
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => {
-      const newValue = !prev
-      localStorage.setItem('darkMode', String(newValue))
-      updateTheme(newValue, is90sStyle)
-      return newValue
-    })
-  }
+    setIsDarkMode(darkModePreference);
+    setIs90sStyle(style90sPreference);
+    setIsMounted(true);
+  }, []);
 
-  const toggle90sStyle = () => {
-    setIs90sStyle((prev) => {
-      const newValue = !prev
-      localStorage.setItem('90sStyle', String(newValue))
-      updateTheme(isDarkMode, newValue)
-      return newValue
-    })
-  }
+  // Update theme whenever state changes after initial mount
+  useEffect(() => {
+    if (isMounted) {
+      updateTheme();
+    }
+  }, [isDarkMode, is90sStyle, isMounted, updateTheme]);
+
+  // Toggle dark mode
+  const toggleDarkMode = useCallback(() => {
+    setIsDarkMode(prev => {
+      const newValue = !prev;
+      localStorage.setItem("darkMode", String(newValue));
+      return newValue;
+    });
+  }, []);
+
+  // Toggle 90s style
+  const toggle90sStyle = useCallback(() => {
+    setIs90sStyle(prev => {
+      const newValue = !prev;
+      localStorage.setItem("90sStyle", String(newValue));
+      return newValue;
+    });
+  }, []);
 
   // Prevent flash of wrong theme while loading
-  if (!mounted) {
+  if (!isMounted) {
     return <div style={{ visibility: 'hidden' }}>{children}</div>
   }
 
   return (
-    <ThemeContext.Provider 
+    <ThemeContext.Provider
       value={{
         isDarkMode,
         is90sStyle,
         toggleDarkMode,
         toggle90sStyle,
+        isMounted
       }}
     >
       {children}

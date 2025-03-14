@@ -24,7 +24,14 @@ export async function GET() {
       })
     }
 
-    const isAdmin = session.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
+    // Check admin status using the user_roles table
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', session.user.id)
+      .single()
+
+    const isAdmin = roleData?.role === 'admin'
 
     return NextResponse.json({
       isAuthenticated: true,

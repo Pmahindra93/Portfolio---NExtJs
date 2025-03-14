@@ -9,6 +9,7 @@ import TextAlign from '@tiptap/extension-text-align'
 import Underline from '@tiptap/extension-underline'
 import Color from '@tiptap/extension-color'
 import FontFamily from '@tiptap/extension-font-family'
+import TextStyle from '@tiptap/extension-text-style'
 
 const fontFamilies = [
   { name: 'Default', value: 'Inter' },
@@ -121,6 +122,7 @@ export default function RichTextEditor({ value, onChange, className }: RichTextE
   const editor = useEditor({
     extensions: [
       StarterKit,
+      TextStyle,
       Link,
       Image,
       Underline,
