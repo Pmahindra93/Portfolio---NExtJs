@@ -16,22 +16,34 @@ export default function NewPost() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!title.trim() || !content.trim()) {
+      toast({
+        title: "Error",
+        description: "Title and content are required",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/blog", {
+      const response = await fetch("/api/posts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include',
         body: JSON.stringify({
-          title,
-          content,
+          title: title.trim(),
+          content: content.trim(),
+          published: true,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create post");
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create post');
       }
 
       toast({
@@ -42,9 +54,10 @@ export default function NewPost() {
       router.push("/blog");
       router.refresh();
     } catch (error) {
+      console.error('Error creating post:', error);
       toast({
         title: "Error",
-        description: "Failed to create blog post",
+        description: error instanceof Error ? error.message : "Failed to create blog post",
         variant: "destructive",
       });
     } finally {

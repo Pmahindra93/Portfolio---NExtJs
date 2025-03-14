@@ -10,18 +10,27 @@ import { useAdmin } from '@/lib/hooks/useAdmin'
 import { Post } from '@/types/post'
 import { supabase } from '@/lib/supabase/client'
 
-export default function EditPost({ params }: { params: { id: string } }) {
+export default function EditPost(props: { params: Promise<{ id: string }> }) {
   const [post, setPost] = useState<Post | null>(null)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [params, setParams] = useState<{ id: string } | null>(null)
   const router = useRouter()
   const { toast } = useToast()
   const { isAdmin, isLoading: isAdminLoading } = useAdmin()
 
   useEffect(() => {
-    if (isAdminLoading) return;
-    
+    async function loadParams() {
+      const resolvedParams = await props.params
+      setParams(resolvedParams)
+    }
+    loadParams()
+  }, [props.params])
+
+  useEffect(() => {
+    if (!params?.id || isAdminLoading) return;
+
     if (!isAdmin) {
       toast({
         title: 'Unauthorized',
@@ -33,6 +42,8 @@ export default function EditPost({ params }: { params: { id: string } }) {
     }
 
     async function fetchPost() {
+      if (!params?.id) return;
+
       try {
         const response = await fetch(`/api/posts/${params.id}`, {
           cache: 'no-store',
@@ -63,15 +74,16 @@ export default function EditPost({ params }: { params: { id: string } }) {
     }
 
     fetchPost()
-  }, [params.id, router, toast, isAdmin, isAdminLoading])
+  }, [params, router, toast, isAdmin, isAdminLoading])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!params?.id) return;
     setIsLoading(true)
 
     try {
       const { data: { session } } = await supabase.auth.getSession()
-      
+
       if (!session) {
         throw new Error('No active session')
       }
@@ -97,7 +109,7 @@ export default function EditPost({ params }: { params: { id: string } }) {
         title: 'Success',
         description: 'Post updated successfully',
       })
-      
+
       router.push('/blog')
       router.refresh()
     } catch (error) {
@@ -112,7 +124,7 @@ export default function EditPost({ params }: { params: { id: string } }) {
     }
   }
 
-  if (isAdminLoading || isLoading) {
+  if (isAdminLoading || isLoading || !params?.id) {
     return (
       <div className="container max-w-4xl py-10">
         <div className="flex items-center justify-center">

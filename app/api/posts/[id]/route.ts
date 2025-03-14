@@ -8,15 +8,16 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 export const dynamic = 'force-dynamic'
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse<Post | { error: string }>> {
+  request: Request,
+  props: { params: Promise<{ id: string }> }
+) {
+  const { id } = await props.params
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: post, error } = await supabase
       .from('posts')
       .select('id, title, content, published, created_at, updated_at, author_id')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) {
@@ -39,23 +40,25 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse<Post | { error: string }>> {
+  props: { params: Promise<{ id: string }> }
+) {
+  const { id } = await props.params
   try {
-    const cookieStore = cookies()
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
       {
         cookies: {
           get(name: string) {
-            return cookieStore.get(name)?.value
+            return request.cookies.get(name)?.value
           },
           set(name: string, value: string, options: CookieOptions) {
-            cookieStore.set({ name, value, ...options })
+            // Next.js cookies() API is read-only in route handlers
+            // We'll handle cookie setting through the response headers
           },
           remove(name: string, options: CookieOptions) {
-            cookieStore.set({ name, value: '', ...options })
+            // Next.js cookies() API is read-only in route handlers
+            // We'll handle cookie removal through the response headers
           },
         },
       }
@@ -95,7 +98,7 @@ export async function PUT(
         content,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -117,11 +120,12 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-): Promise<NextResponse> {
+  request: Request,
+  props: { params: Promise<{ id: string }> }
+) {
+  const { id } = await props.params
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {
@@ -143,7 +147,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('posts')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       return NextResponse.json(

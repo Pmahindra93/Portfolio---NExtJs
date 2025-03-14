@@ -49,35 +49,148 @@
   }
 }
 
+/* Theme Switching */
+.modern-theme {
+  min-height: 100vh;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+}
+
+.dark .modern-theme {
+  background-color: hsl(222.2, 84%, 4.9%);
+}
+
+/* Modern theme typography */
+.modern-theme h1,
+.modern-theme h2,
+.modern-theme h3,
+.modern-theme h4,
+.modern-theme h5,
+.modern-theme h6 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.modern-theme p,
+.modern-theme li,
+.modern-theme a {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+  line-height: 1.6;
+}
+
+/* Hide modern theme when 90s theme is active */
+html.theme-90s .modern-theme {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+/* Hide 90s theme elements when modern theme is active */
+html:not(.theme-90s) [data-theme="90s"],
+html:not(.theme-90s) .theme-90s-element {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 /* 90s Style Theme */
-[data-theme="90s"] {
-  --background: 300 100% 98%;
-  --foreground: 0 0% 0%;
+html.theme-90s {
   font-family: "Comic Sans MS", cursive !important;
 }
 
-[data-theme="90s"] body {
-  background: linear-gradient(45deg, #ff69b4, #00ffff, #ff00ff) !important;
-  background-size: 400% 400% !important;
-  animation: gradient 15s ease infinite !important;
+html.theme-90s body {
+  background: #C0C0C0 !important;
+  color: #000080 !important;
+  font-family: "Comic Sans MS", cursive !important;
 }
 
-[data-theme="90s"] * {
-  border-color: #ff00ff;
-}
-
-[data-theme="90s"] button {
-  background: #1e40af !important;
+html.theme-90s button {
+  background: #008080 !important;
   border: 3px solid black !important;
   box-shadow: 3px 3px 0 black !important;
   font-weight: bold !important;
   text-transform: uppercase !important;
+  color: #FFFF00 !important;
+  transition: all 0.1s ease-in-out;
 }
 
-@keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+html.theme-90s button:hover {
+  background: #006666 !important;
+}
+
+html.theme-90s button:active {
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 black !important;
+}
+
+html.theme-90s h1,
+html.theme-90s h2,
+html.theme-90s h3 {
+  color: #FF00FF !important;
+  text-shadow: 2px 2px 0 #000000;
+}
+
+html.theme-90s a {
+  color: #0000FF !important;
+  text-decoration: underline !important;
+}
+
+html.theme-90s a:hover {
+  color: #FF00FF !important;
+}
+
+html.theme-90s .card {
+  border: 3px solid #000000 !important;
+  background: #FFFFFF !important;
+  box-shadow: 5px 5px 0 #000000 !important;
+}
+
+html.theme-90s .sidebar {
+  background: #000080 !important;
+  border-right: 3px solid #000000 !important;
+}
+
+html.theme-90s .navbar {
+  background: #000080 !important;
+  border-bottom: 3px solid #000000 !important;
+}
+
+/* 90s Animations */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+@keyframes rainbow {
+  0% { color: red; }
+  14% { color: orange; }
+  28% { color: yellow; }
+  42% { color: green; }
+  57% { color: blue; }
+  71% { color: indigo; }
+  85% { color: violet; }
+  100% { color: red; }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Force immediate repaints for theme changes */
+html.theme-90s * {
+  animation-duration: 0.01s;
+  animation-name: theme-switch-repaint;
+  animation-iteration-count: 1;
+  animation-timing-function: step-end;
+}
+
+@keyframes theme-switch-repaint {
+  from { opacity: 0.99; }
+  to { opacity: 1; }
 }
 
 @layer base {

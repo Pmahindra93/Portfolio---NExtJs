@@ -4,12 +4,23 @@ import { createClient } from '@/lib/supabase/server'
 import { Post, CreatePostInput } from '@/types/post'
 import { cookies } from 'next/headers'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET(): Promise<NextResponse<Post[]  | { error: string }>> {
+async function checkIsAdmin(supabase: SupabaseClient, userId: string): Promise<boolean> {
+  const { data: roleData } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+
+  return roleData?.role === 'admin'
+}
+
+export async function GET(): Promise<NextResponse<Post[] | { error: string }>> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: posts, error } = await supabase
       .from('posts')
       .select('*')
@@ -38,7 +49,7 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<Post | { error: string }>> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {
@@ -48,13 +59,8 @@ export async function POST(
       )
     }
 
-    const { data: userData } = await supabase
-      .from('auth.users')
-      .select('admin')
-      .eq('id', session.user.id)
-      .single()
-
-    if (!userData?.admin) {
+    const isAdmin = await checkIsAdmin(supabase, session.user.id)
+    if (!isAdmin) {
       return NextResponse.json(
         { error: 'Only admins can create posts' },
         { status: 403 }

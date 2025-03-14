@@ -6,15 +6,16 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
-  const cookieStore = cookies()
-  
+  const cookieStore = await cookies()
+
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value
+          const cookie = cookieStore.get(name)
+          return cookie?.value
         },
         set(name: string, value: string, options: CookieOptions) {
           cookieStore.set({ name, value, ...options })
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
     }
 
     const { data: { session }, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
-    
+
     if (sessionError) {
       console.error('Session error:', sessionError)
       throw sessionError
@@ -57,7 +58,7 @@ export async function GET(request: Request) {
     // First try to update if the user exists
     const { error: updateError } = await supabase
       .from('users')
-      .update({ 
+      .update({
         email: session.user.email,
         admin: isAdmin,
         last_sign_in: new Date().toISOString()
