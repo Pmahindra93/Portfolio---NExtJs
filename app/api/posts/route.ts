@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(): Promise<NextResponse<Post[]  | { error: string }>> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: posts, error } = await supabase
       .from('posts')
       .select('*')
@@ -38,7 +38,7 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<Post | { error: string }>> {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { session } } = await supabase.auth.getSession()
 
     if (!session) {

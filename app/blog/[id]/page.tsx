@@ -7,17 +7,29 @@ import { Card } from '@/components/ui/card'
 import { useTheme } from '@/lib/hooks/useTheme'
 import { notFound } from 'next/navigation'
 
-export default function BlogPost({ params }: { params: { id: string } }) {
+export default function BlogPost(props: { params: Promise<{ id: string }> }) {
   const [post, setPost] = useState<Post | null>(null)
   const [loading, setLoading] = useState(true)
+  const [params, setParams] = useState<{ id: string } | null>(null)
   const { is90sStyle } = useTheme()
 
   useEffect(() => {
+    async function loadParams() {
+      const resolvedParams = await props.params
+      setParams(resolvedParams)
+    }
+    loadParams()
+  }, [props.params])
+
+  useEffect(() => {
+    if (!params?.id) return;
+
     async function fetchPost() {
+      if (!params?.id) return;
       try {
         setLoading(true)
         console.log('Fetching post:', params.id)
-        
+
         const { data, error } = await supabase
           .from('posts')
           .select('*')
@@ -48,9 +60,9 @@ export default function BlogPost({ params }: { params: { id: string } }) {
     }
 
     fetchPost()
-  }, [params.id])
+  }, [params?.id])
 
-  if (loading) {
+  if (loading || !params?.id) {
     return (
       <main className={`flex-1 p-8 ${
         is90sStyle
