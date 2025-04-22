@@ -28,7 +28,7 @@ export function NavBar({ className }: { className?: string }) {
         provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          scopes: 'user:email',
+          scopes: 'user:email'
         }
       })
 

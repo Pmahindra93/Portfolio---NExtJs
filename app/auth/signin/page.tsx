@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createBrowserClient } from '@supabase/ssr'
 import { Button } from '@/components/ui/button'
@@ -8,14 +8,14 @@ import { Card } from '@/components/ui/card'
 import { useToast } from '@/components/ui/use-toast'
 import { Github } from 'lucide-react'
 
-export default function SignIn() {
+function SignInContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
   const error = searchParams.get('error')
   const next = searchParams.get('next') || '/'
-  
+
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -88,5 +88,21 @@ export default function SignIn() {
         </Button>
       </Card>
     </div>
+  )
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+        <Card className="w-full max-w-sm space-y-4 p-4">
+          <div className="space-y-2 text-center">
+            <h1 className="text-2xl font-bold">Loading...</h1>
+          </div>
+        </Card>
+      </div>
+    }>
+      <SignInContent />
+    </Suspense>
   )
 }
