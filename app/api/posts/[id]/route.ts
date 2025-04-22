@@ -53,7 +53,7 @@ export async function PUT(
             return request.cookies.get(name)?.value
           },
           set(name: string, value: string, options: CookieOptions) {
-            // Next.js cookies() API is read-only in route handlers
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           // Next.js cookies() API is read-only in route handlers
             // We'll handle cookie setting through the response headers
           },
           remove(name: string, options: CookieOptions) {

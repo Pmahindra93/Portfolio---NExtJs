@@ -89,56 +89,74 @@ export default function ClientPage({ posts }: ClientPageProps) {
     <div key={`theme-${themeVersion}`}>
       {/* Modern Theme Content */}
       {!is90sStyle && (
-        <div className="modern-theme">
-          <div className="container mx-auto px-4 py-8">
-            <div className="mb-12">
-              <h1 className="text-5xl font-bold mb-6 tracking-tight">Work, Ideas, and Perspectives</h1>
-              <div className="prose prose-lg max-w-3xl">
-                <p className="text-muted-foreground">
-                  Welcome to my corner of the internet, where I showcase my projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
+        <div id="modern-theme" className="modern-theme">
+          {/* Structure copied from ThemeContent.tsx */}
+          <main className="container mx-auto px-4 mt-16">
+            <div className="space-y-12">
+              <div>
+                <h1 className="text-4xl font-bold mb-3 text-slate-900 dark:text-white">
+                  Work, Ideas, and Perspectives
+                </h1>
+                <p className="text-lg text-slate-600 dark:text-slate-400">
+                  Welcome to my corner of the internet, where I showcase my CV, projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
                 </p>
               </div>
-            </div>
 
-            <div className="mt-16">
-              <h2 className="text-3xl font-semibold mb-8 tracking-tight">Recent Posts</h2>
-              <Suspense fallback={<PostsSkeleton />}>
-                <RecentPostsWrapper posts={posts} />
-              </Suspense>
-            </div>
-
-            <div className="mt-16">
-              <div className="flex items-center gap-3 mb-8">
-                <h2 className="text-3xl font-semibold tracking-tight">My Journey</h2>
-                <a
-                  href="https://linkedin.com/in/prateekmahindra"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center p-1.5 rounded-md border-2 border-blue-200 hover:border-blue-300 transition-colors"
-                  aria-label="LinkedIn Profile"
-                >
-                  <Linkedin className="h-5 w-5 text-blue-600" />
-                </a>
+              <div>
+                <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Recent Posts</h2>
+                <Suspense fallback={<PostsSkeleton />}>
+                  <RecentPostsWrapper posts={posts} />
+                </Suspense>
               </div>
-              <Suspense fallback={<div>Loading timeline...</div>}>
-                <TimelineWrapper />
-              </Suspense>
-            </div>
 
-            <div className="mt-16 mb-16">
-              <h2 className="text-3xl font-semibold mb-8 tracking-tight">Featured Projects</h2>
-              <Suspense fallback={<div>Loading projects...</div>}>
-                <FeaturedProjectsWrapper />
-              </Suspense>
+              <div>
+                <div className="flex items-center gap-4 mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Journey</h2>
+                  <a
+                    href="https://linkedin.com/in/pmahindra"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-center w-7 h-7 rounded-md border-2 border-blue-600 dark:border-blue-500 hover:border-blue-700 dark:hover:border-blue-400 transition-colors"
+                    aria-label="LinkedIn Profile"
+                  >
+                    <Linkedin className="w-4 h-4 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400" />
+                  </a>
+                </div>
+                <Suspense fallback={<div className="h-96 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />}>
+                  <TimelineWrapper />
+                </Suspense>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Projects</h2>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    Coming Soon
+                  </span>
+                </div>
+                <Suspense fallback={<div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />}>
+                  <FeaturedProjectsWrapper />
+                </Suspense>
+              </div>
+              {/* Add Footer Here */}
+                <footer className="border-t border-slate-200 pt-4 pb-2 dark:border-slate-800">
+                  <p className="text-center text-lg text-muted-foreground">
+                  Made with ❤️ in North London with 🤖 and 🍵
+                </p>
+              </footer>
             </div>
-          </div>
+          </main>
         </div>
       )}
 
       {/* 90s Theme Content */}
       {is90sStyle && (
         <div className="theme-90s-element">
-          <NinetiesLayout posts={getNinetiesPosts(posts)} />
+          <NinetiesLayout
+            posts={getNinetiesPosts(posts)}
+            journeyContent={<TimelineWrapper />}
+            projectsContent={<FeaturedProjectsWrapper />}
+          />
         </div>
       )}
     </div>

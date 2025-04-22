@@ -83,9 +83,9 @@ export function FeaturedProjects() {
               />
             </div>
             <DialogDescription className="space-y-4">
-              <p className="text-slate-600 dark:text-slate-400">
+              <div className="text-slate-600 dark:text-slate-400">
                 {selectedProject.description}
-              </p>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {selectedProject.technologies.map((tech) => (
                   <span

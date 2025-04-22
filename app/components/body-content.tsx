@@ -24,7 +24,7 @@ export function BodyContent({
           <NavBar className="z-40" />
           <div className="flex-1 flex">
             <Sidebar className="hidden md:block z-30" />
-            <main className="flex-1 md:pl-[200px] px-4 pt-16 theme-90s:bg-[#C0C0C0]">
+            <main className="flex-1 md:pl-[200px] px-4 pt-16 pb-16 theme-90s:bg-[#C0C0C0]">
               {children}
             </main>
           </div>
