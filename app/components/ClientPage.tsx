@@ -111,7 +111,7 @@ export default function ClientPage({ posts }: ClientPageProps) {
               <div className="flex items-center gap-3 mb-8">
                 <h2 className="text-3xl font-semibold tracking-tight">My Journey</h2>
                 <a
-                  href="https://linkedin.com/in/prateekmahindra"
+                  href="https://linkedin.com/in/pmahindra"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center p-1.5 rounded-md border-2 border-blue-200 hover:border-blue-300 transition-colors"
