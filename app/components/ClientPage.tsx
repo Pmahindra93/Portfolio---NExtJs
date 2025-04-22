@@ -138,6 +138,12 @@ export default function ClientPage({ posts }: ClientPageProps) {
                   <FeaturedProjectsWrapper />
                 </Suspense>
               </div>
+              {/* Add Footer Here */}
+                <footer className="border-t border-slate-200 pt-4 pb-2 dark:border-slate-800">
+                  <p className="text-center text-lg text-muted-foreground">
+                  Made with ❤️ in North London with 🤖 and 🍵
+                </p>
+              </footer>
             </div>
           </main>
         </div>

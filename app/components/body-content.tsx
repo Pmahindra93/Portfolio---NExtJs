@@ -28,12 +28,6 @@ export function BodyContent({
               {children}
             </main>
           </div>
-          {/* Add Footer Here */}
-          <footer className="py-4 border-t border-slate-200 dark:border-slate-800">
-            <p className="text-center text-sm text-muted-foreground">
-              Made with ❤️ in North London with 🤖 and 🍵
-            </p>
-          </footer>
         </div>
       </Providers>
     </body>

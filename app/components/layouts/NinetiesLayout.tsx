@@ -101,104 +101,99 @@ export function NinetiesLayout({ posts, journeyContent, projectsContent }: Ninet
       )}
 
 
-      <div className="flex flex-col md:flex-row gap-4">
-        {/* Sidebar */}
-        <aside className="md:w-1/4 bg-[#FFFFFF] border-4 border-[#000000] shadow-[5px_5px_0_#000000] p-4 space-y-4">
-          {/* New Title */}
-          <div className="bg-[#000080] text-[#FFFFFF] p-1 text-center font-bold">
-            Welcome to my Cyber Realm
-          </div>
-
-          {/* Webmaster Profile */}
-          <div className="text-center">
-            <div
-              className="inline-block border-4 border-[#000000] bg-[#FFFFFF] p-2 shadow-[3px_3px_0_#000000]"
-            >
-              <img
-                src="https://res.cloudinary.com/dvscdtpyl/image/upload/v1745332094/46C8C8BC-AB4F-4DA9-9CFA-97B8C2F8EDCD_lnawly.png"
-                alt="Webmaster"
-                className="w-32 h-32 mx-auto"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/128?text=Me'
-                }}
-              />
-            </div>
-            <p className="mt-2 font-bold">Webmaster Prateek</p>
-          </div>
-
-          {/* Navigation */}
-          <nav>
-            <div className="bg-[#000080] text-[#FFFFFF] p-1 mb-2 text-center">
-              Navigation
-            </div>
-            <ul>
-              <li className="mb-2">
-                <a
-                  href="#"
-                  className="flex items-center text-[#0000FF] hover:text-[#FF00FF]"
-                >
-                  <span className="mr-1">→</span> Home
-                </a>
-              </li>
-              <li className="mb-2">
-                <a
-                  href="#"
-                  className="flex items-center text-[#0000FF] hover:text-[#FF00FF]"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setShowGuestbook(!showGuestbook)
-                  }}
-                >
-                  <span className="mr-1">→</span> Guestbook
-                </a>
-              </li>
-               {/* Add links to content sections if desired */}
-            </ul>
-          </nav>
-
-          {/* Visitor Count */}
-          <div>
-            <div className="bg-[#000080] text-[#FFFFFF] p-1 mb-2 text-center">
-              Visitor Count
-            </div>
-            <div
-              className="text-center font-bold text-2xl"
-              style={{ animation: 'blink 1s infinite' }}
-            >
-              {visitorCount.toString().padStart(6, '0')}
-            </div>
-          </div>
-
-          {/* Browser Badges */}
-          <div className="text-center">
-            <div className="mb-2">This site is best viewed with:</div>
-            <div className="flex justify-center gap-2">
-              <div className="border-2 border-[#000000] p-1 bg-[#FFFFFF]">
-                <img
-                  src="/netscape.gif"
-                  alt="Netscape Now!"
-                  className="h-8"
-                  onError={(e) => { e.currentTarget.style.display = 'none' }}
-                />
-              </div>
-              <div className="border-2 border-[#000000] p-1 bg-[#FFFFFF]">
-                <img
-                  src="/ie.gif"
-                  alt="Internet Explorer"
-                  className="h-8"
-                  onError={(e) => { e.currentTarget.style.display = 'none' }}
-                />
-              </div>
-            </div>
-          </div>
-        </aside>
-
+      <div className="flex flex-col">
         {/* Main Content */}
-        <main className="flex-1 space-y-4">
+        <main className="flex-1 space-y-4 max-w-6xl mx-auto">
+          {/* Moved Sidebar Content */}
+          <section className="bg-[#FFFFFF] border-4 border-[#000000] shadow-[5px_5px_0_#000000] p-4 space-y-4">
+            {/* Webmaster Profile */}
+            <div className="text-center">
+              <div
+                className="inline-block border-4 border-[#000000] bg-[#FFFFFF] p-2 shadow-[3px_3px_0_#000000]"
+              >
+                <img
+                  src="https://res.cloudinary.com/dvscdtpyl/image/upload/v1745332094/46C8C8BC-AB4F-4DA9-9CFA-97B8C2F8EDCD_lnawly.png"
+                  alt="Webmaster"
+                  className="w-32 h-32 mx-auto"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://via.placeholder.com/128?text=Me'
+                  }}
+                />
+              </div>
+              <p className="mt-2 font-bold">Webmaster Prateek</p>
+            </div>
+
+            {/* Navigation */}
+            <nav>
+              <div className="bg-[#000080] text-[#FFFFFF] p-1 mb-2 text-center">
+                Navigation
+              </div>
+              <ul>
+                <li className="mb-2">
+                  <a
+                    href="#"
+                    className="flex items-center text-[#0000FF] hover:text-[#FF00FF]"
+                  >
+                    <span className="mr-1">→</span> Home
+                  </a>
+                </li>
+                <li className="mb-2">
+                  <a
+                    href="#"
+                    className="flex items-center text-[#0000FF] hover:text-[#FF00FF]"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setShowGuestbook(!showGuestbook)
+                    }}
+                  >
+                    <span className="mr-1">→</span> Guestbook
+                  </a>
+                </li>
+                 {/* Add links to content sections if desired */}
+              </ul>
+            </nav>
+
+            {/* Visitor Count */}
+            <div>
+              <div className="bg-[#000080] text-[#FFFFFF] p-1 mb-2 text-center">
+                Visitor Count
+              </div>
+              <div
+                className="text-center font-bold text-2xl"
+                style={{ animation: 'blink 1s infinite' }}
+              >
+                {visitorCount.toString().padStart(6, '0')}
+              </div>
+            </div>
+
+            {/* Browser Badges */}
+            <div className="text-center">
+              <div className="mb-2">This site is best viewed with:</div>
+              <div className="flex justify-center gap-2">
+                <div className="border-2 border-[#000000] p-1 bg-[#FFFFFF]">
+                  <img
+                    src="/images/netscape.png"
+                    alt="Netscape Now!"
+                    className="h-8"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                </div>
+                <div className="border-2 border-[#000000] p-1 bg-[#FFFFFF]">
+                  <img
+                    src="/images/IE.png"
+                    alt="Internet Explorer"
+                    className="h-8"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Section: Recent Posts */}
           <section className="bg-[#FFFFFF] border-4 border-[#000000] shadow-[5px_5px_0_#000000] p-4">
             <div className="bg-[#000080] text-[#FFFFFF] p-1 mb-2 text-center">
-              Da Latest News! (Recent Posts)
+              Recent Posts
             </div>
             <ul className="list-disc list-inside">
               {posts && posts.length > 0 ? (
@@ -282,11 +277,11 @@ export function NinetiesLayout({ posts, journeyContent, projectsContent }: Ninet
       </div>
 
       {/* Footer */}
-      <footer className="mt-4 text-center text-sm text-[#000080]">
+      <footer className="mt-4 text-center text-sm pt-5 text-[#000080]">
         <p>
           1999-{new Date().getFullYear()} Prateek Mahindra. All rights reserved.
         </p>
-        <p>This website is powered by !</p>
+        <p>This website is powered by 🍵 & 👨🏽‍💻 !</p>
         <div className="flex justify-center gap-2 mt-2">
           <img
             src="/geocities.gif"
