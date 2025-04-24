@@ -59,7 +59,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact
 
-*   [Your Name] - [Prateek Mahindra]
+* Prateek Mahindra
 *   Portfolio - [https://www.prateekmahindra.com/]
 *   LinkedIn - [https://www.linkedin.com/in/pmahindra/]
 *   GitHub - [https://github.com/Pmahindra93]
