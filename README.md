@@ -1,4 +1,4 @@
-# [Your Name]'s Portfolio
+# Prateek's Portfolio
 
 A personal portfolio website built with Next.js and TypeScript, showcasing web development projects and skills with a unique retro 90s aesthetic.
 
