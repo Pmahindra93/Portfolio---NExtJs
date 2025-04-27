@@ -4,6 +4,7 @@ import { Caveat } from "next/font/google"
 import { Metadata } from "next"
 import { BodyContent } from '@/app/components/body-content'
 import { cn } from "@/lib/utils"
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css'
 
 const inter = Inter({
@@ -37,7 +38,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       inter.variable,
       caveat.variable
     )}>
-      <BodyContent className="min-h-screen">{children}</BodyContent>
+      <BodyContent className="min-h-screen">{children}<Analytics /></BodyContent>
     </html>
   )
 }
