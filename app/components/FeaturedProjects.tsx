@@ -18,8 +18,10 @@ const projects: Project[] = [
   {
     id: 'ai-chat',
     title: 'AI Chat Application',
-    description: 'A real-time chat application powered by large language models. Built with Next.js, TypeScript, and integrated with OpenAI\'s GPT-4 API. Features include conversation memory, code highlighting, and markdown support.',
-    technologies: ['Next.js', 'TypeScript', 'OpenAI', 'TailwindCSS']
+    description: `A real-time chat application powered by Open Ai 4.1 models to anaswer any questions about Prateek\'s professional background.
+    Built with Vite, TypeScript, and integrated with OpenAI\'s GPT-4.1 API.
+    Features include conversation memory,rate limiting, and contextual memory to talk about Prateek\'s journey.`,
+    technologies: ['Vite', 'TypeScript', 'OpenAI', 'TailwindCSS']
   },
   {
     id: 'ml-dashboard',
@@ -82,7 +84,7 @@ export function FeaturedProjects() {
               </div>
               <div className="pt-4">
                 <Button asChild>
-                  <Link href={`https://github.com/yourusername/${selectedProject.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                  <Link href={`https://solve-smart-landing-page.vercel.app/`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                     View Project <ExternalLink className="w-4 h-4" />
                   </Link>
                 </Button>
