@@ -91,7 +91,7 @@ export default function ClientPage({ posts }: ClientPageProps) {
       {!is90sStyle && (
         <div id="modern-theme" className="modern-theme">
           {/* Structure copied from ThemeContent.tsx */}
-          <main className="container mx-auto px-4 mt-16">
+          <main className="container mx-auto px-4 mt-6">
             <div className="space-y-12">
               <div>
                 <h1 className="text-4xl font-bold mb-3 text-slate-900 dark:text-white">
