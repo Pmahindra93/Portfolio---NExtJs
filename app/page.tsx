@@ -2,6 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import ClientPage from '@/app/components/ClientPage'
 import { Post } from '@/types/post'
 
+// Force dynamic rendering since we use Supabase with cookies
+export const dynamic = 'force-dynamic'
+
 // Fetch posts from Supabase
 async function getPosts() {
   try {

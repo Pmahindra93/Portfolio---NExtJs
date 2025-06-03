@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
+import Image from 'next/image'
 
 export function NavBar({ className }: { className?: string }) {
   const { is90sStyle, toggle90sStyle } = useTheme()
@@ -75,19 +76,24 @@ export function NavBar({ className }: { className?: string }) {
     >
       <div className="w-full px-4 flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
-          <span className={cn(
-            "font-bold inline-block",
-            is90sStyle
-              ? "text-[#FFFF00] font-['Comic_Sans_MS',_cursive] animate-pulse text-2xl"
-              : ""
-          )}>
-            <span className="hidden md:inline">
-              {is90sStyle ? "Welcome to Prateek's Cyber Space!" : "Prateek Mahindra"}
+          {is90sStyle ? (
+            <span className="text-[#FFFF00] font-['Comic_Sans_MS',_cursive] animate-pulse text-2xl font-bold">
+              <span className="hidden md:inline">Welcome to Prateek&apos;s Cyber Space!</span>
+              <span className="md:hidden">Prateek&apos;s Space</span>
             </span>
-            <span className="md:hidden">
-              {is90sStyle ? "Prateek's Space" : "Prateek M."}
-            </span>
-          </span>
+          ) : (
+            <div className="flex items-center">
+              {/* Show logo on desktop, text on mobile */}
+              <Image
+                src="/images/website_logo.jpg"
+                alt="Prateek Mahindra Logo"
+                width={108}
+                height={108}
+                className="rounded-lg hidden md:block"
+              />
+              <span className="font-bold md:hidden">Prateek M.</span>
+            </div>
+          )}
         </Link>
 
         <div className="flex items-center space-x-6">
