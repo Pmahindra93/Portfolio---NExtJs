@@ -12,26 +12,36 @@ interface Project {
   title: string
   description: string
   technologies: string[]
+  preview?: string // Optional path to GIF or image
+  link?: string
 }
 
 const projects: Project[] = [
   {
     id: 'ai-chat',
     title: 'AI Chat Application',
-    description: 'A real-time chat application powered by large language models. Built with Next.js, TypeScript, and integrated with OpenAI\'s GPT-4 API. Features include conversation memory, code highlighting, and markdown support.',
-    technologies: ['Next.js', 'TypeScript', 'OpenAI', 'TailwindCSS']
+    description: `A real-time chat application powered by Open Ai 4.1 models to answer any questions about Prateek\'s professional background.
+    Built with Vite, TypeScript, and integrated with OpenAI\'s GPT-4.1 API.
+    Features include conversation memory,rate limiting, and contextual memory to talk about Prateek\'s journey.`,
+    technologies: ['Vite', 'TypeScript', 'OpenAI', 'TailwindCSS'],
+    preview: '/images/ai-chat-preview.gif',
+    link: 'https://solve-smart-landing-page.vercel.app/'
   },
   {
-    id: 'ml-dashboard',
-    title: 'ML Analytics Dashboard',
-    description: 'An interactive dashboard for visualizing machine learning model performance metrics. Built with React and D3.js, featuring real-time data updates and customizable visualizations.',
-    technologies: ['React', 'D3.js', 'Python', 'FastAPI']
+    id: 'ai-note-taking-app',
+    title: 'AIVA - AI Note Taking App for Doctors',
+    description: 'AI-powered medical scribing that allows doctors to record patient consultations in 99+ languages and generate summaries.',
+    technologies: ['React', 'NextJS', 'Anthropic API', 'ElevenLabs API', 'Supabase Postgres'],
+    preview: '/images/aiva-preview.gif',
+    link: 'https://anaiva.io'
   },
   {
     id: 'llm-api',
-    title: 'LLM API Service',
-    description: 'A scalable API service for deploying and managing multiple language models. Includes features like model versioning, A/B testing, and performance monitoring.',
-    technologies: ['Python', 'FastAPI', 'Docker', 'PostgreSQL']
+    title: 'Bank Statement Analyzer',
+    description: 'A scalable service for analyzing bank statements and extracting relevant information.',
+    technologies: ['Typescript', 'NextJS', 'Anthropic API'],
+    preview: '/images/bank-statement.gif',
+    link: 'https://github.com/Pmahindra93/pdf-extractor'
   }
 ]
 
@@ -51,7 +61,16 @@ export function FeaturedProjects() {
               <h3 className="text-white text-lg font-semibold">{project.title}</h3>
             </div>
             <div className="flex items-center justify-center h-full">
-              <span className="text-slate-400 dark:text-slate-500">Project Preview</span>
+              {project.preview ? (
+                <Image
+                  src={project.preview}
+                  alt={project.title}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <span className="text-slate-400 dark:text-slate-500">Project Preview</span>
+              )}
             </div>
           </div>
         ))}
@@ -62,14 +81,23 @@ export function FeaturedProjects() {
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold">{selectedProject.title}</DialogTitle>
-            </DialogHeader>
-            <div className="h-[300px] my-4 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center">
-              <span className="text-slate-400 dark:text-slate-500">Project Preview</span>
-            </div>
-            <DialogDescription className="space-y-4">
-              <p className="text-slate-600 dark:text-slate-400">
+              <DialogDescription>
                 {selectedProject.description}
-              </p>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="h-[300px] my-4 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center relative">
+              {selectedProject.preview ? (
+                <Image
+                  src={selectedProject.preview}
+                  alt={selectedProject.title}
+                  fill
+                  className="object-contain"
+                />
+              ) : (
+                <span className="text-slate-400 dark:text-slate-500">Project Preview</span>
+              )}
+            </div>
+            <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
                 {selectedProject.technologies.map((tech) => (
                   <span
@@ -82,12 +110,12 @@ export function FeaturedProjects() {
               </div>
               <div className="pt-4">
                 <Button asChild>
-                  <Link href={`https://github.com/yourusername/${selectedProject.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                  <Link href={selectedProject.link || ''} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                     View Project <ExternalLink className="w-4 h-4" />
                   </Link>
                 </Button>
               </div>
-            </DialogDescription>
+            </div>
           </DialogContent>
         )}
       </Dialog>

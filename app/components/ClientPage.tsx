@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { Linkedin } from 'lucide-react'
+import { Linkedin, Github } from 'lucide-react'
 import { FeaturedProjectsWrapper, TimelineWrapper, RecentPostsWrapper } from './client-wrappers/DynamicComponents'
 import { PostsSkeleton } from './skeletons/PostsSkeleton'
 import { NinetiesLayout } from './layouts/NinetiesLayout'
@@ -91,7 +91,7 @@ export default function ClientPage({ posts }: ClientPageProps) {
       {!is90sStyle && (
         <div id="modern-theme" className="modern-theme">
           {/* Structure copied from ThemeContent.tsx */}
-          <main className="container mx-auto px-4 mt-16">
+          <main className="container mx-auto px-4 mt-6">
             <div className="space-y-12">
               <div>
                 <h1 className="text-4xl font-bold mb-3 text-slate-900 dark:text-white">
@@ -100,6 +100,24 @@ export default function ClientPage({ posts }: ClientPageProps) {
                 <p className="text-lg text-slate-600 dark:text-slate-400">
                   Welcome to my corner of the internet, where I showcase my CV, projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
                 </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-4 mb-6">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Projects</h2>
+                  <a
+                    href="https://github.com/Pmahindra93"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-center w-7 h-7 rounded-md border-2 border-slate-600 dark:border-slate-400 hover:border-slate-700 dark:hover:border-slate-300 transition-colors"
+                    aria-label="GitHub Profile"
+                  >
+                    <Github className="w-4 h-4 text-slate-600 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" />
+                  </a>
+                </div>
+                <Suspense fallback={<div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />}>
+                  <FeaturedProjectsWrapper />
+                </Suspense>
               </div>
 
               <div>
@@ -124,18 +142,6 @@ export default function ClientPage({ posts }: ClientPageProps) {
                 </div>
                 <Suspense fallback={<div className="h-96 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />}>
                   <TimelineWrapper />
-                </Suspense>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Projects</h2>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                    Coming Soon
-                  </span>
-                </div>
-                <Suspense fallback={<div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />}>
-                  <FeaturedProjectsWrapper />
                 </Suspense>
               </div>
               {/* Add Footer Here */}
