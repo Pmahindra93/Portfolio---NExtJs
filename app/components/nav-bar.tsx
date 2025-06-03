@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useTheme } from '@/lib/hooks/useTheme'
@@ -36,24 +35,19 @@ export function NavBar({ className }: { className?: string }) {
     >
       <div className="w-full px-4 flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
-          {is90sStyle ? (
-            <span className="text-[#FFFF00] font-['Comic_Sans_MS',_cursive] animate-pulse text-2xl font-bold">
-              <span className="hidden md:inline">Welcome to Prateek&apos;s Cyber Space!</span>
-              <span className="md:hidden">Prateek&apos;s Space</span>
+          <span className={cn(
+            "font-bold inline-block",
+            is90sStyle
+              ? "text-[#FFFF00] font-['Comic_Sans_MS',_cursive] animate-pulse text-2xl"
+              : ""
+          )}>
+            <span className="hidden md:inline">
+              {is90sStyle ? "Welcome to Prateek's Cyber Space!" : "Prateek Mahindra"}
             </span>
-          ) : (
-            <div className="flex items-center">
-              {/* Show logo on desktop, text on mobile */}
-              <Image
-                src="/images/website-logo.jpg"
-                alt="Prateek Mahindra Logo"
-                width={32}
-                height={32}
-                className="rounded-lg hidden md:block"
-              />
-              <span className="font-bold md:hidden">Prateek M.</span>
-            </div>
-          )}
+            <span className="md:hidden">
+              {is90sStyle ? "Prateek's Space" : "Prateek M."}
+            </span>
+          </span>
         </Link>
 
         <div className="flex items-center space-x-6">
