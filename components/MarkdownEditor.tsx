@@ -1,7 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import dynamic from 'next/dynamic'
+import { useDropzone } from 'react-dropzone'
+import { supabase } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { ImageIcon, Loader2 } from 'lucide-react'
+import { useTheme } from '@/lib/hooks/useTheme'
 import '@uiw/react-md-editor/markdown-editor.css'
 import '@uiw/react-markdown-preview/markdown.css'
 
@@ -25,10 +30,62 @@ export default function MarkdownEditor({
   placeholder = 'Start writing...' 
 }: MarkdownEditorProps) {
   const [mounted, setMounted] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const { isDarkMode } = useTheme()
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  const uploadImage = useCallback(async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop()
+    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
+    const filePath = `blog-images/${fileName}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('post-images')
+      .upload(filePath, file)
+
+    if (uploadError) {
+      throw uploadError
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('post-images')
+      .getPublicUrl(filePath)
+
+    return publicUrl
+  }, [])
+
+  const handleImageUpload = useCallback(async (files: File[]) => {
+    const file = files[0]
+    if (!file) return
+
+    setIsUploading(true)
+    try {
+      const imageUrl = await uploadImage(file)
+      const altText = file.name.split('.')[0]
+      const markdownImage = `![${altText}](${imageUrl})\n\n`
+      
+      // Insert the image markdown at the current cursor position or at the end
+      const newContent = value + markdownImage
+      onChange(newContent)
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      alert('Failed to upload image. Please try again.')
+    } finally {
+      setIsUploading(false)
+    }
+  }, [value, onChange, uploadImage])
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: handleImageUpload,
+    accept: {
+      'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
+    },
+    maxFiles: 1,
+    noClick: true, // We'll handle clicks manually
+  })
 
   if (!mounted) {
     return (
@@ -44,13 +101,54 @@ export default function MarkdownEditor({
   }
 
   return (
-    <div className={`markdown-editor-container ${className}`}>
+    <div 
+      {...getRootProps()} 
+      className={`markdown-editor-container relative ${className} ${
+        isDragActive ? 'ring-2 ring-primary ring-offset-2' : ''
+      }`}
+    >
+      <input {...getInputProps()} />
+      
+      {/* Custom toolbar with image upload */}
+      <div className="flex items-center gap-2 p-2 border-b border-border bg-muted/50">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation()
+            const input = document.createElement('input')
+            input.type = 'file'
+            input.accept = 'image/*'
+            input.onchange = (event) => {
+              const files = (event.target as HTMLInputElement).files
+              if (files) {
+                handleImageUpload(Array.from(files))
+              }
+            }
+            input.click()
+          }}
+          disabled={isUploading}
+          className="flex items-center gap-1"
+        >
+          {isUploading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <ImageIcon className="h-4 w-4" />
+          )}
+          Upload Image
+        </Button>
+        <span className="text-xs text-muted-foreground">
+          {isDragActive ? 'Drop image here...' : 'Drag & drop images or click to upload'}
+        </span>
+      </div>
+
       <MDEditor
         value={value || ''}
         onChange={(val) => onChange(val || '')}
         preview="edit"
         hideToolbar={false}
-        visibleDragBar={false}
+        visibleDragbar={false}
         textareaProps={{
           placeholder,
           style: {
@@ -65,7 +163,7 @@ export default function MarkdownEditor({
             background: 'transparent',
           },
         }}
-        data-color-mode="auto"
+        data-color-mode={isDarkMode ? "dark" : "light"}
         height={400}
       />
       <style jsx global>{`
