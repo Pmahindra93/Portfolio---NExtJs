@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import RichTextEditor from '@/components/RichTextEditor'
+import MarkdownEditor from '@/components/MarkdownEditor'
 import { useAdmin } from '@/lib/hooks/useAdmin'
 import { Post } from '@/types/post'
 import { supabase } from '@/lib/supabase/client'
@@ -158,10 +158,10 @@ export default function EditPost(props: { params: Promise<{ id: string }> }) {
           <label htmlFor="content" className="block text-sm font-medium mb-2">
             Content
           </label>
-          <RichTextEditor
+          <MarkdownEditor
             value={content}
             onChange={setContent}
-            className="min-h-[400px]"
+            placeholder="Write your blog post in markdown..."
           />
         </div>
         <div className="flex justify-end gap-4">

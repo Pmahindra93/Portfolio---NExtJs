@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import RichTextEditor from "@/components/RichTextEditor";
+import MarkdownEditor from "@/components/MarkdownEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
@@ -85,10 +85,10 @@ export default function NewPost() {
           <label htmlFor="content" className="block text-sm font-medium mb-2">
             Content
           </label>
-          <RichTextEditor
+          <MarkdownEditor
             value={content}
             onChange={setContent}
-            className="min-h-[400px]"
+            placeholder="Write your blog post in markdown..."
           />
         </div>
         <div className="flex justify-end">

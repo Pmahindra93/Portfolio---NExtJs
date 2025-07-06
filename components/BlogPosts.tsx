@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import RichTextEditor from './RichTextEditor'
+import MarkdownEditor from './MarkdownEditor'
 import { cn } from "@/lib/utils"
 
 interface Post {
@@ -81,9 +81,10 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
                 value={newPost.title}
                 onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
               />
-              <RichTextEditor
+              <MarkdownEditor
                 value={newPost.content}
                 onChange={(content) => setNewPost({ ...newPost, content })}
+                placeholder="Write your post in markdown..."
               />
               <Button onClick={handleCreate}>Create</Button>
             </div>
@@ -111,9 +112,10 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
                   value={editPost.title}
                   onChange={(e) => setEditPost({ ...editPost, title: e.target.value })}
                 />
-                <RichTextEditor
+                <MarkdownEditor
                   value={editPost.content}
                   onChange={(content) => setEditPost({ ...editPost, content })}
+                  placeholder="Write your post in markdown..."
                 />
                 <Button onClick={() => handleUpdate(post.id)}>Save</Button>
                 <Button variant="outline" onClick={() => setIsEditing(null)}>Cancel</Button>
