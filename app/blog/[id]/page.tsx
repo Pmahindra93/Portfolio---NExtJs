@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card'
 import { useTheme } from '@/lib/hooks/useTheme'
 import { notFound } from 'next/navigation'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 export default function BlogPost(props: { params: Promise<{ id: string }> }) {
   const [post, setPost] = useState<Post | null>(null)
@@ -259,13 +260,16 @@ export default function BlogPost(props: { params: Promise<{ id: string }> }) {
 
           {post.cover_image && (
             <div className="mb-6">
-              <img
+              <Image
                 src={post.cover_image}
                 alt={post.title}
+                width={800}
+                height={400}
                 className={cn("w-full h-auto rounded-lg", {
                   'border-4 border-[#000000] p-2 bg-[#FFFFFF]': is90sStyle,
                   'rounded-lg': !is90sStyle
                 })}
+                priority
               />
             </div>
           )}
@@ -318,16 +322,13 @@ export default function BlogPost(props: { params: Promise<{ id: string }> }) {
                 Thanks for visiting my awesome webpage! Don&apos;t forget to sign my guestbook!
               </div>
               <div className="mt-4">
-                <img
+                <Image
                   src="/construction.gif"
                   alt="Under Construction"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                  style={{
-                    display: 'inline-block',
-                    height: '50px'
-                  }}
+                  width={50}
+                  height={50}
+                  className="inline-block"
+                  unoptimized
                 />
               </div>
             </div>

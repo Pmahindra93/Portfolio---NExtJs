@@ -4,8 +4,19 @@ import { createClient } from '@/lib/supabase/server'
 import { Post, UpdatePostInput } from '@/types/post'
 import { cookies } from 'next/headers'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { SupabaseClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
+
+async function checkIsAdmin(supabase: SupabaseClient, userId: string): Promise<boolean> {
+  const { data: roleData } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', userId)
+    .single()
+
+  return roleData?.role === 'admin'
+}
 
 export async function GET(
   request: Request,
@@ -44,39 +55,20 @@ export async function PUT(
 ) {
   const { id } = await props.params
   try {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return request.cookies.get(name)?.value
-          },
-          set(name: string, value: string, options: CookieOptions) {
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           // Next.js cookies() API is read-only in route handlers
-            // We'll handle cookie setting through the response headers
-          },
-          remove(name: string, options: CookieOptions) {
-            // Next.js cookies() API is read-only in route handlers
-            // We'll handle cookie removal through the response headers
-          },
-        },
-      }
-    )
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    // Get session from cookie
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-    if (sessionError || !session) {
+    if (authError || !user) {
       return NextResponse.json(
-        { error: 'No valid session found' },
+        { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    // Check if user is admin
-    if (session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+    const isAdmin = await checkIsAdmin(supabase, user.id)
+    if (!isAdmin) {
       return NextResponse.json(
-        { error: 'Unauthorized - Admin access required' },
+        { error: 'Only admins can edit posts' },
         { status: 403 }
       )
     }
@@ -126,20 +118,19 @@ export async function DELETE(
   const { id } = await props.params
   try {
     const supabase = await createClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    // Check if user is admin using environment variable
-    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL
-    if (session.user.email !== adminEmail) {
+    const isAdmin = await checkIsAdmin(supabase, user.id)
+    if (!isAdmin) {
       return NextResponse.json(
-        { error: 'Unauthorized - Admin access required' },
+        { error: 'Only admins can delete posts' },
         { status: 403 }
       )
     }

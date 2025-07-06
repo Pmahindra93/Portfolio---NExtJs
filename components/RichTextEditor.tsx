@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect } from 'react'
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
@@ -10,6 +10,9 @@ import Underline from '@tiptap/extension-underline'
 import Color from '@tiptap/extension-color'
 import FontFamily from '@tiptap/extension-font-family'
 import TextStyle from '@tiptap/extension-text-style'
+import BulletList from '@tiptap/extension-bullet-list'
+import OrderedList from '@tiptap/extension-ordered-list'
+import ListItem from '@tiptap/extension-list-item'
 
 const fontFamilies = [
   { name: 'Default', value: 'Inter' },
@@ -21,7 +24,7 @@ const fontFamilies = [
   { name: 'Courier', value: 'Courier' },
 ]
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
     return null
   }
@@ -85,6 +88,20 @@ const MenuBar = ({ editor }: { editor: any }) => {
         ordered list
       </button>
       <button
+        onClick={() => editor.chain().focus().sinkListItem('listItem').run()}
+        disabled={!editor.can().sinkListItem('listItem')}
+        className="p-2 rounded hover:bg-secondary disabled:opacity-50"
+      >
+        indent
+      </button>
+      <button
+        onClick={() => editor.chain().focus().liftListItem('listItem').run()}
+        disabled={!editor.can().liftListItem('listItem')}
+        className="p-2 rounded hover:bg-secondary disabled:opacity-50"
+      >
+        outdent
+      </button>
+      <button
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         className={`p-2 rounded hover:bg-secondary ${editor.isActive('codeBlock') ? 'bg-secondary' : ''}`}
       >
@@ -121,7 +138,11 @@ interface RichTextEditorProps {
 export default function RichTextEditor({ value, onChange, className }: RichTextEditorProps) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        bulletList: false,
+        orderedList: false,
+        listItem: false,
+      }),
       TextStyle,
       Link,
       Image,
@@ -133,10 +154,48 @@ export default function RichTextEditor({ value, onChange, className }: RichTextE
       FontFamily.configure({
         types: ['textStyle'],
       }),
+      BulletList.configure({
+        HTMLAttributes: {
+          class: 'my-custom-bullet-list',
+        },
+        keepMarks: true,
+        keepAttributes: false,
+      }),
+      OrderedList.configure({
+        HTMLAttributes: {
+          class: 'my-custom-ordered-list',
+        },
+        keepMarks: true,
+        keepAttributes: false,
+      }),
+      ListItem.configure({
+        HTMLAttributes: {
+          class: 'my-custom-list-item',
+        },
+      }),
     ],
     content: value,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML())
+    },
+    editorProps: {
+      handleKeyDown: (view, event): boolean => {
+        if (event.key === 'Tab') {
+          const { state } = view
+          const { selection } = state
+          const { $from } = selection
+          
+          if ($from.parent.type.name === 'listItem') {
+            event.preventDefault()
+            if (event.shiftKey) {
+              return editor?.commands.liftListItem('listItem') || false
+            } else {
+              return editor?.commands.sinkListItem('listItem') || false
+            }
+          }
+        }
+        return false
+      },
     },
   })
 
@@ -152,7 +211,7 @@ export default function RichTextEditor({ value, onChange, className }: RichTextE
       <div className="p-4">
         <EditorContent
           editor={editor}
-          className="prose dark:prose-invert max-w-none min-h-[200px] [&_.tiptap]:min-h-[200px] [&_.tiptap]:outline-none [&_.tiptap]:whitespace-pre-wrap [&_.tiptap>p]:my-4 [&_.tiptap>p:first-child]:mt-0 [&_.tiptap>p:last-child]:mb-0"
+          className="prose dark:prose-invert max-w-none min-h-[200px] [&_.tiptap]:min-h-[200px] [&_.tiptap]:outline-none [&_.tiptap]:whitespace-pre-wrap [&_.tiptap>p]:my-4 [&_.tiptap>p:first-child]:mt-0 [&_.tiptap>p:last-child]:mb-0 [&_.my-custom-bullet-list]:list-disc [&_.my-custom-bullet-list]:ml-6 [&_.my-custom-bullet-list]:my-2 [&_.my-custom-ordered-list]:list-decimal [&_.my-custom-ordered-list]:ml-6 [&_.my-custom-ordered-list]:my-2 [&_.my-custom-list-item]:mb-1"
         />
       </div>
     </div>

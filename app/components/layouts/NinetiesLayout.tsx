@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 interface NinetiesPost {
@@ -111,13 +112,12 @@ export function NinetiesLayout({ posts, journeyContent, projectsContent }: Ninet
               <div
                 className="inline-block border-4 border-[#000000] bg-[#FFFFFF] p-2 shadow-[3px_3px_0_#000000]"
               >
-                <img
+                <Image
                   src="https://res.cloudinary.com/dvscdtpyl/image/upload/v1745332094/46C8C8BC-AB4F-4DA9-9CFA-97B8C2F8EDCD_lnawly.png"
                   alt="Webmaster"
+                  width={128}
+                  height={128}
                   className="w-32 h-32 mx-auto"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/128?text=Me'
-                  }}
                 />
               </div>
               <p className="mt-2 font-bold">Webmaster Prateek</p>
@@ -171,19 +171,21 @@ export function NinetiesLayout({ posts, journeyContent, projectsContent }: Ninet
               <div className="mb-2">This site is best viewed with:</div>
               <div className="flex justify-center gap-2">
                 <div className="border-2 border-[#000000] p-1 bg-[#FFFFFF]">
-                  <img
+                  <Image
                     src="/images/netscape.png"
                     alt="Netscape Now!"
+                    width={32}
+                    height={32}
                     className="h-8"
-                    onError={(e) => { e.currentTarget.style.display = 'none' }}
                   />
                 </div>
                 <div className="border-2 border-[#000000] p-1 bg-[#FFFFFF]">
-                  <img
+                  <Image
                     src="/images/IE.png"
                     alt="Internet Explorer"
+                    width={32}
+                    height={32}
                     className="h-8"
-                    onError={(e) => { e.currentTarget.style.display = 'none' }}
                   />
                 </div>
               </div>
@@ -283,17 +285,21 @@ export function NinetiesLayout({ posts, journeyContent, projectsContent }: Ninet
         </p>
         <p>This website is powered by 🍵 & 👨🏽‍💻 !</p>
         <div className="flex justify-center gap-2 mt-2">
-          <img
+          <Image
             src="/geocities.gif"
             alt="GeoCities"
+            width={24}
+            height={24}
             className="h-6"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
+            unoptimized
           />
-          <img
+          <Image
             src="/html.gif"
             alt="Made with HTML"
+            width={24}
+            height={24}
             className="h-6"
-            onError={(e) => { e.currentTarget.style.display = 'none' }}
+            unoptimized
           />
         </div>
       </footer>

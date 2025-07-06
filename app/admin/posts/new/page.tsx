@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { Card } from '@/components/ui/card'
 import { ImageUpload } from '@/components/ImageUpload'
-import RichTextEditor from '@/components/RichTextEditor'
+import MarkdownEditor from '@/components/MarkdownEditor'
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -76,9 +76,10 @@ export default function NewPostPage() {
             onRemove={() => setCoverImage(null)}
           />
 
-          <RichTextEditor
+          <MarkdownEditor
             value={content}
             onChange={(value) => setContent(value)}
+            placeholder="Write your blog post in markdown..."
           />
 
           <div className="flex justify-end space-x-4">

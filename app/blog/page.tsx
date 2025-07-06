@@ -18,7 +18,7 @@ export default function BlogPage() {
       
       const { data, error } = await supabase
         .from('posts')
-        .select('*')
+        .select('id, title, content, published, created_at, updated_at, author_id, cover_image')
         .eq('published', true)
         .order('created_at', { ascending: false })
 

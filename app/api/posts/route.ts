@@ -50,16 +50,16 @@ export async function POST(
 ): Promise<NextResponse<Post | { error: string }>> {
   try {
     const supabase = await createClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const isAdmin = await checkIsAdmin(supabase, session.user.id)
+    const isAdmin = await checkIsAdmin(supabase, user.id)
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Only admins can create posts' },
@@ -74,7 +74,7 @@ export async function POST(
       .insert([
         {
           ...input,
-          author_id: session.user.id,
+          author_id: user.id,
         },
       ])
       .select()
