@@ -56,16 +56,16 @@ export async function PUT(
   const { id } = await props.params
   try {
     const supabase = await createClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const isAdmin = await checkIsAdmin(supabase, session.user.id)
+    const isAdmin = await checkIsAdmin(supabase, user.id)
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Only admins can edit posts' },
@@ -118,16 +118,16 @@ export async function DELETE(
   const { id } = await props.params
   try {
     const supabase = await createClient()
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
-    if (!session) {
+    if (authError || !user) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       )
     }
 
-    const isAdmin = await checkIsAdmin(supabase, session.user.id)
+    const isAdmin = await checkIsAdmin(supabase, user.id)
     if (!isAdmin) {
       return NextResponse.json(
         { error: 'Only admins can delete posts' },

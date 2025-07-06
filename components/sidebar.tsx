@@ -36,11 +36,11 @@ export function Sidebar({ className }: SidebarProps) {
 
   const handleSignOut = async () => {
     try {
-      // Check session first
-      const { data: { session } } = await supabase.auth.getSession()
+      // Check user first
+      const { data: { user } } = await supabase.auth.getUser()
       
-      if (!session) {
-        // If no session, just clean up and redirect
+      if (!user) {
+        // If no user, just clean up and redirect
         localStorage.clear()
         router.push('/')
         router.refresh()

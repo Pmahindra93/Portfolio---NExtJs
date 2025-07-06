@@ -1,20 +1,9 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
-import dynamic from 'next/dynamic'
 import { useDropzone } from 'react-dropzone'
 import { supabase } from '@/lib/supabase/client'
-import { Button } from '@/components/ui/button'
-import { ImageIcon, Loader2 } from 'lucide-react'
 import { useTheme } from '@/lib/hooks/useTheme'
-import '@uiw/react-md-editor/markdown-editor.css'
-import '@uiw/react-markdown-preview/markdown.css'
-
-// Dynamic import to avoid SSR issues
-const MDEditor = dynamic(
-  () => import('@uiw/react-md-editor').then((mod) => mod.default),
-  { ssr: false }
-)
 
 interface MarkdownEditorProps {
   value: string
@@ -40,14 +29,29 @@ export default function MarkdownEditor({
   const uploadImage = useCallback(async (file: File): Promise<string> => {
     const fileExt = file.name.split('.').pop()
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-    const filePath = `blog-images/${fileName}`
+    const filePath = fileName // Remove nested folder structure
+
+    // First, check if bucket exists and create if needed
+    const { data: buckets } = await supabase.storage.listBuckets()
+    const bucketExists = buckets?.some(bucket => bucket.name === 'post-images')
+    
+    if (!bucketExists) {
+      await supabase.storage.createBucket('post-images', {
+        public: true,
+        allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
+      })
+    }
 
     const { error: uploadError } = await supabase.storage
       .from('post-images')
-      .upload(filePath, file)
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
 
     if (uploadError) {
-      throw uploadError
+      console.error('Upload error details:', uploadError)
+      throw new Error(`Upload failed: ${uploadError.message}`)
     }
 
     const { data: { publicUrl } } = supabase.storage
@@ -84,13 +88,14 @@ export default function MarkdownEditor({
       'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
     },
     maxFiles: 1,
-    noClick: true, // We'll handle clicks manually
+    noClick: true,
+    noKeyboard: true,
   })
 
   if (!mounted) {
     return (
-      <div className={`border rounded-lg p-4 min-h-[400px] bg-background ${className}`}>
-        <div className="animate-pulse">
+      <div className={`min-h-[400px] bg-background ${className}`}>
+        <div className="animate-pulse p-6">
           <div className="h-4 bg-gray-300 rounded w-1/4 mb-4"></div>
           <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
           <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
@@ -101,121 +106,146 @@ export default function MarkdownEditor({
   }
 
   return (
-    <div 
-      {...getRootProps()} 
-      className={`markdown-editor-container relative ${className} ${
-        isDragActive ? 'ring-2 ring-primary ring-offset-2' : ''
-      }`}
-    >
-      <input {...getInputProps()} />
-      
-      {/* Custom toolbar with image upload */}
-      <div className="flex items-center gap-2 p-2 border-b border-border bg-muted/50">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={(e) => {
-            e.stopPropagation()
-            const input = document.createElement('input')
-            input.type = 'file'
-            input.accept = 'image/*'
-            input.onchange = (event) => {
-              const files = (event.target as HTMLInputElement).files
-              if (files) {
-                handleImageUpload(Array.from(files))
-              }
-            }
-            input.click()
-          }}
-          disabled={isUploading}
-          className="flex items-center gap-1"
-        >
-          {isUploading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <ImageIcon className="h-4 w-4" />
-          )}
-          Upload Image
-        </Button>
-        <span className="text-xs text-muted-foreground">
-          {isDragActive ? 'Drop image here...' : 'Drag & drop images or click to upload'}
-        </span>
+    <div className={`writing-container ${className}`}>
+      <div {...getRootProps()} className="relative">
+        <input {...getInputProps()} />
+        
+        {/* Drag overlay */}
+        {isDragActive && (
+          <div className="absolute inset-0 bg-primary/10 border-2 border-dashed border-primary rounded-lg z-50 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-4xl mb-2">📷</div>
+              <p className="text-primary font-medium">Drop image here</p>
+            </div>
+          </div>
+        )}
+
+        {/* Upload indicator */}
+        {isUploading && (
+          <div className="absolute top-4 right-4 bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm z-40">
+            Uploading...
+          </div>
+        )}
+
+        <textarea
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="writing-textarea"
+          autoFocus
+          spellCheck="true"
+        />
       </div>
 
-      <MDEditor
-        value={value || ''}
-        onChange={(val) => onChange(val || '')}
-        preview="edit"
-        hideToolbar={false}
-        visibleDragbar={false}
-        textareaProps={{
-          placeholder,
-          style: {
-            fontSize: '16px',
-            lineHeight: '1.6',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            padding: '16px',
-            border: 'none',
-            outline: 'none',
-            resize: 'none',
-            minHeight: '400px',
-            background: 'transparent',
-          },
-        }}
-        data-color-mode={isDarkMode ? "dark" : "light"}
-        height={400}
-      />
       <style jsx global>{`
-        .markdown-editor-container .w-md-editor {
-          background: transparent !important;
+        /* iA Writer inspired clean writing interface */
+        .writing-container {
+          width: 100%;
+          max-width: 100%;
+          margin: 0 auto;
+          position: relative;
+          background: hsl(var(--background));
         }
-        .markdown-editor-container .w-md-editor.w-md-editor-focus {
-          border-color: hsl(var(--ring)) !important;
-          box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2) !important;
+
+        .writing-textarea {
+          width: 100%;
+          min-height: 60vh;
+          padding: 4rem 2rem;
+          border: none;
+          outline: none;
+          background: transparent;
+          color: hsl(var(--foreground));
+          font-family: "Charter", "Georgia", "Times New Roman", serif;
+          font-size: 18px;
+          line-height: 1.6;
+          font-weight: 400;
+          letter-spacing: 0;
+          word-spacing: 0;
+          resize: none;
+          overflow-y: auto;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          text-rendering: optimizeLegibility;
+          font-variant-ligatures: common-ligatures;
+          font-feature-settings: "liga" 1, "calt" 1;
+          tab-size: 2;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          box-sizing: border-box;
         }
-        .markdown-editor-container .w-md-editor-text-pre,
-        .markdown-editor-container .w-md-editor-text-input,
-        .markdown-editor-container .w-md-editor-text {
-          background: transparent !important;
-          color: hsl(var(--foreground)) !important;
-          font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
-          font-size: 16px !important;
-          line-height: 1.6 !important;
+
+        .writing-textarea::placeholder {
+          color: hsl(var(--muted-foreground));
+          opacity: 0.6;
+          font-style: italic;
         }
-        .markdown-editor-container .w-md-editor-bar {
-          background: hsl(var(--muted)) !important;
-          border-bottom: 1px solid hsl(var(--border)) !important;
+
+        .writing-textarea:focus {
+          outline: none;
+          box-shadow: none;
         }
-        .markdown-editor-container .w-md-editor-bar svg {
-          color: hsl(var(--foreground)) !important;
+
+        /* Responsive typography */
+        @media (max-width: 768px) {
+          .writing-textarea {
+            padding: 2rem 1rem;
+            font-size: 16px;
+            line-height: 1.5;
+          }
         }
-        .markdown-editor-container .w-md-editor-bar button:hover {
-          background: hsl(var(--accent)) !important;
+
+        @media (min-width: 1024px) {
+          .writing-container {
+            max-width: 700px;
+          }
+          
+          .writing-textarea {
+            padding: 4rem 0;
+            font-size: 19px;
+            line-height: 1.65;
+          }
         }
-        .markdown-editor-container ul {
-          list-style-type: disc !important;
-          margin-left: 1.5rem !important;
+
+        /* Dark mode adjustments */
+        [data-theme="dark"] .writing-textarea {
+          color: hsl(var(--foreground));
+          background: hsl(var(--background));
         }
-        .markdown-editor-container ol {
-          list-style-type: decimal !important;
-          margin-left: 1.5rem !important;
+
+        [data-theme="dark"] .writing-textarea::placeholder {
+          color: hsl(var(--muted-foreground));
+          opacity: 0.5;
         }
-        .markdown-editor-container li {
-          margin-bottom: 0.25rem !important;
+
+        /* Focus mode - subtle */
+        .writing-textarea:focus {
+          background: hsl(var(--background));
         }
-        .markdown-editor-container .w-md-editor-text-pre .token.list {
-          color: hsl(var(--foreground)) !important;
+
+        /* Smooth scrolling */
+        .writing-textarea {
+          scroll-behavior: smooth;
         }
-        .markdown-editor-container .w-md-editor-text-pre .token.title {
-          color: hsl(var(--foreground)) !important;
-          font-weight: 600 !important;
+
+        /* Remove default browser styling */
+        .writing-textarea {
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          appearance: none;
+          border-radius: 0;
+          box-shadow: none;
         }
-        .markdown-editor-container .w-md-editor-text-pre .token.code {
-          background: hsl(var(--muted)) !important;
-          color: hsl(var(--muted-foreground)) !important;
-          padding: 0.125rem 0.25rem !important;
-          border-radius: 0.25rem !important;
+
+        /* Selection styling */
+        .writing-textarea::selection {
+          background: hsl(var(--primary) / 0.2);
+          color: hsl(var(--foreground));
+        }
+
+        .writing-textarea::-moz-selection {
+          background: hsl(var(--primary) / 0.2);
+          color: hsl(var(--foreground));
         }
       `}</style>
     </div>

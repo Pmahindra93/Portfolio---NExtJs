@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
 import { useAdmin } from '@/lib/hooks/useAdmin'
+import { formatLastModified } from '@/lib/utils/date'
 
 interface RecentPostsProps {
   posts: Post[]
@@ -57,7 +58,7 @@ export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
             >
               <h3 className="text-lg font-medium">{post.title}</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                {new Date(post.created_at).toLocaleDateString()}
+                {formatLastModified(post.created_at, post.updated_at)}
               </p>
             </Link>
             {!isLoading && isAdmin && (

@@ -6,18 +6,18 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   try {
     const supabase = await createClient()
-    const { data: { session }, error } = await supabase.auth.getSession()
+    const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error) {
-      console.error('Session error:', error)
+      console.error('Auth error:', error)
       return NextResponse.json({
         isAuthenticated: false,
         isAdmin: false,
-        error: 'Session error'
+        error: 'Auth error'
       }, { status: 401 })
     }
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({
         isAuthenticated: false,
         isAdmin: false
@@ -28,7 +28,7 @@ export async function GET() {
     const { data: roleData } = await supabase
       .from('user_roles')
       .select('role')
-      .eq('user_id', session.user.id)
+      .eq('user_id', user.id)
       .single()
 
     const isAdmin = roleData?.role === 'admin'
@@ -36,7 +36,7 @@ export async function GET() {
     return NextResponse.json({
       isAuthenticated: true,
       isAdmin,
-      email: session.user?.email
+      email: user?.email
     })
   } catch (error) {
     console.error('Auth check error:', error)

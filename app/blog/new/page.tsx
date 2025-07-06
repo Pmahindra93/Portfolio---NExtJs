@@ -14,8 +14,8 @@ export default function NewPost() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (!title.trim() || !content.trim()) {
       toast({
         title: "Error",
@@ -67,7 +67,15 @@ export default function NewPost() {
 
   return (
     <div className="container max-w-4xl py-10">
-      <h1 className="text-3xl font-bold mb-8">Create New Blog Post</h1>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">Create New Blog Post</h1>
+        <Button 
+          onClick={handleSubmit} 
+          disabled={isLoading}
+        >
+          {isLoading ? "Creating..." : "Create Post"}
+        </Button>
+      </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="title" className="block text-sm font-medium mb-2">
@@ -90,11 +98,6 @@ export default function NewPost() {
             onChange={setContent}
             placeholder="Write your blog post in markdown..."
           />
-        </div>
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Creating..." : "Create Post"}
-          </Button>
         </div>
       </form>
     </div>

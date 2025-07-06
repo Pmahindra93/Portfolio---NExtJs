@@ -14,24 +14,24 @@ export function useAdmin() {
   useEffect(() => {
     async function checkAdmin() {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { user }, error } = await supabase.auth.getUser();
         
         if (error) {
-          console.error('Error getting session:', error);
+          console.error('Error getting user:', error);
           setIsAdmin(false);
           return;
         }
 
-        if (!session) {
-          console.log('No session found');
+        if (!user) {
+          console.log('No user found');
           setIsAdmin(false);
           return;
         }
 
-        console.log('Current user email:', session.user?.email);
+        console.log('Current user email:', user?.email);
         console.log('Admin email:', ADMIN_EMAIL);
         
-        const isUserAdmin = session.user?.email === ADMIN_EMAIL;
+        const isUserAdmin = user?.email === ADMIN_EMAIL;
         console.log('Is admin?', isUserAdmin);
         
         setIsAdmin(isUserAdmin);
