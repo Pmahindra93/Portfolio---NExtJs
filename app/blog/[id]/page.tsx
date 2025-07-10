@@ -8,6 +8,14 @@ import { useTheme } from '@/lib/hooks/useTheme'
 import { notFound } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import dynamic from 'next/dynamic'
+import { formatLastModified } from '@/lib/utils/date'
+
+// Dynamic import for markdown preview to avoid SSR issues
+const MarkdownPreview = dynamic(
+  () => import('@uiw/react-markdown-preview').then((mod) => mod.default),
+  { ssr: false }
+)
 
 export default function BlogPost(props: { params: Promise<{ id: string }> }) {
   const [post, setPost] = useState<Post | null>(null)
@@ -199,33 +207,7 @@ export default function BlogPost(props: { params: Promise<{ id: string }> }) {
     return notFound()
   }
 
-  // Add 90s styles to the content
-  let processedContent = post.content;
-  if (is90sStyle) {
-    // Add inline styles to headings
-    processedContent = processedContent
-      .replace(/<h1/g, `<h1 style="color: #FF00FF; text-shadow: 2px 2px 0 #000000;"`)
-      .replace(/<h2/g, `<h2 style="color: #FF00FF; text-shadow: 2px 2px 0 #000000;"`)
-      .replace(/<h3/g, `<h3 style="color: #FF00FF; text-shadow: 2px 2px 0 #000000;"`)
-      .replace(/<h4/g, `<h4 style="color: #FF00FF; text-shadow: 2px 2px 0 #000000;"`)
-      .replace(/<h5/g, `<h5 style="color: #FF00FF; text-shadow: 2px 2px 0 #000000;"`)
-      .replace(/<h6/g, `<h6 style="color: #FF00FF; text-shadow: 2px 2px 0 #000000;"`)
-      .replace(/<blockquote/g, `<blockquote style="border-left: 4px solid #FF00FF; background-color: #FFFF99; padding: 1rem;"`)
-      .replace(/<pre/g, `<pre style="background-color: #000080; color: #00FF00; border: 2px dashed #FF00FF;"`)
-      .replace(/<code/g, `<code style="background-color: #000080; color: #00FF00; padding: 2px 4px; border-radius: 4px;"`)
-      .replace(/<img/g, `<img style="border: 3px solid #000000; padding: 4px; background-color: #FFFFFF;"`)
-      .replace(/<a /g, `<a style="color: #0000FF; text-decoration: underline;" `)
-      .replace(/<hr/g, `<hr style="border: none; height: 3px; background: repeating-linear-gradient(90deg, #FF00FF, #FF00FF 10px, #00FFFF 10px, #00FFFF 20px); margin: 2rem 0;"`)
-      .replace(/<table/g, `<table style="border-collapse: separate; border-spacing: 2px; border: 3px solid #000000;"`)
-      .replace(/<th/g, `<th style="background-color: #000080; color: #FFFFFF; border: 2px solid #000000; padding: 8px;"`)
-      .replace(/<td/g, `<td style="border: 2px solid #000000; padding: 8px;"`);
-  }
 
-  // Clean up empty paragraphs
-  processedContent = processedContent
-    .replace(/<p><br><\/p>/g, '')
-    .replace(/<p>&nbsp;<\/p>/g, '')
-    .replace(/<p>\s*<\/p>/g, '');
 
   return (
     <main
@@ -254,7 +236,7 @@ export default function BlogPost(props: { params: Promise<{ id: string }> }) {
             'text-muted-foreground': !is90sStyle
           })}>
             <p className="text-sm">
-              {new Date(post.created_at).toLocaleDateString()}
+              {formatLastModified(post.created_at, post.updated_at)}
             </p>
           </div>
 
@@ -274,39 +256,83 @@ export default function BlogPost(props: { params: Promise<{ id: string }> }) {
             </div>
           )}
 
-          <div
-            className={cn(
-              // Base prose styles
-              "prose max-w-none",
-              // Theme-specific styles
-              {
-                'text-[#000080]': is90sStyle,
-                'prose-neutral dark:prose-invert': !is90sStyle
-              },
-              // Typography styles
-              "prose-headings:font-semibold prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl",
-              // Paragraph styles with explicit spacing
-              "prose-p:my-6 prose-p:leading-relaxed",
-              // Link styles
-              "prose-a:text-blue-600 hover:prose-a:underline",
-              // List styles with explicit spacing
-              "prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6",
-              "prose-ol:my-6 prose-ol:list-decimal prose-ol:pl-6",
-              "prose-li:my-2",
-              // Blockquote styles
-              "prose-blockquote:my-6 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:italic",
-              // Code styles
-              "prose-pre:my-6 prose-pre:bg-gray-100 prose-pre:p-4 prose-pre:rounded",
-              "prose-code:text-sm prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded",
-              // Remove margin from first and last elements
-              "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
-              // Additional spacing between block elements
-              "[&>*+*]:mt-6"
-            )}
-            dangerouslySetInnerHTML={{
-              __html: processedContent
-            }}
-          />
+          <div className="markdown-content">
+            <MarkdownPreview 
+              source={post.content}
+              style={{
+                whiteSpace: 'pre-wrap',
+                backgroundColor: 'transparent',
+                color: 'inherit',
+                fontFamily: 'inherit'
+              }}
+              className={cn(
+                // Base prose styles for better typography
+                "prose prose-lg max-w-none",
+                // Theme-specific styles
+                {
+                  'text-[#000080]': is90sStyle,
+                  'prose-neutral dark:prose-invert': !is90sStyle
+                },
+                // Enhanced typography
+                "prose-headings:font-bold prose-headings:tracking-tight",
+                "prose-h1:text-4xl prose-h1:mb-8 prose-h1:mt-12",
+                "prose-h2:text-3xl prose-h2:mb-6 prose-h2:mt-10",
+                "prose-h3:text-2xl prose-h3:mb-4 prose-h3:mt-8",
+                "prose-h4:text-xl prose-h4:mb-3 prose-h4:mt-6",
+                
+                // Paragraph and text styles
+                "prose-p:text-base prose-p:leading-relaxed prose-p:mb-6",
+                "prose-p:text-gray-700 dark:prose-p:text-gray-300",
+                
+                // List styles
+                "prose-ul:mb-6 prose-ul:list-disc prose-ul:ml-6",
+                "prose-ol:mb-6 prose-ol:list-decimal prose-ol:ml-6", 
+                "prose-li:mb-2 prose-li:leading-relaxed",
+                
+                // Link styles
+                "prose-a:text-blue-600 prose-a:underline prose-a:decoration-2",
+                "hover:prose-a:text-blue-800 dark:prose-a:text-blue-400",
+                
+                // Blockquote styles
+                "prose-blockquote:border-l-4 prose-blockquote:border-blue-500",
+                "prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/20",
+                "prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:my-8",
+                "prose-blockquote:italic prose-blockquote:text-gray-800",
+                "dark:prose-blockquote:text-gray-200",
+                
+                // Code styles
+                "prose-code:bg-gray-100 dark:prose-code:bg-gray-800",
+                "prose-code:text-red-600 dark:prose-code:text-red-400",
+                "prose-code:px-2 prose-code:py-1 prose-code:rounded",
+                "prose-code:text-sm prose-code:font-mono",
+                
+                // Pre/code block styles
+                "prose-pre:bg-gray-900 prose-pre:text-gray-100",
+                "prose-pre:p-6 prose-pre:rounded-lg prose-pre:my-8",
+                "prose-pre:overflow-x-auto prose-pre:text-sm",
+                
+                // Image styles
+                "prose-img:rounded-lg prose-img:shadow-lg prose-img:my-8",
+                "prose-img:mx-auto prose-img:max-w-full",
+                
+                // Table styles
+                "prose-table:my-8 prose-table:border-collapse",
+                "prose-th:bg-gray-100 dark:prose-th:bg-gray-800",
+                "prose-th:border prose-th:border-gray-300 dark:prose-th:border-gray-600",
+                "prose-th:px-4 prose-th:py-2 prose-th:font-semibold",
+                "prose-td:border prose-td:border-gray-300 dark:prose-td:border-gray-600",
+                "prose-td:px-4 prose-td:py-2",
+                
+                // HR styles
+                "prose-hr:border-gray-300 dark:prose-hr:border-gray-600",
+                "prose-hr:my-12 prose-hr:border-t-2",
+                
+                // Strong/em styles
+                "prose-strong:font-bold prose-strong:text-gray-900 dark:prose-strong:text-gray-100",
+                "prose-em:italic prose-em:text-gray-700 dark:prose-em:text-gray-300"
+              )}
+            />
+          </div>
 
           {is90sStyle && (
             <div className="mt-8 text-center">

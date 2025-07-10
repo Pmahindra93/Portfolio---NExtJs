@@ -27,38 +27,73 @@ export default function MarkdownEditor({
   }, [])
 
   const uploadImage = useCallback(async (file: File): Promise<string> => {
+    console.log('Starting image upload for file:', file.name, 'Size:', file.size, 'Type:', file.type)
+    
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      throw new Error('File must be an image')
+    }
+    
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      throw new Error('File size must be less than 10MB')
+    }
+
     const fileExt = file.name.split('.').pop()
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-    const filePath = fileName // Remove nested folder structure
-
-    // First, check if bucket exists and create if needed
-    const { data: buckets } = await supabase.storage.listBuckets()
-    const bucketExists = buckets?.some(bucket => bucket.name === 'post-images')
     
-    if (!bucketExists) {
-      await supabase.storage.createBucket('post-images', {
-        public: true,
-        allowedMimeTypes: ['image/png', 'image/jpeg', 'image/gif', 'image/webp']
-      })
+    console.log('Generated filename:', fileName)
+
+    try {
+      // Check if bucket exists
+      const { data: buckets, error: listError } = await supabase.storage.listBuckets()
+      if (listError) {
+        console.error('Error listing buckets:', listError)
+        throw new Error(`Bucket check failed: ${listError.message}`)
+      }
+      
+      console.log('Available buckets:', buckets?.map(b => b.name))
+      const bucketExists = buckets?.some(bucket => bucket.name === 'post-images')
+      
+      if (!bucketExists) {
+        console.log('Creating post-images bucket...')
+        const { error: createError } = await supabase.storage.createBucket('post-images', {
+          public: true,
+          allowedMimeTypes: ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp']
+        })
+        
+        if (createError) {
+          console.error('Error creating bucket:', createError)
+          throw new Error(`Bucket creation failed: ${createError.message}`)
+        }
+        console.log('Bucket created successfully')
+      }
+
+      console.log('Uploading file to bucket...')
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
+
+      if (uploadError) {
+        console.error('Upload error details:', uploadError)
+        throw new Error(`Upload failed: ${uploadError.message}`)
+      }
+
+      console.log('Upload successful:', uploadData)
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(fileName)
+
+      console.log('Generated public URL:', publicUrl)
+      return publicUrl
+      
+    } catch (error) {
+      console.error('Image upload error:', error)
+      throw error
     }
-
-    const { error: uploadError } = await supabase.storage
-      .from('post-images')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
-
-    if (uploadError) {
-      console.error('Upload error details:', uploadError)
-      throw new Error(`Upload failed: ${uploadError.message}`)
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('post-images')
-      .getPublicUrl(filePath)
-
-    return publicUrl
   }, [])
 
   const handleImageUpload = useCallback(async (files: File[]) => {
@@ -76,7 +111,8 @@ export default function MarkdownEditor({
       onChange(newContent)
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('Failed to upload image. Please try again.')
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      alert(`Failed to upload image: ${errorMessage}`)
     } finally {
       setIsUploading(false)
     }
