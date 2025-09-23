@@ -1,9 +1,8 @@
 // app/api/posts/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { Post, CreatePostInput } from '@/types/post'
-import { cookies } from 'next/headers'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { Post } from '@/types/post'
+import { deriveTitleFromContent } from '@/lib/posts'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
@@ -67,13 +66,30 @@ export async function POST(
       )
     }
 
-    const input: CreatePostInput = await request.json()
+    const body = await request.json()
+    const rawContent = typeof body.content === 'string' ? body.content : ''
+    const content = rawContent.trim()
+
+    if (!content) {
+      return NextResponse.json(
+        { error: 'Content is required' },
+        { status: 400 }
+      )
+    }
+
+    const titleFromRequest = typeof body.title === 'string' ? body.title.trim() : ''
+    const title = titleFromRequest || deriveTitleFromContent(content)
+    const published = typeof body.published === 'boolean' ? body.published : true
+    const coverImage = typeof body.cover_image === 'string' ? body.cover_image : undefined
 
     const { data: post, error } = await supabase
       .from('posts')
       .insert([
         {
-          ...input,
+          title,
+          content,
+          published,
+          cover_image: coverImage,
           author_id: user.id,
         },
       ])

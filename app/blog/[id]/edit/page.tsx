@@ -4,15 +4,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import MarkdownEditor from '@/components/MarkdownEditor'
 import { useAdmin } from '@/lib/hooks/useAdmin'
-import { Post } from '@/types/post'
 import { supabase } from '@/lib/supabase/client'
+import { deriveTitleFromContent } from '@/lib/posts'
 
 export default function EditPost(props: { params: Promise<{ id: string }> }) {
-  const [post, setPost] = useState<Post | null>(null)
-  const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [params, setParams] = useState<{ id: string } | null>(null)
@@ -57,8 +54,6 @@ export default function EditPost(props: { params: Promise<{ id: string }> }) {
         if (!data) {
           throw new Error('Post not found')
         }
-        setPost(data)
-        setTitle(data.title || '')
         setContent(data.content || '')
       } catch (error) {
         console.error('Error fetching post:', error)
@@ -88,14 +83,26 @@ export default function EditPost(props: { params: Promise<{ id: string }> }) {
         throw new Error('No active session')
       }
 
+      const trimmedContent = content.trim()
+
+      if (!trimmedContent) {
+        throw new Error('Content is required')
+      }
+
+      const derivedTitle = deriveTitleFromContent(trimmedContent, '')
+
+      if (!derivedTitle) {
+        throw new Error('Add a first line to use as the title')
+      }
+
       const response = await fetch(`/api/posts/${params.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title,
-          content,
+          title: derivedTitle,
+          content: trimmedContent,
         }),
         credentials: 'include',
       })
@@ -143,25 +150,15 @@ export default function EditPost(props: { params: Promise<{ id: string }> }) {
       <h1 className="text-3xl font-bold mb-8">Edit Blog Post</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-2">
-            Title
-          </label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter post title"
-            required
-          />
-        </div>
-        <div>
           <label htmlFor="content" className="block text-sm font-medium mb-2">
             Content
           </label>
+          <p className="text-sm text-muted-foreground mb-2">
+            Update the first non-empty line to change the post title.
+          </p>
           <MarkdownEditor
             value={content}
             onChange={setContent}
-            placeholder="Write your blog post in markdown..."
           />
         </div>
         <div className="flex justify-end gap-4">

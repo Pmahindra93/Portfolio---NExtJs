@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from 'react'
+import Link from 'next/link'
 import { Linkedin, Github } from 'lucide-react'
 import { FeaturedProjectsWrapper, TimelineWrapper, RecentPostsWrapper } from './client-wrappers/DynamicComponents'
 import { PostsSkeleton } from './skeletons/PostsSkeleton'
@@ -8,6 +9,7 @@ import { NinetiesLayout } from './layouts/NinetiesLayout'
 import { useTheme } from '@/lib/hooks/useTheme'
 import { Suspense } from 'react'
 import { Post } from '@/types/post'
+import { Button } from '@/components/ui/button'
 
 // Define a NinetiesPost interface for the 90s layout
 interface NinetiesPost {
@@ -95,11 +97,25 @@ export default function ClientPage({ posts }: ClientPageProps) {
             <div className="space-y-12">
               <div>
                 <h1 className="text-4xl font-bold mb-3 text-slate-900 dark:text-white">
-                  Work, Ideas, and Perspectives
+                  Build Smarter Products with AI
                 </h1>
-                <p className="text-lg text-slate-600 dark:text-slate-400">
-                  Welcome to my corner of the internet, where I showcase my CV, projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
+                <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl">
+                  I help lean teams ship AI-powered experiences fast and share the playbooks that make product, growth, and LLM tooling work in the real world. Expect hands-on experiments, candid lessons, and the occasional caffeine-fueled breakthrough.
                 </p>
+                <div className="flex flex-wrap items-center gap-3 mt-6">
+                  <Button asChild size="lg">
+                    <Link href="/blog">Read the blog</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg">
+                    <a
+                      href="https://linkedin.com/in/pmahindra"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Connect on LinkedIn
+                    </a>
+                  </Button>
+                </div>
               </div>
 
               <div>

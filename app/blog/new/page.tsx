@@ -3,12 +3,11 @@
 import { useState } from "react";
 import MarkdownEditor from "@/components/MarkdownEditor";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { deriveTitleFromContent } from "@/lib/posts";
 
 export default function NewPost() {
-  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -16,10 +15,23 @@ export default function NewPost() {
 
   const handleSubmit = async (e?: React.FormEvent | React.MouseEvent) => {
     if (e) e.preventDefault();
-    if (!title.trim() || !content.trim()) {
+    const trimmedContent = content.trim();
+
+    if (!trimmedContent) {
       toast({
         title: "Error",
-        description: "Title and content are required",
+        description: "Content is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const title = deriveTitleFromContent(trimmedContent, "");
+
+    if (!title) {
+      toast({
+        title: "Add a title",
+        description: "Start your post with a descriptive first line to use as the title.",
         variant: "destructive",
       });
       return;
@@ -35,8 +47,8 @@ export default function NewPost() {
         },
         credentials: 'include',
         body: JSON.stringify({
-          title: title.trim(),
-          content: content.trim(),
+          title,
+          content: trimmedContent,
           published: true,
         }),
       });
@@ -78,25 +90,15 @@ export default function NewPost() {
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium mb-2">
-            Title
-          </label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter post title"
-            required
-          />
-        </div>
-        <div>
           <label htmlFor="content" className="block text-sm font-medium mb-2">
             Content
           </label>
+          <p className="text-sm text-muted-foreground mb-2">
+            The first non-empty line becomes the post title.
+          </p>
           <MarkdownEditor
             value={content}
             onChange={setContent}
-            placeholder="Write your blog post in markdown..."
           />
         </div>
       </form>

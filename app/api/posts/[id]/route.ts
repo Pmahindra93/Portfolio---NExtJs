@@ -1,9 +1,8 @@
 // app/api/posts/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { Post, UpdatePostInput } from '@/types/post'
-import { cookies } from 'next/headers'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { Post } from '@/types/post'
+import { deriveTitleFromContent } from '@/lib/posts'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
@@ -74,22 +73,34 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { title, content } = body as UpdatePostInput
-
-    if (!title || !content) {
+    const rawContent = typeof body.content === 'string' ? body.content.trim() : ''
+    if (!rawContent) {
       return NextResponse.json(
-        { error: 'Title and content are required' },
+        { error: 'Content is required' },
         { status: 400 }
       )
     }
 
+    const titleFromRequest = typeof body.title === 'string' ? body.title.trim() : ''
+    const title = titleFromRequest || deriveTitleFromContent(rawContent)
+
+    const updates: Record<string, unknown> = {
+      title,
+      content: rawContent,
+      updated_at: new Date().toISOString(),
+    }
+
+    if (typeof body.published === 'boolean') {
+      updates.published = body.published
+    }
+
+    if (typeof body.cover_image === 'string') {
+      updates.cover_image = body.cover_image
+    }
+
     const { data: post, error: updateError } = await supabase
       .from('posts')
-      .update({
-        title,
-        content,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updates)
       .eq('id', id)
       .select()
       .single()
