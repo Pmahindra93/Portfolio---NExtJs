@@ -1,4 +1,5 @@
-import MarkdownIt from 'markdown-it'
+import * as MarkdownIt from 'markdown-it'
+import * as DOMPurify from 'isomorphic-dompurify'
 
 const markdown = new MarkdownIt({
   html: false,
@@ -11,5 +12,6 @@ export function renderMarkdownToHtml(content: string): string {
     return ''
   }
 
-  return markdown.render(content)
+  const htmlContent = markdown.render(content)
+  return DOMPurify.sanitize(htmlContent)
 }
