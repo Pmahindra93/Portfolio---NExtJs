@@ -5,9 +5,11 @@ import { useState, useEffect } from 'react'
 // import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+import { useToast } from "@/components/ui/use-toast"
 import MarkdownEditor from './MarkdownEditor'
 import { cn } from "@/lib/utils"
+import { renderMarkdownToHtml } from '@/lib/markdown'
+import { deriveTitleFromContent } from '@/lib/posts'
 
 interface Post {
   id: string
@@ -23,9 +25,10 @@ interface BlogPostsProps {
 
 export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
   const [posts, setPosts] = useState<Post[]>([])
-  const [newPost, setNewPost] = useState({ title: '', content: '', published: true })
+  const [newPostContent, setNewPostContent] = useState('')
   const [isEditing, setIsEditing] = useState<string | null>(null)
-  const [editPost, setEditPost] = useState({ title: '', content: '', published: true })
+  const [editContent, setEditContent] = useState('')
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchPosts()
@@ -38,21 +41,92 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
   }
 
   const handleCreate = async () => {
-    await fetch('/api/posts', {
+    const trimmedContent = newPostContent.trim()
+
+    if (!trimmedContent) {
+      toast({
+        title: 'Content required',
+        description: 'Please add content before publishing.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const title = deriveTitleFromContent(trimmedContent, '')
+
+    if (!title) {
+      toast({
+        title: 'Add a title',
+        description: 'Start the post with a descriptive first line to use as the title.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const createResponse = await fetch('/api/posts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newPost)
+      body: JSON.stringify({
+        title,
+        content: trimmedContent,
+        published: true,
+      })
     })
-    setNewPost({ title: '', content: '', published: true })
+
+    if (!createResponse.ok) {
+      const error = await createResponse.json().catch(() => ({}))
+      toast({
+        title: 'Error creating post',
+        description: error.error || 'Failed to create post',
+        variant: 'destructive',
+      })
+      return
+    }
+    setNewPostContent('')
     fetchPosts()
   }
 
   const handleUpdate = async (id: string) => {
-    await fetch(`/api/posts/${id}`, {
+    const trimmedContent = editContent.trim()
+
+    if (!trimmedContent) {
+      toast({
+        title: 'Content required',
+        description: 'Please add content before saving.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const title = deriveTitleFromContent(trimmedContent, '')
+
+    if (!title) {
+      toast({
+        title: 'Add a title',
+        description: 'Start the post with a descriptive first line to use as the title.',
+        variant: 'destructive',
+      })
+      return
+    }
+
+    const updateResponse = await fetch(`/api/posts/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(editPost)
+      body: JSON.stringify({
+        title,
+        content: trimmedContent,
+      })
     })
+
+    if (!updateResponse.ok) {
+      const error = await updateResponse.json().catch(() => ({}))
+      toast({
+        title: 'Error updating post',
+        description: error.error || 'Failed to update post',
+        variant: 'destructive',
+      })
+      return
+    }
     setIsEditing(null)
     fetchPosts()
   }
@@ -76,15 +150,12 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
               <DialogTitle>Create New Post</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <Input
-                placeholder="Title"
-                value={newPost.title}
-                onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-              />
+              <p className="text-sm text-muted-foreground">
+                The first non-empty line becomes the post title.
+              </p>
               <MarkdownEditor
-                value={newPost.content}
-                onChange={(content) => setNewPost({ ...newPost, content })}
-                placeholder="Write your post in markdown..."
+                value={newPostContent}
+                onChange={setNewPostContent}
               />
               <Button onClick={handleCreate}>Create</Button>
             </div>
@@ -108,14 +179,12 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
           >
             {isEditing === post.id ? (
               <div className="space-y-2">
-                <Input
-                  value={editPost.title}
-                  onChange={(e) => setEditPost({ ...editPost, title: e.target.value })}
-                />
+                <p className="text-sm text-muted-foreground">
+                  Update the first non-empty line to change the title.
+                </p>
                 <MarkdownEditor
-                  value={editPost.content}
-                  onChange={(content) => setEditPost({ ...editPost, content })}
-                  placeholder="Write your post in markdown..."
+                  value={editContent}
+                  onChange={setEditContent}
                 />
                 <Button onClick={() => handleUpdate(post.id)}>Save</Button>
                 <Button variant="outline" onClick={() => setIsEditing(null)}>Cancel</Button>
@@ -138,17 +207,18 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
                     "prose-pre:bg-gray-50 dark:prose-pre:bg-gray-800 prose-pre:p-4 prose-pre:rounded-md",
                     "sm:prose-p:text-lg sm:prose-p:leading-8"
                   )}
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  // renderMarkdownToHtml escapes raw HTML (markdown-it html:false)
+                  dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(post.content) }}
                 />
                 <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 space-x-2">
                   <Button
                     variant="outline"
-                    onClick={() => {
-                      setIsEditing(post.id)
-                      setEditPost(post)
-                    }}
-                  >
-                    Edit
+                  onClick={() => {
+                    setIsEditing(post.id)
+                    setEditContent(post.content)
+                  }}
+                >
+                  Edit
                   </Button>
                   <Button
                     variant="destructive"

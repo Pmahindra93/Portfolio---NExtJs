@@ -8,6 +8,7 @@ import { useTheme } from '@/lib/hooks/useTheme'
 import { notFound } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import { renderMarkdownToHtml } from '@/lib/markdown'
 
 export default function BlogPost(props: { params: Promise<{ id: string }> }) {
   const [post, setPost] = useState<Post | null>(null)
@@ -200,7 +201,8 @@ export default function BlogPost(props: { params: Promise<{ id: string }> }) {
   }
 
   // Add 90s styles to the content
-  let processedContent = post.content;
+  // renderMarkdownToHtml escapes raw HTML before injection
+  let processedContent = renderMarkdownToHtml(post.content);
   if (is90sStyle) {
     // Add inline styles to headings
     processedContent = processedContent

@@ -3,24 +3,46 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { useToast } from '@/components/ui/use-toast'
 import { Card } from '@/components/ui/card'
 import { ImageUpload } from '@/components/ImageUpload'
 import MarkdownEditor from '@/components/MarkdownEditor'
+import { deriveTitleFromContent } from '@/lib/posts'
 
 export default function NewPostPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
-  const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [coverImage, setCoverImage] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+
+    const trimmedContent = content.trim()
+
+    if (!trimmedContent) {
+      toast({
+        title: 'Content required',
+        description: 'Please add some content before publishing.',
+        variant: 'destructive',
+      })
+      setIsLoading(false)
+      return
+    }
+
+    const title = deriveTitleFromContent(trimmedContent, '')
+
+    if (!title) {
+      toast({
+        title: 'Add a title',
+        description: 'Start the post with a meaningful first line to use as the title.',
+        variant: 'destructive',
+      })
+      setIsLoading(false)
+      return
+    }
 
     try {
       const response = await fetch('/api/posts', {
@@ -30,14 +52,15 @@ export default function NewPostPage() {
         },
         body: JSON.stringify({
           title,
-          content,
-          cover_image: coverImage,
+          content: trimmedContent,
+          cover_image: coverImage?.trim() || undefined,
           published: true,
         }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create post')
+        const error = await response.json().catch(() => null)
+        throw new Error(error?.error || 'Failed to create post')
       }
 
       toast({
@@ -49,7 +72,7 @@ export default function NewPostPage() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to create post',
+        description: error instanceof Error ? error.message : 'Failed to create post',
         variant: 'destructive',
       })
     } finally {
@@ -61,25 +84,18 @@ export default function NewPostPage() {
     <div className="container mx-auto py-10">
       <Card className="p-6">
         <form onSubmit={handleSubmit} className="space-y-8">
-          <div>
-            <Input
-              placeholder="Post title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="text-2xl font-bold"
-            />
-          </div>
-
           <ImageUpload
             value={coverImage}
             onChange={(url) => setCoverImage(url)}
             onRemove={() => setCoverImage(null)}
           />
 
+          <p className="text-sm text-muted-foreground">
+            The first non-empty line becomes the post title.
+          </p>
           <MarkdownEditor
             value={content}
             onChange={(value) => setContent(value)}
-            placeholder="Write your blog post in markdown..."
           />
 
           <div className="flex justify-end space-x-4">

@@ -1,9 +1,8 @@
 // app/api/posts/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { Post, CreatePostInput } from '@/types/post'
-import { cookies } from 'next/headers'
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { Post } from '@/types/post'
+import { deriveTitleFromContent } from '@/lib/posts'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
@@ -67,13 +66,48 @@ export async function POST(
       )
     }
 
-    const input: CreatePostInput = await request.json()
+    const body = await request.json()
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json(
+        { error: 'Invalid request payload' },
+        { status: 400 }
+      )
+    }
+
+    const bodyRecord = body as Record<string, unknown>
+
+    const rawContent = typeof bodyRecord.content === 'string'
+      ? (bodyRecord.content as string)
+      : ''
+    const content = rawContent.trim()
+
+    if (!content) {
+      return NextResponse.json(
+        { error: 'Content is required' },
+        { status: 400 }
+      )
+    }
+
+    const titleFromRequest = typeof bodyRecord.title === 'string'
+      ? (bodyRecord.title as string).trim()
+      : ''
+    const title = titleFromRequest || deriveTitleFromContent(content)
+    const published = typeof bodyRecord.published === 'boolean'
+      ? (bodyRecord.published as boolean)
+      : true
+    const coverImage = typeof bodyRecord.cover_image === 'string'
+      ? (bodyRecord.cover_image as string).trim() || undefined
+      : undefined
 
     const { data: post, error } = await supabase
       .from('posts')
       .insert([
         {
-          ...input,
+          title,
+          content,
+          published,
+          cover_image: coverImage,
           author_id: user.id,
         },
       ])

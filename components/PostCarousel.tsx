@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Post } from '@/lib/types'
+import { renderMarkdownToHtml } from '@/lib/markdown'
 
 interface PostCarouselProps {
   posts: Post[]
@@ -80,7 +81,8 @@ export function PostCarousel({ posts, loading = false }: PostCarouselProps) {
                 <div
                   className="line-clamp-2 text-sm text-gray-200"
                   dangerouslySetInnerHTML={{
-                    __html: post.content,
+                    // renderMarkdownToHtml sanitizes markdown (raw HTML disabled)
+                    __html: renderMarkdownToHtml(post.content),
                   }}
                 />
               </div>

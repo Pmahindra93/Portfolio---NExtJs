@@ -1,13 +1,19 @@
-'use client'
+"use client";
 
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { Linkedin, Github } from 'lucide-react'
-import { FeaturedProjectsWrapper, TimelineWrapper, RecentPostsWrapper } from './client-wrappers/DynamicComponents'
-import { PostsSkeleton } from './skeletons/PostsSkeleton'
-import { NinetiesLayout } from './layouts/NinetiesLayout'
-import { useTheme } from '@/lib/hooks/useTheme'
-import { Suspense } from 'react'
-import { Post } from '@/types/post'
+import { useEffect, useState, useRef, useCallback } from "react";
+import Link from "next/link";
+import { Linkedin, Github } from "lucide-react";
+import {
+  FeaturedProjectsWrapper,
+  TimelineWrapper,
+  RecentPostsWrapper,
+} from "./client-wrappers/DynamicComponents";
+import { PostsSkeleton } from "./skeletons/PostsSkeleton";
+import { NinetiesLayout } from "./layouts/NinetiesLayout";
+import { useTheme } from "@/lib/hooks/useTheme";
+import { Suspense } from "react";
+import { Post } from "@/types/post";
+import { Button } from "@/components/ui/button";
 
 // Define a NinetiesPost interface for the 90s layout
 interface NinetiesPost {
@@ -22,67 +28,73 @@ interface ClientPageProps {
 }
 
 export default function ClientPage({ posts }: ClientPageProps) {
-  const { isDarkMode, is90sStyle, isMounted } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  const [themeVersion, setThemeVersion] = useState(0)
-  const prevThemeRef = useRef({ is90sStyle, isDarkMode })
+  const { isDarkMode, is90sStyle, isMounted } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [themeVersion, setThemeVersion] = useState(0);
+  const prevThemeRef = useRef({ is90sStyle, isDarkMode });
 
   // Convert posts to the format needed by NinetiesLayout
   const getNinetiesPosts = (posts: Post[]): NinetiesPost[] => {
-    return posts.map(post => ({
+    return posts.map((post) => ({
       id: post.id,
       title: post.title,
       created_at: post.created_at,
-      slug: post.id // Use id as slug since the Post type doesn't have slug
+      slug: post.id, // Use id as slug since the Post type doesn't have slug
     }));
   };
 
   // Handle theme changes
-  const handleThemeChange = useCallback((event: Event) => {
-    if (!mounted) return;
+  const handleThemeChange = useCallback(
+    (event: Event) => {
+      if (!mounted) return;
 
-    const customEvent = event as CustomEvent;
-    const newTheme = customEvent.detail;
+      const customEvent = event as CustomEvent;
+      const newTheme = customEvent.detail;
 
-    // Check if theme actually changed
-    if (
-      prevThemeRef.current.is90sStyle !== newTheme.is90sStyle ||
-      prevThemeRef.current.isDarkMode !== newTheme.isDarkMode
-    ) {
-      prevThemeRef.current = newTheme;
-      // Force re-render by updating theme version
-      setThemeVersion(prev => prev + 1);
-    }
-  }, [mounted]);
+      // Check if theme actually changed
+      if (
+        prevThemeRef.current.is90sStyle !== newTheme.is90sStyle ||
+        prevThemeRef.current.isDarkMode !== newTheme.isDarkMode
+      ) {
+        prevThemeRef.current = newTheme;
+        // Force re-render by updating theme version
+        setThemeVersion((prev) => prev + 1);
+      }
+    },
+    [mounted]
+  );
 
   // Set up initial state and event listeners
   useEffect(() => {
     setMounted(true);
 
     // Listen for theme changes
-    window.addEventListener('themeChanged', handleThemeChange);
+    window.addEventListener("themeChanged", handleThemeChange);
 
     return () => {
-      window.removeEventListener('themeChanged', handleThemeChange);
+      window.removeEventListener("themeChanged", handleThemeChange);
     };
   }, [handleThemeChange]);
 
   // Update theme version when theme changes directly
   useEffect(() => {
-    if (mounted && (
-      prevThemeRef.current.is90sStyle !== is90sStyle ||
-      prevThemeRef.current.isDarkMode !== isDarkMode
-    )) {
+    if (
+      mounted &&
+      (prevThemeRef.current.is90sStyle !== is90sStyle ||
+        prevThemeRef.current.isDarkMode !== isDarkMode)
+    ) {
       prevThemeRef.current = { is90sStyle, isDarkMode };
-      setThemeVersion(prev => prev + 1);
+      setThemeVersion((prev) => prev + 1);
     }
   }, [is90sStyle, isDarkMode, mounted]);
 
   // Don't render anything until mounted to prevent hydration errors
   if (!mounted || !isMounted) {
-    return <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-pulse">Loading...</div>
-    </div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
   }
 
   return (
@@ -97,14 +109,36 @@ export default function ClientPage({ posts }: ClientPageProps) {
                 <h1 className="text-4xl font-bold mb-3 text-slate-900 dark:text-white">
                   Work, Ideas, and Perspectives
                 </h1>
-                <p className="text-lg text-slate-600 dark:text-slate-400">
-                  Welcome to my corner of the internet, where I showcase my CV, projects, and latest experiments in AI and full-stack development (some of which may or may not involve breaking things before fixing them). From building smarter applications to pondering the future of tech, this is where I share my work, ideas, and occasional epiphanies—usually accompanied by a cup of matcha 🍵 and a questionable number of browser tabs.
+                <p className="text-lg text-slate-600 dark:text-slate-400 max-w-3xl">
+                  Welcome to my corner of the internet, where I showcase my CV,
+                  projects, and latest experiments in AI and full-stack
+                  development (some of which may or may not involve breaking
+                  things before fixing them). From building smarter applications
+                  to pondering the future of tech, this is where I share my
+                  work, ideas, and occasional epiphanies—usually accompanied by
+                  a cup of matcha 🍵 and a questionable number of browser tabs.
                 </p>
+                <div className="flex flex-wrap items-center gap-3 mt-6">
+                  <Button asChild size="lg">
+                    <Link href="/blog">Read the blog</Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg">
+                    <a
+                      href="https://linkedin.com/in/pmahindra"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Connect on LinkedIn
+                    </a>
+                  </Button>
+                </div>
               </div>
 
               <div>
                 <div className="flex items-center gap-4 mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Projects</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                    Featured Projects
+                  </h2>
                   <a
                     href="https://github.com/Pmahindra93"
                     target="_blank"
@@ -115,13 +149,19 @@ export default function ClientPage({ posts }: ClientPageProps) {
                     <Github className="w-4 h-4 text-slate-600 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" />
                   </a>
                 </div>
-                <Suspense fallback={<div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />}>
+                <Suspense
+                  fallback={
+                    <div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                  }
+                >
                   <FeaturedProjectsWrapper />
                 </Suspense>
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">Recent Posts</h2>
+                <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
+                  Recent Posts
+                </h2>
                 <Suspense fallback={<PostsSkeleton />}>
                   <RecentPostsWrapper posts={posts} />
                 </Suspense>
@@ -129,7 +169,9 @@ export default function ClientPage({ posts }: ClientPageProps) {
 
               <div>
                 <div className="flex items-center gap-4 mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">My Journey</h2>
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+                    My Journey
+                  </h2>
                   <a
                     href="https://linkedin.com/in/pmahindra"
                     target="_blank"
@@ -140,13 +182,17 @@ export default function ClientPage({ posts }: ClientPageProps) {
                     <Linkedin className="w-4 h-4 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400" />
                   </a>
                 </div>
-                <Suspense fallback={<div className="h-96 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />}>
+                <Suspense
+                  fallback={
+                    <div className="h-96 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                  }
+                >
                   <TimelineWrapper />
                 </Suspense>
               </div>
               {/* Add Footer Here */}
-                <footer className="border-t border-slate-200 pt-4 pb-2 dark:border-slate-800">
-                  <p className="text-center text-lg text-muted-foreground">
+              <footer className="border-t border-slate-200 pt-4 pb-2 dark:border-slate-800">
+                <p className="text-center text-lg text-muted-foreground">
                   Made with ❤️ in North London with 🤖 and 🍵
                 </p>
               </footer>

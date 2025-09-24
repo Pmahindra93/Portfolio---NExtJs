@@ -7,6 +7,21 @@ import { cn } from "@/lib/utils"
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css'
 
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL
+
+const siteUrl = (() => {
+  if (!rawSiteUrl) {
+    return 'https://prateekmahindra.com'
+  }
+
+  try {
+    const parsed = new URL(rawSiteUrl.startsWith('http') ? rawSiteUrl : `https://${rawSiteUrl}`)
+    return parsed.toString().replace(/\/$/, '')
+  } catch {
+    return 'https://prateekmahindra.com'
+  }
+})()
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
@@ -18,8 +33,57 @@ const caveat = Caveat({
 })
 
 export const metadata: Metadata = {
-  title: "Prateek Mahindra | AI, LLM Apps & Startup Growth",
-  description: "Exploring AI, product engineering, and startup strategies. Read Prateek Mahindra's latest insights on building and scaling tech products.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Prateek Mahindra | AI, LLM Apps & Startup Growth",
+    template: "%s | Prateek Mahindra"
+  },
+  description: "Product engineer and AI builder sharing playbooks on shipping LLM-powered products, startup growth, and applied experimentation.",
+  keywords: [
+    'Prateek Mahindra',
+    'AI product engineer',
+    'LLM applications',
+    'startup growth',
+    'supabase',
+    'typescript',
+    'next.js blog'
+  ],
+  alternates: {
+    canonical: '/'
+  },
+  authors: [{ name: 'Prateek Mahindra', url: siteUrl }],
+  openGraph: {
+    type: 'website',
+    url: siteUrl,
+    title: 'Prateek Mahindra | AI, LLM Apps & Startup Growth',
+    description: 'Product engineer and AI builder sharing playbooks on shipping LLM-powered products, startup growth, and applied experimentation.',
+    siteName: 'Prateek Mahindra',
+    images: [
+      {
+        url: '/images/website_logo.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Prateek Mahindra portfolio preview'
+      }
+    ]
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Prateek Mahindra | AI, LLM Apps & Startup Growth',
+    description: 'Insights and projects from an AI-focused product engineer building with LLMs, Supabase, and Next.js.',
+    images: ['/images/website_logo.jpg']
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    }
+  },
   icons: {
     icon: "/favicon.ico"
   }

@@ -1,9 +1,8 @@
 // app/api/posts/[id]/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { Post, UpdatePostInput } from '@/types/post'
-import { cookies } from 'next/headers'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { Post } from '@/types/post'
+import { deriveTitleFromContent } from '@/lib/posts'
 import { SupabaseClient } from '@supabase/supabase-js'
 
 export const dynamic = 'force-dynamic'
@@ -74,22 +73,49 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { title, content } = body as UpdatePostInput
 
-    if (!title || !content) {
+    if (!body || typeof body !== 'object') {
       return NextResponse.json(
-        { error: 'Title and content are required' },
+        { error: 'Invalid request payload' },
         { status: 400 }
       )
     }
 
+    const rawContent = typeof (body as Record<string, unknown>).content === 'string'
+      ? ((body as Record<string, unknown>).content as string).trim()
+      : ''
+    if (!rawContent) {
+      return NextResponse.json(
+        { error: 'Content is required' },
+        { status: 400 }
+      )
+    }
+
+    const bodyRecord = body as Record<string, unknown>
+
+    const titleFromRequest = typeof bodyRecord.title === 'string'
+      ? (bodyRecord.title as string).trim()
+      : ''
+    const title = titleFromRequest || deriveTitleFromContent(rawContent)
+
+    const updates: Record<string, unknown> = {
+      title,
+      content: rawContent,
+      updated_at: new Date().toISOString(),
+    }
+
+    if (typeof bodyRecord.published === 'boolean') {
+      updates.published = bodyRecord.published as boolean
+    }
+
+    if (typeof bodyRecord.cover_image === 'string') {
+      const trimmedCover = (bodyRecord.cover_image as string).trim()
+      updates.cover_image = trimmedCover.length ? trimmedCover : undefined
+    }
+
     const { data: post, error: updateError } = await supabase
       .from('posts')
-      .update({
-        title,
-        content,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updates)
       .eq('id', id)
       .select()
       .single()
