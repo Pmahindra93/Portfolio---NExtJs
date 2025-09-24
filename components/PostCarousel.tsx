@@ -81,6 +81,7 @@ export function PostCarousel({ posts, loading = false }: PostCarouselProps) {
                 <div
                   className="line-clamp-2 text-sm text-gray-200"
                   dangerouslySetInnerHTML={{
+                    // renderMarkdownToHtml sanitizes markdown (raw HTML disabled)
                     __html: renderMarkdownToHtml(post.content),
                   }}
                 />

@@ -207,6 +207,7 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
                     "prose-pre:bg-gray-50 dark:prose-pre:bg-gray-800 prose-pre:p-4 prose-pre:rounded-md",
                     "sm:prose-p:text-lg sm:prose-p:leading-8"
                   )}
+                  // renderMarkdownToHtml escapes raw HTML (markdown-it html:false)
                   dangerouslySetInnerHTML={{ __html: renderMarkdownToHtml(post.content) }}
                 />
                 <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-800 space-x-2">

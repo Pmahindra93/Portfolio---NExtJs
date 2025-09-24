@@ -183,6 +183,7 @@ export default function MarkdownEditor({
         ) : (
           <div
             className="writing-preview prose prose-neutral dark:prose-invert max-w-none"
+            // Preview uses sanitized markdown output (raw HTML disabled)
             dangerouslySetInnerHTML={{ __html: previewContent }}
           />
         )}

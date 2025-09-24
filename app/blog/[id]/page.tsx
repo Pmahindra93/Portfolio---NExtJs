@@ -201,6 +201,7 @@ export default function BlogPost(props: { params: Promise<{ id: string }> }) {
   }
 
   // Add 90s styles to the content
+  // renderMarkdownToHtml escapes raw HTML before injection
   let processedContent = renderMarkdownToHtml(post.content);
   if (is90sStyle) {
     // Add inline styles to headings
