@@ -20,19 +20,31 @@ export default function NewPostPage() {
     e.preventDefault()
     setIsLoading(true)
 
+    const trimmedContent = content.trim()
+
+    if (!trimmedContent) {
+      toast({
+        title: 'Content required',
+        description: 'Please add some content before publishing.',
+        variant: 'destructive',
+      })
+      setIsLoading(false)
+      return
+    }
+
+    const title = deriveTitleFromContent(trimmedContent, '')
+
+    if (!title) {
+      toast({
+        title: 'Add a title',
+        description: 'Start the post with a meaningful first line to use as the title.',
+        variant: 'destructive',
+      })
+      setIsLoading(false)
+      return
+    }
+
     try {
-      const trimmedContent = content.trim()
-
-      if (!trimmedContent) {
-        throw new Error('Content is required')
-      }
-
-      const title = deriveTitleFromContent(trimmedContent, '')
-
-      if (!title) {
-        throw new Error('Add a first line to use as the title')
-      }
-
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {
@@ -41,13 +53,14 @@ export default function NewPostPage() {
         body: JSON.stringify({
           title,
           content: trimmedContent,
-          cover_image: coverImage,
+          cover_image: coverImage?.trim() || undefined,
           published: true,
         }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to create post')
+        const error = await response.json().catch(() => null)
+        throw new Error(error?.error || 'Failed to create post')
       }
 
       toast({
@@ -59,7 +72,7 @@ export default function NewPostPage() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to create post',
+        description: error instanceof Error ? error.message : 'Failed to create post',
         variant: 'destructive',
       })
     } finally {

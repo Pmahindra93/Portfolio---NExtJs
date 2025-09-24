@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAdmin } from '@/lib/hooks/useAdmin'
 import { renderMarkdownToHtml } from '@/lib/markdown'
@@ -41,6 +42,14 @@ interface RecentPostsProps {
 export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
   const router = useRouter()
   const { isAdmin, isLoading } = useAdmin()
+
+  const excerpts = useMemo(() => {
+    const map = new Map<string, string>()
+    posts.forEach((post) => {
+      map.set(post.id, createExcerpt(post.content))
+    })
+    return map
+  }, [posts])
 
   const handleDelete = async (postId: string) => {
     try {
@@ -79,7 +88,7 @@ export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
                 {new Date(post.created_at).toLocaleDateString()}
               </p>
               <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
-                {createExcerpt(post.content)}
+                {excerpts.get(post.id) ?? ''}
               </p>
             </Link>
             {!isLoading && isAdmin && (

@@ -13,7 +13,7 @@ export interface Post {
 }
 
 export interface CreatePostInput {
-  title?: string;
+  title: string;
   content: string;
   published?: boolean;
   cover_image?: string;

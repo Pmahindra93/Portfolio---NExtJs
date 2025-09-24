@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 // import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useToast } from "@/components/ui/use-toast"
 import MarkdownEditor from './MarkdownEditor'
 import { cn } from "@/lib/utils"
 import { renderMarkdownToHtml } from '@/lib/markdown'
@@ -27,6 +28,7 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
   const [newPostContent, setNewPostContent] = useState('')
   const [isEditing, setIsEditing] = useState<string | null>(null)
   const [editContent, setEditContent] = useState('')
+  const { toast } = useToast()
 
   useEffect(() => {
     fetchPosts()
@@ -42,14 +44,22 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
     const trimmedContent = newPostContent.trim()
 
     if (!trimmedContent) {
-      alert('Content is required')
+      toast({
+        title: 'Content required',
+        description: 'Please add content before publishing.',
+        variant: 'destructive',
+      })
       return
     }
 
     const title = deriveTitleFromContent(trimmedContent, '')
 
     if (!title) {
-      alert('Add a first line to use as the title')
+      toast({
+        title: 'Add a title',
+        description: 'Start the post with a descriptive first line to use as the title.',
+        variant: 'destructive',
+      })
       return
     }
 
@@ -65,7 +75,11 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
 
     if (!createResponse.ok) {
       const error = await createResponse.json().catch(() => ({}))
-      alert(error.error || 'Failed to create post')
+      toast({
+        title: 'Error creating post',
+        description: error.error || 'Failed to create post',
+        variant: 'destructive',
+      })
       return
     }
     setNewPostContent('')
@@ -76,14 +90,22 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
     const trimmedContent = editContent.trim()
 
     if (!trimmedContent) {
-      alert('Content is required')
+      toast({
+        title: 'Content required',
+        description: 'Please add content before saving.',
+        variant: 'destructive',
+      })
       return
     }
 
     const title = deriveTitleFromContent(trimmedContent, '')
 
     if (!title) {
-      alert('Add a first line to use as the title')
+      toast({
+        title: 'Add a title',
+        description: 'Start the post with a descriptive first line to use as the title.',
+        variant: 'destructive',
+      })
       return
     }
 
@@ -98,7 +120,11 @@ export default function BlogPosts({ is90sStyle }: BlogPostsProps) {
 
     if (!updateResponse.ok) {
       const error = await updateResponse.json().catch(() => ({}))
-      alert(error.error || 'Failed to update post')
+      toast({
+        title: 'Error updating post',
+        description: error.error || 'Failed to update post',
+        variant: 'destructive',
+      })
       return
     }
     setIsEditing(null)

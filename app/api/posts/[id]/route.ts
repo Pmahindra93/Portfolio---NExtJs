@@ -73,7 +73,17 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const rawContent = typeof body.content === 'string' ? body.content.trim() : ''
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json(
+        { error: 'Invalid request payload' },
+        { status: 400 }
+      )
+    }
+
+    const rawContent = typeof (body as Record<string, unknown>).content === 'string'
+      ? ((body as Record<string, unknown>).content as string).trim()
+      : ''
     if (!rawContent) {
       return NextResponse.json(
         { error: 'Content is required' },
@@ -81,7 +91,11 @@ export async function PUT(
       )
     }
 
-    const titleFromRequest = typeof body.title === 'string' ? body.title.trim() : ''
+    const bodyRecord = body as Record<string, unknown>
+
+    const titleFromRequest = typeof bodyRecord.title === 'string'
+      ? (bodyRecord.title as string).trim()
+      : ''
     const title = titleFromRequest || deriveTitleFromContent(rawContent)
 
     const updates: Record<string, unknown> = {
@@ -90,12 +104,13 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     }
 
-    if (typeof body.published === 'boolean') {
-      updates.published = body.published
+    if (typeof bodyRecord.published === 'boolean') {
+      updates.published = bodyRecord.published as boolean
     }
 
-    if (typeof body.cover_image === 'string') {
-      updates.cover_image = body.cover_image
+    if (typeof bodyRecord.cover_image === 'string') {
+      const trimmedCover = (bodyRecord.cover_image as string).trim()
+      updates.cover_image = trimmedCover.length ? trimmedCover : undefined
     }
 
     const { data: post, error: updateError } = await supabase

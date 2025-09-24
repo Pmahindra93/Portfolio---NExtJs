@@ -43,7 +43,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const payload = (await request.json()) as IAWriterPayload
+  let payload: IAWriterPayload
+  try {
+    payload = await request.json()
+  } catch (error) {
+    console.error('Invalid JSON payload from iA Writer:', error)
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
   const rawContent = typeof payload.content === 'string' ? payload.content : ''
   const content = rawContent.trim()
 

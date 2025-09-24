@@ -67,7 +67,19 @@ export async function POST(
     }
 
     const body = await request.json()
-    const rawContent = typeof body.content === 'string' ? body.content : ''
+
+    if (!body || typeof body !== 'object') {
+      return NextResponse.json(
+        { error: 'Invalid request payload' },
+        { status: 400 }
+      )
+    }
+
+    const bodyRecord = body as Record<string, unknown>
+
+    const rawContent = typeof bodyRecord.content === 'string'
+      ? (bodyRecord.content as string)
+      : ''
     const content = rawContent.trim()
 
     if (!content) {
@@ -77,10 +89,16 @@ export async function POST(
       )
     }
 
-    const titleFromRequest = typeof body.title === 'string' ? body.title.trim() : ''
+    const titleFromRequest = typeof bodyRecord.title === 'string'
+      ? (bodyRecord.title as string).trim()
+      : ''
     const title = titleFromRequest || deriveTitleFromContent(content)
-    const published = typeof body.published === 'boolean' ? body.published : true
-    const coverImage = typeof body.cover_image === 'string' ? body.cover_image : undefined
+    const published = typeof bodyRecord.published === 'boolean'
+      ? (bodyRecord.published as boolean)
+      : true
+    const coverImage = typeof bodyRecord.cover_image === 'string'
+      ? (bodyRecord.cover_image as string).trim() || undefined
+      : undefined
 
     const { data: post, error } = await supabase
       .from('posts')

@@ -7,7 +7,20 @@ import { cn } from "@/lib/utils"
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://prateekmahindra.com'
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL
+
+const siteUrl = (() => {
+  if (!rawSiteUrl) {
+    return 'https://prateekmahindra.com'
+  }
+
+  try {
+    const parsed = new URL(rawSiteUrl.startsWith('http') ? rawSiteUrl : `https://${rawSiteUrl}`)
+    return parsed.toString().replace(/\/$/, '')
+  } catch {
+    return 'https://prateekmahindra.com'
+  }
+})()
 
 const inter = Inter({
   subsets: ["latin"],
