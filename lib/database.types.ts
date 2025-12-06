@@ -73,6 +73,30 @@ export interface Database {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          user_id: string
+          role: Database["public"]["Enums"]["user_role"]
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          role?: Database["public"]["Enums"]["user_role"]
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -91,7 +115,7 @@ export interface Database {
       }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "editor" | "user"
     }
     CompositeTypes: {
       [_ in never]: never

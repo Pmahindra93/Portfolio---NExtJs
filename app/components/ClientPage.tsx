@@ -17,7 +17,7 @@ import { Post } from "@/types/post";
 interface NinetiesPost {
   id: string;
   title: string;
-  created_at: string;
+  created_at: string | null;
   slug: string;
 }
 

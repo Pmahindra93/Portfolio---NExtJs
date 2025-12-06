@@ -1,4 +1,6 @@
-export function formatRelativeTime(date: string | Date): string {
+export function formatRelativeTime(date: string | Date | null): string {
+  if (!date) return 'N/A';
+
   const now = new Date();
   const targetDate = new Date(date);
   const diffInMs = now.getTime() - targetDate.getTime();
@@ -27,17 +29,20 @@ export function formatRelativeTime(date: string | Date): string {
   }
 }
 
-export function formatLastModified(createdAt: string | Date, updatedAt: string | Date): string {
+export function formatLastModified(createdAt: string | Date | null, updatedAt: string | Date | null): string {
+  if (!createdAt) return 'N/A';
+  if (!updatedAt) return formatRelativeTime(createdAt);
+
   const created = new Date(createdAt);
   const updated = new Date(updatedAt);
-  
+
   // If updated is significantly different from created (more than 1 minute), show last modified
   const diffInMs = updated.getTime() - created.getTime();
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-  
+
   if (diffInMinutes > 1) {
     return `Last modified ${formatRelativeTime(updatedAt).replace('Posted ', '')}`;
   }
-  
+
   return formatRelativeTime(createdAt);
 }
