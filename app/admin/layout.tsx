@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import type { Database } from "@/lib/database.types";
 
 export default function AdminLayout({
   children,
@@ -12,11 +11,12 @@ export default function AdminLayout({
 }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClient();
 
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
+        const supabase = createClient();
+
         // Check if user is logged in
         const {
           data: { session },
@@ -52,7 +52,7 @@ export default function AdminLayout({
     };
 
     checkAdminStatus();
-  }, [router, supabase]);
+  }, [router]);
 
   if (isLoading) {
     return (

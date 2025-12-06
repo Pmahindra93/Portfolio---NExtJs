@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/lib/database.types";
 
 async function checkIsAdmin(
   supabase: Awaited<ReturnType<typeof createClient>>
@@ -45,7 +44,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // Update user to admin status
-    // @ts-ignore - Supabase type inference issue with async createClient
     const { error: updateError } = await supabase
       .from("users")
       .update({ admin: true })

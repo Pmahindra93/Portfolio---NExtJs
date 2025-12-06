@@ -1,4 +1,4 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
@@ -13,15 +13,17 @@ export async function GET(request: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          const cookie = cookieStore.get(name)
-          return cookie?.value
+        getAll() {
+          return cookieStore.getAll()
         },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options })
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            )
+          } catch {
+            // Handle cookie errors (e.g., in Server Components)
+          }
         },
       },
     }
@@ -55,32 +57,20 @@ export async function GET(request: Request) {
       isAdmin
     })
 
-    // First try to update if the user exists
-    const { error: updateError } = await supabase
+    // Use upsert to handle both insert and update atomically
+    const { error: upsertError } = await supabase
       .from('users')
-      .update({
+      .upsert({
+        id: session.user.id,
         email: session.user.email,
         admin: isAdmin,
-        last_sign_in: new Date().toISOString()
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'id'
       })
-      .eq('id', session.user.id)
 
-    if (updateError?.code === 'PGRST116') { // Record not found
-      // If update fails because user doesn't exist, insert new user
-      const { error: insertError } = await supabase
-        .from('users')
-        .insert({
-          id: session.user.id,
-          email: session.user.email,
-          admin: isAdmin,
-          last_sign_in: new Date().toISOString()
-        })
-
-      if (insertError) {
-        console.error('Error inserting user:', insertError)
-      }
-    } else if (updateError) {
-      console.error('Error updating user:', updateError)
+    if (upsertError) {
+      console.error('Error upserting user:', upsertError)
     }
 
     return NextResponse.redirect(new URL(next, request.url))
