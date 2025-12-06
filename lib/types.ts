@@ -9,11 +9,11 @@ export interface Post {
   id: string
   title: string
   content: string
-  cover_image?: string
-  published: boolean
-  author_id: string
-  created_at: string
-  updated_at: string
+  cover_image?: string | null
+  published: boolean | null
+  author_id: string | null
+  created_at: string | null
+  updated_at: string | null
   profiles?: Profile
 }
 

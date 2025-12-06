@@ -256,7 +256,7 @@ export default function BlogPost(props: { params: Promise<{ id: string }> }) {
             'text-muted-foreground': !is90sStyle
           })}>
             <p className="text-sm">
-              {new Date(post.created_at).toLocaleDateString()}
+              {post.created_at && new Date(post.created_at).toLocaleDateString()}
             </p>
           </div>
 

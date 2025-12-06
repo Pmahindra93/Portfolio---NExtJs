@@ -85,7 +85,7 @@ export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
             >
               <h3 className="text-lg font-medium">{post.title}</h3>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                {new Date(post.created_at).toLocaleDateString()}
+                {post.created_at && new Date(post.created_at).toLocaleDateString()}
               </p>
               <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2">
                 {excerpts.get(post.id) ?? ''}

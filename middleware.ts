@@ -3,51 +3,44 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
+  let response = NextResponse.next({
+    request: req,
+  })
 
-  // Create a Supabase client with the cookies
+  // Create a Supabase client with the new cookie interface
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        get(name: string) {
-          return req.cookies.get(name)?.value
+        getAll() {
+          return req.cookies.getAll()
         },
-        set(name: string, value: string, options: CookieOptions) {
-          res.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: CookieOptions) {
-          res.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
         },
       },
     }
   )
 
-  // Refresh session if expired
-  const { data: { session }, error } = await supabase.auth.getSession()
-
   // Allow access to auth-related routes
   if (req.nextUrl.pathname.startsWith('/auth')) {
-    return res
+    return response
   }
 
   // Protected routes that require authentication
   const protectedPaths = ['/blog/new', '/admin']
-  const isProtectedPath = protectedPaths.some(path => 
+  const isProtectedPath = protectedPaths.some(path =>
     req.nextUrl.pathname.startsWith(path)
   )
 
   if (isProtectedPath) {
-    if (!session || error) {
+    // Use getUser() instead of getSession() to avoid session refresh issues
+    const { data: { user }, error } = await supabase.auth.getUser()
+
+    if (!user || error) {
       // Redirect to sign in page
       const redirectUrl = req.nextUrl.clone()
       redirectUrl.pathname = '/auth/signin'
@@ -56,13 +49,13 @@ export async function middleware(req: NextRequest) {
     }
 
     // Check if user is admin for admin routes
-    if (req.nextUrl.pathname.startsWith('/admin') && 
-        session.user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
+    if (req.nextUrl.pathname.startsWith('/admin') &&
+        user.email !== process.env.NEXT_PUBLIC_ADMIN_EMAIL) {
       return NextResponse.redirect(new URL('/', req.url))
     }
   }
 
-  return res
+  return response
 }
 
 export const config = {

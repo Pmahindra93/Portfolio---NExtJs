@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 interface NinetiesPost {
   id: string
   title: string
-  created_at: string
+  created_at: string | null
   slug: string
 }
 
@@ -19,7 +19,8 @@ interface NinetiesLayoutProps {
 }
 
 // Helper to format date like 'MM/DD/YYYY'
-const formatDate = (dateString: string) => {
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return 'N/A';
   try {
     const date = new Date(dateString);
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
