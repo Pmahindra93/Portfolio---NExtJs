@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { useRouter } from 'next/navigation'
 import { useAdmin } from '@/lib/hooks/useAdmin'
 import { formatLastModified } from '@/lib/utils/date'
+import { useToast } from '@/components/ui/use-toast'
 
 interface RecentPostsProps {
   posts: Post[]
@@ -20,6 +21,7 @@ interface RecentPostsProps {
 export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
   const router = useRouter()
   const { isAdmin, isLoading } = useAdmin()
+  const { toast } = useToast()
 
   const handleDelete = async (postId: string) => {
     try {
@@ -30,12 +32,21 @@ export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
 
       if (!response.ok) {
         const error = await response.json()
-        throw new Error(error.message || 'Failed to delete post')
+        throw new Error(error.error || 'Failed to delete post')
       }
+
+      toast({
+        title: "Success",
+        description: "Post deleted successfully",
+      })
 
       onPostDeleted?.()
     } catch (error) {
-      // Error handled silently
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to delete post',
+        variant: "destructive",
+      })
     }
   }
 
