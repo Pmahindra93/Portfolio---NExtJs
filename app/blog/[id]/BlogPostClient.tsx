@@ -83,10 +83,11 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
   // Check if content is already HTML (starts with HTML tags)
   const isHtml = post.content.trim().startsWith("<");
 
-  // If it's markdown, convert to HTML; if it's HTML, sanitize it first
+  // Convert to HTML (don't sanitize yet - we'll do that after all transformations)
   let processedContent = isHtml
-    ? DOMPurify.sanitize(post.content)
+    ? post.content
     : renderMarkdownToHtml(post.content);
+
   if (is90sStyle) {
     // Add inline styles to headings
     processedContent = processedContent
@@ -154,6 +155,10 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
     .replace(/<p><br><\/p>/g, "")
     .replace(/<p>&nbsp;<\/p>/g, "")
     .replace(/<p>\s*<\/p>/g, "");
+
+  // Sanitize AFTER all transformations to prevent XSS from string replacements
+  // This ensures any potential vulnerabilities from inline styles or HTML manipulation are removed
+  processedContent = DOMPurify.sanitize(processedContent);
 
   return (
     <main
