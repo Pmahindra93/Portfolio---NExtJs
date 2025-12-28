@@ -12,20 +12,12 @@ async function isAdmin(supabase: SupabaseClient) {
   } = await supabase.auth.getSession();
 
   if (sessionError || !session?.user) {
-    console.error("No session in isAdmin check:", { sessionError });
     return false;
   }
-
-  console.log("Checking admin status for user:", {
-    userId: session.user.id,
-    userEmail: session.user.email,
-    adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
-  });
 
   const { data, error } = await supabase.rpc("is_admin");
 
   if (error) {
-    console.error("Error checking admin status:", error);
     return false;
   }
 
@@ -80,7 +72,6 @@ export async function POST(req: Request) {
       .single();
 
     if (insertError) {
-      console.error("Error inserting post:", insertError);
       return NextResponse.json(
         { error: "Failed to create post" },
         { status: 500 }
@@ -89,7 +80,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(post);
   } catch (error) {
-    console.error("Error in POST /api/blog:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -115,7 +105,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json(posts);
   } catch (error) {
-    console.error("Error in GET /api/blog:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

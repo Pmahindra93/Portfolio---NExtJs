@@ -6,24 +6,21 @@ import { Post } from '@/types/post'
 const DynamicFeaturedProjects = dynamic(
   () => import('../FeaturedProjects').then(mod => mod.FeaturedProjects),
   {
-    loading: () => <div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />,
-    ssr: false
+    loading: () => <div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
   }
 )
 
 const DynamicTimeline = dynamic(
   () => import('../Timeline').then(mod => mod.Timeline),
   {
-    loading: () => <div className="h-96 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />,
-    ssr: false
+    loading: () => <div className="h-96 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
   }
 )
 
 const DynamicRecentPosts = dynamic(
   () => import('../RecentPosts').then(mod => mod.RecentPosts),
   {
-    loading: () => <div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />,
-    ssr: false
+    loading: () => <div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
   }
 )
 

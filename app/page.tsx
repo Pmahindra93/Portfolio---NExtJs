@@ -2,8 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import ClientPage from '@/app/components/ClientPage'
 import { Post } from '@/types/post'
 
-// Force dynamic rendering since we use Supabase with cookies
-export const dynamic = 'force-dynamic'
+// Use ISR (Incremental Static Regeneration) - regenerate every 5 minutes
+export const revalidate = 300
 
 // Fetch posts from Supabase
 async function getPosts() {
@@ -18,13 +18,11 @@ async function getPosts() {
       .limit(5)
 
     if (error) {
-      console.error('Error fetching posts:', error)
       return []
     }
 
     return posts as Post[]
   } catch (error) {
-    console.error('Error initializing Supabase client:', error)
     return []
   }
 }

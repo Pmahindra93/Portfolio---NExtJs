@@ -54,12 +54,6 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       detail: { isDarkMode, is90sStyle }
     });
     window.dispatchEvent(event);
-
-    // Force a repaint to ensure styles are applied immediately
-    document.body.style.display = 'none';
-    // This triggers a reflow
-    void document.body.offsetHeight;
-    document.body.style.display = '';
   }, [isDarkMode, is90sStyle, isMounted]);
 
   // Initialize theme from localStorage on mount

@@ -5,7 +5,8 @@ import { Post } from '@/types/post'
 import { deriveTitleFromContent } from '@/lib/posts'
 import { SupabaseClient } from '@supabase/supabase-js'
 
-export const dynamic = 'force-dynamic'
+// Use ISR for GET requests - revalidate every 5 minutes
+export const revalidate = 300
 
 async function checkIsAdmin(supabase: SupabaseClient, userId: string): Promise<boolean> {
   const { data: roleData } = await supabase
@@ -36,7 +37,6 @@ export async function GET(): Promise<NextResponse<Post[] | { error: string }>> {
 
     return NextResponse.json(posts)
   } catch (error) {
-    console.error('Error fetching posts:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -124,7 +124,6 @@ export async function POST(
 
     return NextResponse.json(post)
   } catch (error) {
-    console.error('Error creating post:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
