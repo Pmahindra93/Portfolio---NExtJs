@@ -7,6 +7,7 @@ import { useTheme } from "@/lib/hooks/useTheme";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { renderMarkdownToHtml } from "@/lib/markdown";
+import DOMPurify from "isomorphic-dompurify";
 
 interface BlogPostClientProps {
   post: Post;
@@ -79,12 +80,12 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
     );
   }
 
-  // Add 90s styles to the content
   // Check if content is already HTML (starts with HTML tags)
   const isHtml = post.content.trim().startsWith("<");
-  // If it's markdown, convert to HTML first; if it's already HTML, use it directly
+
+  // If it's markdown, convert to HTML; if it's HTML, sanitize it first
   let processedContent = isHtml
-    ? post.content
+    ? DOMPurify.sanitize(post.content)
     : renderMarkdownToHtml(post.content);
   if (is90sStyle) {
     // Add inline styles to headings
