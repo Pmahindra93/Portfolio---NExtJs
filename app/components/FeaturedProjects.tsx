@@ -66,6 +66,7 @@ export function FeaturedProjects() {
                   src={project.preview}
                   alt={project.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="object-cover"
                 />
               ) : (
@@ -91,6 +92,7 @@ export function FeaturedProjects() {
                   src={selectedProject.preview}
                   alt={selectedProject.title}
                   fill
+                  sizes="(max-width: 640px) 100vw, 600px"
                   className="object-contain"
                 />
               ) : (

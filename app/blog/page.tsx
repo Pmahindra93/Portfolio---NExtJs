@@ -1,75 +1,32 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/server'
 import { Post } from '@/types/post'
-import { useTheme } from '@/lib/hooks/useTheme'
-import { RecentPosts } from '@/components/RecentPosts'
+import BlogPageClient from './BlogPageClient'
 
-export default function BlogPage() {
-  const [posts, setPosts] = useState<Post[]>([])
-  const [loading, setLoading] = useState(true)
-  const { is90sStyle } = useTheme()
+// Use ISR - regenerate every 5 minutes
+export const revalidate = 300
 
-  const fetchPosts = async () => {
-    try {
-      setLoading(true)
-      console.log('Fetching posts...')
-      
-      const { data, error } = await supabase
-        .from('posts')
-        .select('id, title, content, published, created_at, updated_at, author_id, cover_image')
-        .eq('published', true)
-        .order('created_at', { ascending: false })
+async function getPosts(): Promise<Post[]> {
+  try {
+    const supabase = await createClient()
 
-      if (error) {
-        console.error('Error fetching posts:', error)
-        return
-      }
+    const { data, error } = await supabase
+      .from('posts')
+      .select('id, title, content, published, created_at, updated_at, author_id, cover_image')
+      .eq('published', true)
+      .order('created_at', { ascending: false })
 
-      console.log('Posts fetched:', data)
-      setPosts(data || [])
-    } catch (error) {
-      console.error('Exception while fetching posts:', error)
-    } finally {
-      setLoading(false)
+    if (error) {
+      return []
     }
+
+    return (data || []) as Post[]
+  } catch (error) {
+    return []
   }
+}
 
-  useEffect(() => {
-    fetchPosts()
-  }, [])
+export default async function BlogPage() {
+  const posts = await getPosts()
 
-  if (loading) {
-    return (
-      <main className={`flex-1 p-8 ${
-        is90sStyle
-          ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]'
-          : 'bg-background text-foreground'
-      }`}>
-        <div className="max-w-4xl mx-auto">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-24 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </main>
-    )
-  }
-
-  return (
-    <main className={`flex-1 p-8 ${
-      is90sStyle
-        ? 'bg-[#C0C0C0] text-[#000080] font-["Comic_Sans_MS",_cursive]'
-        : 'bg-background text-foreground'
-    }`}>
-      <div className="max-w-4xl mx-auto">
-        <RecentPosts posts={posts} onPostDeleted={fetchPosts} />
-      </div>
-    </main>
-  )
+  return <BlogPageClient posts={posts} />
 }

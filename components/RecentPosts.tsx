@@ -21,9 +21,6 @@ export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
   const router = useRouter()
   const { isAdmin, isLoading } = useAdmin()
 
-  console.log('RecentPosts - isAdmin:', isAdmin)
-  console.log('RecentPosts - isLoading:', isLoading)
-
   const handleDelete = async (postId: string) => {
     try {
       const response = await fetch(`/api/posts/${postId}`, {
@@ -38,7 +35,7 @@ export function RecentPosts({ posts, onPostDeleted }: RecentPostsProps) {
 
       onPostDeleted?.()
     } catch (error) {
-      console.error('Error deleting post:', error)
+      // Error handled silently
     }
   }
 

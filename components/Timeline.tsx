@@ -69,6 +69,7 @@ export function Timeline() {
                     src={event.image}
                     alt={event.title}
                     fill
+                    sizes="(max-width: 768px) 100vw, 200px"
                     className="object-cover rounded-md"
                   />
                 </div>
