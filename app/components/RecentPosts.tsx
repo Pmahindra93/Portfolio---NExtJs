@@ -19,8 +19,12 @@ import { useToast } from "@/components/ui/use-toast";
 const createExcerpt = (content: string): string => {
   if (!content) return "";
 
-  // Convert markdown to HTML (markdown-it safely escapes HTML with html: false)
-  const html = renderMarkdownToHtml(content);
+  // Check if content is already HTML (e.g., from Quill editor) or markdown
+  const isHtml = content.trim().startsWith("<");
+
+  // For HTML, use it directly; for markdown, convert to HTML first
+  // (No sanitization needed here since we're just extracting text, not rendering HTML)
+  const html = isHtml ? content : renderMarkdownToHtml(content);
 
   const text = html
     .replace(/<[^>]+>/g, " ")
