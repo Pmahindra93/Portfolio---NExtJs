@@ -19,11 +19,8 @@ import { useToast } from "@/components/ui/use-toast";
 const createExcerpt = (content: string): string => {
   if (!content) return "";
 
-  // Check if content is already HTML (starts with HTML tags)
-  const isHtml = content.trim().startsWith("<");
-
-  // If it's markdown, convert to HTML first; if it's already HTML, use it directly
-  const html = isHtml ? content : renderMarkdownToHtml(content);
+  // Convert markdown to HTML (markdown-it safely escapes HTML with html: false)
+  const html = renderMarkdownToHtml(content);
 
   const text = html
     .replace(/<[^>]+>/g, " ")
