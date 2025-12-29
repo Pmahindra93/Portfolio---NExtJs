@@ -23,7 +23,7 @@ export function Contact() {
 
               <div className="space-y-6">
                 <p className="font-mono text-sm text-slate-600 dark:text-slate-400">
-                  // Use the form below to transmit a message. Response latency may vary.
+                  {"// Use the form below to transmit a message. Response latency may vary."}
                 </p>
 
                 <div className="space-y-4">
