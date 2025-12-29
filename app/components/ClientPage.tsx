@@ -12,6 +12,9 @@ import { NinetiesLayout } from "./layouts/NinetiesLayout";
 import { useTheme } from "@/lib/hooks/useTheme";
 import { Suspense } from "react";
 import { Post } from "@/types/post";
+import { Hero } from "./Hero";
+import { TechStack } from "./TechStack";
+import { Contact } from "./Contact";
 
 // Define a NinetiesPost interface for the 90s layout
 interface NinetiesPost {
@@ -97,45 +100,28 @@ export default function ClientPage({ posts }: ClientPageProps) {
 
   return (
     <div key={`theme-${themeVersion}`}>
-      {/* Modern Theme Content */}
+      {/* Modern Theme Content (Premium Retro) */}
       {!is90sStyle && (
         <div id="modern-theme" className="modern-theme">
-          {/* Structure copied from ThemeContent.tsx */}
-          <main className="container mx-auto px-4 mt-6">
-            <div className="space-y-12">
-              <div>
-                <h1 className="text-4xl font-bold mb-3 text-slate-900 dark:text-white">
-                  Work, Ideas, and Perspectives
-                </h1>
-                <p className="text-lg text-slate-600 dark:text-slate-400">
-                  Welcome to my corner of the internet, where I showcase my CV,
-                  projects, and latest experiments in AI and full-stack
-                  development (some of which may or may not involve breaking
-                  things before fixing them). From building smarter applications
-                  to pondering the future of tech, this is where I share my
-                  work, ideas, and occasional epiphanies—usually accompanied by
-                  a cup of matcha 🍵 and a questionable number of browser tabs.
-                </p>
-              </div>
+          <Hero />
 
-              <div>
-                <div className="flex items-center gap-4 mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <TechStack />
+
+          <main className="container mx-auto px-4 mt-20 mb-20">
+            <div className="space-y-24">
+              <div id="projects" className="scroll-mt-24">
+                <div className="flex items-center gap-4 mb-8 pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
+                   <div className="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900">
+                    <span className="font-mono font-bold text-xl">01</span>
+                   </div>
+                   <h2 className="text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
                     Featured Projects
                   </h2>
-                  <a
-                    href="https://github.com/Pmahindra93"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-center w-7 h-7 rounded-md border-2 border-slate-600 dark:border-slate-400 hover:border-slate-700 dark:hover:border-slate-300 transition-colors"
-                    aria-label="GitHub Profile"
-                  >
-                    <Github className="w-4 h-4 text-slate-600 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" />
-                  </a>
                 </div>
+
                 <Suspense
                   fallback={
-                    <div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    <div className="h-48 animate-pulse bg-slate-200 dark:bg-slate-800" />
                   }
                 >
                   <FeaturedProjectsWrapper />
@@ -143,45 +129,64 @@ export default function ClientPage({ posts }: ClientPageProps) {
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold mb-6 text-slate-900 dark:text-white">
-                  Recent Posts
-                </h2>
+                <div className="flex items-center gap-4 mb-8 pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
+                   <div className="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900">
+                    <span className="font-mono font-bold text-xl">02</span>
+                   </div>
+                  <h2 className="text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+                    Recent Logs
+                  </h2>
+                </div>
                 <Suspense fallback={<PostsSkeleton />}>
                   <RecentPostsWrapper posts={posts} />
                 </Suspense>
               </div>
 
               <div>
-                <div className="flex items-center gap-4 mb-6">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                    My Journey
-                  </h2>
-                  <a
-                    href="https://linkedin.com/in/pmahindra"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-center w-7 h-7 rounded-md border-2 border-blue-600 dark:border-blue-500 hover:border-blue-700 dark:hover:border-blue-400 transition-colors"
-                    aria-label="LinkedIn Profile"
-                  >
-                    <Linkedin className="w-4 h-4 text-blue-600 hover:text-blue-700 dark:text-blue-500 dark:hover:text-blue-400" />
-                  </a>
+                <div className="flex items-center gap-4 mb-8 pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
+                   <div className="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900">
+                    <span className="font-mono font-bold text-xl">03</span>
+                   </div>
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+                        My Journey
+                    </h2>
+                    <a
+                        href="https://linkedin.com/in/pmahindra"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-center w-8 h-8 border-2 border-slate-900 dark:border-white hover:bg-slate-900 hover:text-white dark:hover:bg-white dark:hover:text-slate-900 transition-colors"
+                        aria-label="LinkedIn Profile"
+                    >
+                        <Linkedin className="w-4 h-4" />
+                    </a>
+                  </div>
                 </div>
                 <Suspense
                   fallback={
-                    <div className="h-96 animate-pulse bg-slate-200 dark:bg-slate-800 rounded-lg" />
+                    <div className="h-96 animate-pulse bg-slate-200 dark:bg-slate-800" />
                   }
                 >
                   <TimelineWrapper />
                 </Suspense>
               </div>
-              {/* Add Footer Here */}
-              <footer className="border-t border-slate-200 pt-4 pb-2 dark:border-slate-800">
-                <p className="text-center text-lg text-muted-foreground">
-                  Made with ❤️ in North London with 🤖 and 🍵
-                </p>
-              </footer>
             </div>
           </main>
+
+          <Contact />
+
+          <footer className="border-t-2 border-slate-900 dark:border-white py-8 bg-slate-50 dark:bg-slate-900">
+            <div className="container mx-auto px-4 text-center">
+                <p className="font-mono text-sm text-slate-500 uppercase tracking-widest">
+                  © {new Date().getFullYear()} Prateek Mahindra. System.Active(true)
+                </p>
+                <div className="mt-2 flex justify-center gap-4 font-mono text-xs text-slate-400">
+                    <span>LOCATION: LONDON_UK</span>
+                    <span>::</span>
+                    <span>STATUS: BUILDING</span>
+                </div>
+            </div>
+          </footer>
         </div>
       )}
 
