@@ -107,15 +107,15 @@ export function Contact() {
                   </span>
                   <Send className="ml-2 w-4 h-4" />
                 </Button>
+              </form>
 
-                <div className="flex justify-between items-center pt-4 border-t-2 border-slate-900 dark:border-white border-dashed text-xs font-mono text-slate-500">
+              <div className="flex justify-between items-center pt-4 border-t-2 border-slate-900 dark:border-white border-dashed text-xs font-mono text-slate-500">
                     <div className="flex items-center gap-2">
                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
                         <span>SERVER_STATUS: ONLINE</span>
                     </div>
                     <span>SECURE_CONNECTION_ESTABLISHED</span>
                 </div>
-              </div>
             </div>
           </div>
         </div>
