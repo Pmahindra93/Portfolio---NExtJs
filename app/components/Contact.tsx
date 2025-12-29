@@ -4,8 +4,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Mail, Disc } from "lucide-react";
+import { useState } from "react";
 
 export function Contact() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const formData = new FormData(e.currentTarget);
+    formData.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY!);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert("Message sent successfully!");
+        e.currentTarget.reset();
+      } else {
+        alert("Failed to send message. Please try again.");
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section id="contact" className="py-20 relative overflow-hidden">
       <div className="container px-4 md:px-6 relative z-10">
@@ -21,10 +50,12 @@ export function Contact() {
                 </h2>
               </div>
 
-              <div className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <p className="font-mono text-sm text-slate-600 dark:text-slate-400">
                   {"// Use the form below to transmit a message. Response latency may vary."}
                 </p>
+
+                <input type="hidden" name="redirect" value="false" />
 
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -32,6 +63,8 @@ export function Contact() {
                       User_ID (Name)
                     </label>
                     <Input
+                      name="name"
+                      required
                       className="rounded-none border-2 border-slate-900 dark:border-white focus-visible:ring-0 focus-visible:ring-offset-0 bg-white dark:bg-slate-800"
                       placeholder="ENTER NAME..."
                     />
@@ -41,7 +74,9 @@ export function Contact() {
                       Return_Address (Email)
                     </label>
                     <Input
+                      name="email"
                       type="email"
+                      required
                       className="rounded-none border-2 border-slate-900 dark:border-white focus-visible:ring-0 focus-visible:ring-offset-0 bg-white dark:bg-slate-800"
                       placeholder="ENTER EMAIL..."
                     />
@@ -51,15 +86,23 @@ export function Contact() {
                       Transmission_Data (Message)
                     </label>
                     <Textarea
+                      name="message"
+                      required
                       className="min-h-[120px] rounded-none border-2 border-slate-900 dark:border-white focus-visible:ring-0 focus-visible:ring-offset-0 bg-white dark:bg-slate-800"
                       placeholder="ENTER MESSAGE..."
                     />
                   </div>
                 </div>
 
-                <Button className="w-full h-12 rounded-none bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 uppercase font-mono tracking-widest text-lg font-bold group">
-                  <span className="group-hover:hidden">Transmit</span>
-                  <span className="hidden group-hover:inline-block animate-pulse">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full h-12 rounded-none bg-slate-900 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 uppercase font-mono tracking-widest text-lg font-bold group"
+                >
+                  <span className={isSubmitting ? "hidden" : "group-hover:hidden"}>
+                    Transmit
+                  </span>
+                  <span className={isSubmitting ? "animate-pulse" : "hidden group-hover:inline-block animate-pulse"}>
                     Sending...
                   </span>
                   <Send className="ml-2 w-4 h-4" />
