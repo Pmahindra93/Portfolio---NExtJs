@@ -105,16 +105,19 @@ export default function ClientPage({ posts }: ClientPageProps) {
         <div id="modern-theme" className="modern-theme">
           <Hero />
 
-          <TechStack />
+          {/* Hide TechStack on mobile */}
+          <div className="hidden sm:block">
+            <TechStack />
+          </div>
 
-          <main className="container mx-auto px-4 mt-20 mb-20">
-            <div className="space-y-24">
+          <main className="container mx-auto px-4 mt-12 sm:mt-16 md:mt-20 mb-12 sm:mb-16 md:mb-20">
+            <div className="space-y-12 sm:space-y-16 md:space-y-24">
               <div id="projects" className="scroll-mt-24">
-                <div className="flex items-center gap-4 mb-8 pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
-                   <div className="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900">
-                    <span className="font-mono font-bold text-xl">01</span>
+                <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 pb-3 sm:pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
+                   <div className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex-shrink-0">
+                    <span className="font-mono font-bold text-lg sm:text-xl">01</span>
                    </div>
-                   <h2 className="text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+                   <h2 className="text-xl sm:text-2xl md:text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
                     Featured Projects
                   </h2>
                 </div>
@@ -129,11 +132,11 @@ export default function ClientPage({ posts }: ClientPageProps) {
               </div>
 
               <div>
-                <div className="flex items-center gap-4 mb-8 pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
-                   <div className="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900">
-                    <span className="font-mono font-bold text-xl">02</span>
+                <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 pb-3 sm:pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
+                   <div className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex-shrink-0">
+                    <span className="font-mono font-bold text-lg sm:text-xl">02</span>
                    </div>
-                  <h2 className="text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
                     Recent Logs
                   </h2>
                 </div>
@@ -143,12 +146,12 @@ export default function ClientPage({ posts }: ClientPageProps) {
               </div>
 
               <div>
-                <div className="flex items-center gap-4 mb-8 pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
-                   <div className="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900">
-                    <span className="font-mono font-bold text-xl">03</span>
+                <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 pb-3 sm:pb-4 border-b-2 border-slate-900 dark:border-white border-dashed">
+                   <div className="inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 bg-slate-900 text-white dark:bg-white dark:text-slate-900 flex-shrink-0">
+                    <span className="font-mono font-bold text-lg sm:text-xl">03</span>
                    </div>
-                  <div className="flex items-center gap-4">
-                    <h2 className="text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <h2 className="text-xl sm:text-2xl md:text-3xl font-mono font-bold uppercase tracking-tight text-slate-900 dark:text-white">
                         My Journey
                     </h2>
                     <a
@@ -175,14 +178,14 @@ export default function ClientPage({ posts }: ClientPageProps) {
 
           <Contact />
 
-          <footer className="border-t-2 border-slate-900 dark:border-white py-8 bg-slate-50 dark:bg-slate-900">
+          <footer className="border-t-2 border-slate-900 dark:border-white py-6 sm:py-8 bg-slate-50 dark:bg-slate-900">
             <div className="container mx-auto px-4 text-center">
-                <p className="font-mono text-sm text-slate-500 uppercase tracking-widest">
+                <p className="font-mono text-xs sm:text-sm text-slate-500 uppercase tracking-widest">
                   © {new Date().getFullYear()} Prateek Mahindra. System.Active(true)
                 </p>
-                <div className="mt-2 flex justify-center gap-4 font-mono text-xs text-slate-400">
+                <div className="mt-2 flex flex-wrap justify-center gap-2 sm:gap-4 font-mono text-xs text-slate-400">
                     <span>LOCATION: LONDON_UK</span>
-                    <span>::</span>
+                    <span className="hidden sm:inline">::</span>
                     <span>STATUS: BUILDING</span>
                 </div>
             </div>

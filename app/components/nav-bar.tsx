@@ -33,7 +33,7 @@ export function NavBar({ className }: { className?: string }) {
         className
       )}
     >
-      <div className="w-full px-4 flex justify-between items-center">
+      <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
           <span className={cn(
             "font-bold inline-block",
