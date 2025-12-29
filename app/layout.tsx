@@ -1,6 +1,5 @@
 // app/layout.tsx
-import { Inter } from "next/font/google"
-import { Caveat } from "next/font/google"
+import { Inter, Caveat, JetBrains_Mono } from "next/font/google"
 import { Metadata } from "next"
 import { BodyContent } from '@/app/components/body-content'
 import { cn } from "@/lib/utils"
@@ -30,6 +29,11 @@ const inter = Inter({
 const caveat = Caveat({
   subsets: ["latin"],
   variable: "--font-caveat",
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
 })
 
 export const metadata: Metadata = {
@@ -100,7 +104,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       "bg-background text-foreground",
       "font-sans",
       inter.variable,
-      caveat.variable
+      caveat.variable,
+      jetbrainsMono.variable
     )}>
       <BodyContent className="min-h-screen">{children}<Analytics /></BodyContent>
     </html>

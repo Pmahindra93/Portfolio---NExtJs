@@ -68,9 +68,10 @@
 .modern-theme h4,
 .modern-theme h5,
 .modern-theme h6 {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  font-family: var(--font-mono), 'Inter', -apple-system, monospace !important;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
 }
 
 .modern-theme p,
@@ -78,6 +79,25 @@
 .modern-theme a {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
   line-height: 1.6;
+}
+
+.modern-theme .code-font {
+  font-family: var(--font-mono), monospace !important;
+}
+
+/* Background patterns */
+.modern-theme {
+  min-height: 100vh;
+  background-color: white;
+  background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+  background-size: 24px 24px;
+  transition: all 0.2s ease-in-out;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.dark .modern-theme {
+  background-color: hsl(222.2, 84%, 4.9%);
+  background-image: radial-gradient(#1e293b 1px, transparent 1px);
 }
 
 /* Hide modern theme when 90s theme is active */
@@ -159,25 +179,61 @@ html.theme-90s .navbar {
 
 /* 90s Animations */
 @keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes rainbow {
-  0% { color: red; }
-  14% { color: orange; }
-  28% { color: yellow; }
-  42% { color: green; }
-  57% { color: blue; }
-  71% { color: indigo; }
-  85% { color: violet; }
-  100% { color: red; }
+  0% {
+    color: red;
+  }
+
+  14% {
+    color: orange;
+  }
+
+  28% {
+    color: yellow;
+  }
+
+  42% {
+    color: green;
+  }
+
+  57% {
+    color: blue;
+  }
+
+  71% {
+    color: indigo;
+  }
+
+  85% {
+    color: violet;
+  }
+
+  100% {
+    color: red;
+  }
 }
 
 @keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 /* Force immediate repaints for theme changes */
@@ -189,14 +245,20 @@ html.theme-90s * {
 }
 
 @keyframes theme-switch-repaint {
-  from { opacity: 0.99; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.99;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
