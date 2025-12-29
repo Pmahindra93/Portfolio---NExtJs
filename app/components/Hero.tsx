@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Terminal, Mail } from "lucide-react";
+import { ArrowRight, Mail } from "lucide-react";
 import { useEffect, useState } from "react";
-import { cn } from "@/lib/utils";
+
 
 export function Hero() {
   const [text, setText] = useState("");

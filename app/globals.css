@@ -68,7 +68,7 @@
 .modern-theme h4,
 .modern-theme h5,
 .modern-theme h6 {
-  font-family: 'var(--font-mono)', 'Inter', -apple-system, monospace !important;
+  font-family: var(--font-mono), 'Inter', -apple-system, monospace !important;
   font-weight: 700;
   letter-spacing: -0.05em;
   text-transform: uppercase;
@@ -82,7 +82,7 @@
 }
 
 .modern-theme .code-font {
-  font-family: 'var(--font-mono)', monospace !important;
+  font-family: var(--font-mono), monospace !important;
 }
 
 /* Background patterns */
@@ -179,25 +179,61 @@ html.theme-90s .navbar {
 
 /* 90s Animations */
 @keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0.5; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes rainbow {
-  0% { color: red; }
-  14% { color: orange; }
-  28% { color: yellow; }
-  42% { color: green; }
-  57% { color: blue; }
-  71% { color: indigo; }
-  85% { color: violet; }
-  100% { color: red; }
+  0% {
+    color: red;
+  }
+
+  14% {
+    color: orange;
+  }
+
+  28% {
+    color: yellow;
+  }
+
+  42% {
+    color: green;
+  }
+
+  57% {
+    color: blue;
+  }
+
+  71% {
+    color: indigo;
+  }
+
+  85% {
+    color: violet;
+  }
+
+  100% {
+    color: red;
+  }
 }
 
 @keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
 }
 
 /* Force immediate repaints for theme changes */
@@ -209,14 +245,20 @@ html.theme-90s * {
 }
 
 @keyframes theme-switch-repaint {
-  from { opacity: 0.99; }
-  to { opacity: 1; }
+  from {
+    opacity: 0.99;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
