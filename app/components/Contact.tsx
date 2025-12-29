@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Mail, Disc } from "lucide-react";
+import { Send, Mail } from "lucide-react";
 import { useState } from "react";
 
 export function Contact() {
@@ -13,8 +13,17 @@ export function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
-    formData.append("access_key", process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY!);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const accessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
+    if (!accessKey) {
+      alert("Form configuration error. Please contact the site owner.");
+      setIsSubmitting(false);
+      return;
+    }
+
+    formData.append("access_key", accessKey);
 
     try {
       const response = await fetch("https://api.web3forms.com/submit", {
@@ -24,7 +33,7 @@ export function Contact() {
 
       if (response.ok) {
         alert("Message sent successfully!");
-        e.currentTarget.reset();
+        form.reset();
       } else {
         alert("Failed to send message. Please try again.");
       }
