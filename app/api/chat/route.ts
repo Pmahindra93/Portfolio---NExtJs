@@ -139,8 +139,13 @@ When answering questions about Prateek:
 
 export async function POST(req: NextRequest) {
   try {
-    // Get IP address for rate limiting
-    const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous'
+    // Get client IP address for rate limiting
+    // x-forwarded-for can contain multiple IPs (client, proxy1, proxy2, ...)
+    // Extract only the first IP (actual client) for consistent rate limiting
+    const forwardedFor = req.headers.get('x-forwarded-for')
+    const ip = forwardedFor
+      ? forwardedFor.split(',')[0].trim()
+      : req.headers.get('x-real-ip') ?? 'anonymous'
 
     // Check rate limit
     const { success, limit, remaining, reset } = await ratelimit.limit(ip)
