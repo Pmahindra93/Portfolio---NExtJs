@@ -8,8 +8,17 @@ export const runtime = 'edge'
 
 // Validate required environment variables
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+const KV_REST_API_URL = process.env.KV_REST_API_URL
+const KV_REST_API_TOKEN = process.env.KV_REST_API_TOKEN
+
 if (!OPENAI_API_KEY) {
   throw new Error('Missing required environment variable: OPENAI_API_KEY')
+}
+
+if (!KV_REST_API_URL || !KV_REST_API_TOKEN) {
+  throw new Error(
+    'Missing required Vercel KV environment variables: KV_REST_API_URL and KV_REST_API_TOKEN'
+  )
 }
 
 // Initialize OpenAI client
@@ -17,9 +26,12 @@ const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 })
 
-// Initialize rate limiter
+// Initialize rate limiter with Vercel KV
 const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
+  redis: new Redis({
+    url: KV_REST_API_URL,
+    token: KV_REST_API_TOKEN,
+  }),
   limiter: Ratelimit.slidingWindow(10, '24 h'),
   analytics: true,
   prefix: 'chatbot',
