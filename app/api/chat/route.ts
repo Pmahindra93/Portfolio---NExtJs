@@ -2,6 +2,7 @@ import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
+import type { ResponseStreamEvent } from 'openai/resources/responses/responses'
 
 export const runtime = 'edge'
 
@@ -18,7 +19,7 @@ const ratelimit = new Ratelimit({
   prefix: 'chatbot',
 })
 
-const SYSTEM_PROMPT = `You are a helpful assistant designed to answer questions about **Prateek Mahindra**.
+const SYSTEM_PROMPT = `You are a helpful assistant designed to answer questions about **Prateek Mahindra** only and please do not provide information or context about anything else.
 
 Prateek is a versatile **technical professional, founder, and product engineer** based in **London, UK**, recently relocated under the **High Potential Individual Visa**. He combines strong full-stack engineering skills with product management expertise, focusing on building **AI-powered applications** that enhance usability, automation, and compliance in real-world domains like healthcare and finance.
 
@@ -115,7 +116,8 @@ When answering questions about Prateek:
 - Maintain a **professional, factual, and confident tone**.
 - Focus on his **technical expertise**, **founder experience**, **career achievements**, and **AI-focused projects**.
 - Be concise yet informative.
-- If asked about personal or unrelated matters, politely clarify that you only have information about Prateek's **professional background, skills, and ventures**.`
+- If asked about personal or unrelated matters, politely clarify that you only have information about Prateek's **professional background, skills, and ventures**.
+- Do not provide any information outside of the above information.`
 
 export async function POST(req: NextRequest) {
   try {
@@ -156,27 +158,46 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Create chat completion with streaming
-    const stream = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...messages,
-      ],
+    // Create response with streaming using Responses API
+    const stream = await openai.responses.create({
+      model: 'gpt-5-mini-2025-08-07',
+      instructions: SYSTEM_PROMPT,
+      input: messages,
       stream: true,
-      temperature: 0.7,
-      max_tokens: 500,
+      reasoning: {
+        effort: 'minimal',
+      },
+      text: {
+        verbosity: 'low',
+      },
     })
 
-    // Convert OpenAI stream to web stream
+    // Convert OpenAI Responses API stream to web stream
     const encoder = new TextEncoder()
     const readable = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of stream) {
-            const text = chunk.choices[0]?.delta?.content || ''
+          for await (const event of stream) {
+            let text = ''
+
+            // Type guard for text delta events
+            // The Responses API emits 'response.output_text.delta' events for streaming text
+            if (event.type === 'response.output_text.delta') {
+              text = event.delta
+            }
+
             if (text) {
-              const data = `data: ${JSON.stringify(chunk)}\n\n`
+              // Transform to Chat Completions format for client compatibility
+              const transformedChunk = {
+                choices: [
+                  {
+                    delta: {
+                      content: text
+                    }
+                  }
+                ]
+              }
+              const data = `data: ${JSON.stringify(transformedChunk)}\n\n`
               controller.enqueue(encoder.encode(data))
             }
           }
