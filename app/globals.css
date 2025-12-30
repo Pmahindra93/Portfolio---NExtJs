@@ -414,3 +414,99 @@ html.theme-90s * {
 .terminal-dialog ::-webkit-scrollbar-thumb:hover {
   background: #00dd00;
 }
+
+/* ============================================ */
+/* Voice Recording Animations                  */
+/* ============================================ */
+
+/* Recording pulse */
+@keyframes recording-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
+}
+
+.recording-pulse {
+  animation: recording-pulse 1.2s ease-in-out infinite;
+}
+
+/* Audio wave visualizer */
+@keyframes audio-wave {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+.audio-wave {
+  width: 2px;
+  height: 4px;
+  background: #00ff00;
+  display: inline-block;
+  margin: 0 1px;
+  animation: audio-wave 0.6s ease-in-out infinite;
+  border-radius: 2px;
+}
+
+.audio-wave:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.audio-wave:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* Voice button states */
+.voice-button {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+}
+
+.voice-button--idle {
+  background: #00ff00;
+  color: #000;
+}
+
+.voice-button--idle:hover:not(:disabled) {
+  background: #00dd00;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+  transform: scale(1.05);
+}
+
+.voice-button--recording {
+  background: #ff0000 !important;
+  color: #fff !important;
+  border-color: #ff0000 !important;
+}
+
+.voice-button--processing {
+  background: #00d9ff;
+  color: #000;
+}
+
+.voice-button--playing {
+  background: #00ff00;
+  color: #000;
+  border-color: #00ff00;
+}
+
+.voice-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Audio visualizer container */
+.audio-visualizer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 16px;
+}

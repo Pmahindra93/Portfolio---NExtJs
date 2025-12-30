@@ -18,3 +18,12 @@ export interface RateLimitInfo {
   remaining: number
   reset: number
 }
+
+export interface TranscribeResponse {
+  text: string
+  error?: string
+}
+
+export interface TTSRequest {
+  text: string
+}
