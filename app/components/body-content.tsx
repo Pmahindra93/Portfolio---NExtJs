@@ -3,6 +3,7 @@
 import { Providers } from '@/components/providers'
 import { Sidebar } from '@/components/sidebar'
 import { NavBar } from '@/components/nav-bar'
+import { VoiceModeButton } from '@/app/components/voice/voice-mode-button'
 import { useTheme } from '@/lib/hooks/useTheme'
 
 interface BodyContentProps {
@@ -29,6 +30,7 @@ export function BodyContent({
             </main>
           </div>
         </div>
+        <VoiceModeButton />
       </Providers>
     </body>
   )

@@ -510,3 +510,147 @@ html.theme-90s * {
   gap: 2px;
   height: 16px;
 }
+
+/* ============================================ */
+/* Voice Mode Animations                       */
+/* ============================================ */
+
+/* Floating button */
+.voice-mode-fab {
+  animation: voice-float 3s ease-in-out infinite;
+}
+
+@keyframes voice-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Pulse rings */
+@keyframes voice-pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.voice-pulse-ring {
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  border: 3px solid rgba(34, 197, 94, 0.6);
+  animation: voice-pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+
+/* Voice orb states */
+.voice-orb-connecting {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  animation: voice-pulse 1.5s ease-in-out infinite;
+}
+
+.voice-orb-listening {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  animation: voice-listening 2s ease-in-out infinite;
+  box-shadow: 0 0 40px rgba(34, 197, 94, 0.6);
+}
+
+.voice-orb-thinking {
+  background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+  animation: voice-thinking 1s ease-in-out infinite;
+  box-shadow: 0 0 40px rgba(234, 179, 8, 0.6);
+}
+
+.voice-orb-speaking {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  animation: voice-speaking 0.8s ease-in-out infinite;
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
+}
+
+@keyframes voice-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes voice-listening {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.6);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 0 60px rgba(34, 197, 94, 0.8);
+  }
+}
+
+@keyframes voice-thinking {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.05) rotate(2deg);
+  }
+  75% {
+    transform: scale(1.05) rotate(-2deg);
+  }
+}
+
+@keyframes voice-speaking {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  75% {
+    transform: scale(1.05);
+  }
+}
+
+/* Animated background */
+@keyframes voice-bg-gradient {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.voice-mode-bg {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    -45deg,
+    rgba(34, 197, 94, 0.1),
+    rgba(59, 130, 246, 0.1),
+    rgba(168, 85, 247, 0.1),
+    rgba(234, 179, 8, 0.1)
+  );
+  background-size: 400% 400%;
+  animation: voice-bg-gradient 15s ease infinite;
+}
+
+/* Modal styling */
+.voice-mode-modal {
+  backdrop-filter: blur(10px);
+}
