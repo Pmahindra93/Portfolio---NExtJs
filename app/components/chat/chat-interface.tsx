@@ -71,10 +71,17 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
 
       if (!response.ok) {
         if (response.status === 429) {
-          const data = await response.json()
-          throw new Error(
-            `Rate limit exceeded. You have ${data.limit} requests per 24 hours. Try again later.`
-          )
+          try {
+            const data = await response.json()
+            throw new Error(
+              `Rate limit exceeded. You have ${data.limit} requests per 24 hours. Try again later.`
+            )
+          } catch (parseError) {
+            // Fallback if response is not JSON (e.g., from proxy/CDN)
+            throw new Error(
+              'Rate limit exceeded. You have reached the maximum number of requests. Please try again later.'
+            )
+          }
         }
         throw new Error(`Error: ${response.statusText}`)
       }

@@ -6,9 +6,15 @@ import type { ResponseStreamEvent } from 'openai/resources/responses/responses'
 
 export const runtime = 'edge'
 
+// Validate required environment variables
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+if (!OPENAI_API_KEY) {
+  throw new Error('Missing required environment variable: OPENAI_API_KEY')
+}
+
 // Initialize OpenAI client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
+  apiKey: OPENAI_API_KEY,
 })
 
 // Initialize rate limiter

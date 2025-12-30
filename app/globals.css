@@ -370,13 +370,13 @@ html.theme-90s * {
   user-select: none;
 }
 
-@keyframes blink {
+@keyframes terminal-cursor-blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
 }
 
 .terminal-cursor {
-  animation: blink 1s infinite;
+  animation: terminal-cursor-blink 1s infinite;
   color: #00ff00;
 }
 
