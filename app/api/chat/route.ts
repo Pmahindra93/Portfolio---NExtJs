@@ -183,9 +183,9 @@ export async function POST(req: NextRequest) {
 
     const { messages } = body
 
-    if (!messages || !Array.isArray(messages)) {
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(
-        JSON.stringify({ error: 'Invalid request: messages array required' }),
+        JSON.stringify({ error: 'Invalid request: non-empty messages array required' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
