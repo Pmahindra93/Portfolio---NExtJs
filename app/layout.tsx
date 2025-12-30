@@ -100,14 +100,14 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning className={cn(
-      "min-h-screen antialiased transition-colors",
+      "min-h-screen antialiased transition-colors overflow-x-hidden",
       "bg-background text-foreground",
       "font-sans",
       inter.variable,
       caveat.variable,
       jetbrainsMono.variable
     )}>
-      <BodyContent className="min-h-screen">{children}<Analytics /></BodyContent>
+      <BodyContent className="min-h-screen overflow-x-hidden">{children}<Analytics /></BodyContent>
     </html>
   )
 }

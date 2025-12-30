@@ -260,6 +260,157 @@ html.theme-90s * {
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-hidden;
+    max-width: 100vw;
   }
+
+  html {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+}
+
+/* ============================================ */
+/* PrateekGPT Button Styles                    */
+/* ============================================ */
+
+.prateek-ai-button {
+  position: relative;
+  animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+.prateek-ai-button::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, #00ff00, #00d9ff, #00ff00);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+  filter: blur(8px);
+}
+
+.prateek-ai-button:hover::before {
+  opacity: 0.6;
+  animation: glow-rotate 2s linear infinite;
+}
+
+@keyframes glow-rotate {
+  0% {
+    filter: blur(8px) hue-rotate(0deg);
+  }
+  100% {
+    filter: blur(8px) hue-rotate(360deg);
+  }
+}
+
+/* ============================================ */
+/* Terminal Chat Dialog Styles                 */
+/* ============================================ */
+
+/* Terminal Dialog */
+.terminal-dialog {
+  background: #0a0e1a !important;
+  border: 2px solid #00ff00 !important;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.3) !important;
+  color: #00ff00;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+.terminal-header {
+  border-bottom: 1px solid #00ff00;
+  padding: 12px 20px;
+  background: #000000;
+  font-family: 'JetBrains Mono', monospace;
+  color: #00ff00;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.terminal-message-user {
+  color: #00d9ff;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.5;
+}
+
+.terminal-message-assistant {
+  color: #00ff00;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.5;
+}
+
+.terminal-input {
+  background: transparent !important;
+  border: none !important;
+  color: #00ff00 !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.terminal-input:focus {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.terminal-prompt {
+  color: #00ff00;
+  font-family: 'JetBrains Mono', monospace;
+  user-select: none;
+}
+
+@keyframes terminal-cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.terminal-cursor {
+  animation: terminal-cursor-blink 1s infinite;
+  color: #00ff00;
+}
+
+/* Optional CRT effect */
+.terminal-scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0, 255, 0, 0.02) 50%
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Terminal scrollbar */
+.terminal-dialog ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terminal-dialog ::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+
+.terminal-dialog ::-webkit-scrollbar-thumb {
+  background: #00ff00;
+  border-radius: 0;
+}
+
+.terminal-dialog ::-webkit-scrollbar-thumb:hover {
+  background: #00dd00;
 }
