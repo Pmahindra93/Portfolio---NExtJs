@@ -95,6 +95,7 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
       const decoder = new TextDecoder()
       let assistantMessage = ''
       let streamFinished = false
+      let buffer = '' // Buffer for incomplete lines across chunks
 
       if (!reader) throw new Error('No response stream')
 
@@ -113,7 +114,11 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
         if (done) break
 
         const chunk = decoder.decode(value, { stream: true })
-        const lines = chunk.split('\n')
+        buffer += chunk
+
+        // Split on newlines and keep incomplete line in buffer
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || '' // Keep last potentially incomplete line
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
