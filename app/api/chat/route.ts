@@ -154,7 +154,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Parse request body
-    const body = await req.json()
+    let body: any
+    try {
+      body = await req.json()
+    } catch (err) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid JSON in request body' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
     const { messages } = body
 
     if (!messages || !Array.isArray(messages)) {

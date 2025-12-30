@@ -71,17 +71,21 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
 
       if (!response.ok) {
         if (response.status === 429) {
+          // Try to parse JSON response for detailed rate limit info
+          let data
           try {
-            const data = await response.json()
-            throw new Error(
-              `Rate limit exceeded. You have ${data.limit} requests per 24 hours. Try again later.`
-            )
+            data = await response.json()
           } catch (parseError) {
             // Fallback if response is not JSON (e.g., from proxy/CDN)
             throw new Error(
               'Rate limit exceeded. You have reached the maximum number of requests. Please try again later.'
             )
           }
+
+          // Successfully parsed JSON, throw specific error with limit details
+          throw new Error(
+            `Rate limit exceeded. You have ${data.limit} requests per 24 hours. Try again later.`
+          )
         }
         throw new Error(`Error: ${response.statusText}`)
       }
@@ -90,6 +94,7 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
       let assistantMessage = ''
+      let streamFinished = false
 
       if (!reader) throw new Error('No response stream')
 
@@ -113,7 +118,10 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
         for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = line.slice(6)
-            if (data === '[DONE]') break
+            if (data === '[DONE]') {
+              streamFinished = true
+              break
+            }
 
             try {
               const parsed = JSON.parse(data)
@@ -136,12 +144,20 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
             }
           }
         }
+
+        // Break outer loop when stream is finished
+        if (streamFinished) break
       }
     } catch (err: any) {
       if (err.name === 'AbortError') return
       setError(err.message || 'An error occurred')
-      // Remove the empty assistant message on error
-      setMessages((prev) => prev.filter((m) => m.content !== ''))
+      // Remove the empty assistant message placeholder on error
+      setMessages((prev) => {
+        if (prev.length && prev[prev.length - 1].role === 'assistant' && prev[prev.length - 1].content === '') {
+          return prev.slice(0, -1)
+        }
+        return prev
+      })
     } finally {
       setIsLoading(false)
       abortControllerRef.current = null
