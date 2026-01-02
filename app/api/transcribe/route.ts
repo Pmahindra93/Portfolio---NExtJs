@@ -31,7 +31,7 @@ const ratelimit = new Ratelimit({
     url: KV_REST_API_URL,
     token: KV_REST_API_TOKEN,
   }),
-  limiter: Ratelimit.slidingWindow(10, '24 h'),
+  limiter: Ratelimit.slidingWindow(20, '24 h'), // TODO: Change back to 10 before merge
   analytics: true,
   prefix: 'chatbot',
 })
