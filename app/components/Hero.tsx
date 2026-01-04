@@ -26,20 +26,9 @@ export function Hero() {
       <div className="container px-3 sm:px-4 md:px-6 relative z-10">
         <div className="grid gap-6 sm:gap-8 md:gap-10 lg:gap-12 lg:grid-cols-2 items-center">
           <div className="space-y-4 sm:space-y-6 md:space-y-8">
-            {/* PrateekGPT Button - Mobile Position */}
-            <div className="block sm:hidden">
+            {/* PrateekGPT Button */}
+            <div>
               <ChatButton />
-            </div>
-
-            {/* System Online Badge - Desktop Only */}
-            <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-sm bg-slate-100 dark:bg-slate-800 border-2 border-slate-900 dark:border-slate-100">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-              </span>
-              <span className="text-xs font-mono font-bold uppercase tracking-wider">
-                System Online
-              </span>
             </div>
 
             <div className="space-y-2 sm:space-y-3 md:space-y-4">
@@ -85,11 +74,6 @@ export function Hero() {
 
           {/* Hide entire image section on mobile */}
           <div className="hidden sm:block relative mx-auto w-full max-w-[280px] md:max-w-[340px] lg:max-w-none">
-            {/* PrateekGPT Button - Desktop Only */}
-            <div className="flex mb-3 sm:mb-4 justify-end">
-              <ChatButton />
-            </div>
-
             <div className="relative aspect-square md:aspect-[4/5] w-full border-2 md:border-4 border-slate-900 dark:border-white bg-slate-100 dark:bg-slate-800 p-2 sm:p-3 md:p-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] lg:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] dark:md:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] dark:lg:shadow-[8px_8px_0px_0px_rgba(255,255,255,1)]">
               <div className="relative h-full w-full overflow-hidden grayscale contrast-125">
                 <Image
@@ -99,7 +83,6 @@ export function Hero() {
                   className="object-cover"
                   priority
                 />
-                <div className="absolute inset-0 bg-[url('/images/noise.png')] opacity-20 mix-blend-overlay pointer-events-none"></div>
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent pointer-events-none"></div>
               </div>
 
