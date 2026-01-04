@@ -37,6 +37,8 @@ export function BarVisualizer({
       const rect = canvas.getBoundingClientRect()
       canvas.width = rect.width * window.devicePixelRatio
       canvas.height = rect.height * window.devicePixelRatio
+      // Reset transform before scaling to prevent compounding on resize
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
     }
 
@@ -103,6 +105,12 @@ export function BarVisualizer({
     }
 
     const animate = () => {
+      // Sync bar arrays when barCount changes
+      if (barsRef.current.length !== barCount) {
+        barsRef.current = Array(barCount).fill(minHeight)
+        targetBarsRef.current = Array(barCount).fill(minHeight)
+      }
+
       const rect = canvas.getBoundingClientRect()
       ctx.clearRect(0, 0, rect.width, rect.height)
 

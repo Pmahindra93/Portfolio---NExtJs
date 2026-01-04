@@ -233,9 +233,10 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
           console.log('Agent message:', message)
           setVoiceTranscript((prev) => [...prev, `AI: ${message.message}`])
         },
-        onError: (error) => {
+        onError: (error: unknown) => {
           console.error('Voice agent error:', error)
-          setVoiceError(typeof error === 'string' ? error : 'Connection error')
+          const errorMessage = error instanceof Error ? error.message : String(error)
+          setVoiceError(errorMessage || 'Connection error')
           setVoiceState('idle')
         },
         onModeChange: (mode) => {

@@ -54,9 +54,10 @@ export function VoiceMode({ isOpen, setIsOpen }: VoiceModeProps) {
           console.log('Agent message:', message)
           setTranscript((prev) => [...prev, `AI: ${message.message}`])
         },
-        onError: (error) => {
+        onError: (error: unknown) => {
           console.error('Voice agent error:', error)
-          setError(typeof error === 'string' ? error : 'Connection error')
+          const errorMessage = error instanceof Error ? error.message : String(error)
+          setError(errorMessage || 'Connection error')
           setVoiceState('idle')
         },
         onModeChange: (mode) => {
