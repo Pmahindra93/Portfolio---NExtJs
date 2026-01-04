@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Phone, PhoneOff, Mic, Volume2, X } from 'lucide-react'
+import { Phone, PhoneOff, Mic, Volume2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Conversation, type ConnectionType } from '@elevenlabs/client'
 
@@ -94,12 +94,22 @@ export function VoiceMode({ isOpen, setIsOpen }: VoiceModeProps) {
     }
   }, [])
 
-  // Cleanup on unmount or close
+  // Cleanup when dialog closes
   useEffect(() => {
     if (!isOpen && conversationRef.current) {
       endConversation()
     }
   }, [isOpen, endConversation])
+
+  // Cleanup on unmount - ensure WebSocket is closed even if component is unmounted while open
+  useEffect(() => {
+    return () => {
+      if (conversationRef.current) {
+        conversationRef.current.endSession().catch(console.error)
+        conversationRef.current = null
+      }
+    }
+  }, [])
 
   const handleToggleConversation = () => {
     if (voiceState === 'idle') {
@@ -131,15 +141,6 @@ export function VoiceMode({ isOpen, setIsOpen }: VoiceModeProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="voice-mode-modal sm:max-w-[500px] md:max-w-[600px] p-0 gap-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-slate-700 overflow-hidden">
-        {/* Close button */}
-        <button
-          onClick={() => setIsOpen(false)}
-          className="absolute top-4 right-4 z-50 p-2 rounded-full bg-slate-800/80 hover:bg-slate-700/80 transition-colors"
-          aria-label="Close voice mode"
-        >
-          <X className="h-4 w-4 text-white" />
-        </button>
-
         {/* Animated background */}
         <div className="absolute inset-0 opacity-30">
           <div className="voice-mode-bg" />

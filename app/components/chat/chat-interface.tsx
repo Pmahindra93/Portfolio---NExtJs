@@ -47,10 +47,15 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
-  // Cleanup on unmount
+  // Cleanup on unmount - abort any pending requests and end voice session
   useEffect(() => {
     return () => {
       abortControllerRef.current?.abort()
+      // End voice conversation on unmount if active
+      if (conversationRef.current) {
+        conversationRef.current.endSession().catch(console.error)
+        conversationRef.current = null
+      }
     }
   }, [])
 
@@ -294,7 +299,13 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={isOpen} onOpenChange={(open) => {
+        setIsOpen(open)
+        // End voice conversation when dialog closes
+        if (!open && conversationRef.current) {
+          endConversation()
+        }
+      }}>
         <DialogContent
           className={cn(
             'terminal-dialog w-full h-[100dvh] sm:h-[500px] md:h-[600px] sm:max-w-lg md:max-w-2xl flex flex-col p-0 gap-0'
@@ -407,7 +418,7 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
             </Button>
           </div>
           <p className="text-[10px] sm:text-xs text-[#00ff00]/60 mt-2 font-mono">
-            20 messages per 24h · Press Enter to send
+            10 messages per 24h · Press Enter to send
           </p>
         </form>
           </>
@@ -420,7 +431,6 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
               <div className="w-full max-w-2xl">
                 <BarVisualizer
                   state={getAgentState()}
-                  demo={true}
                   barCount={24}
                   minHeight={20}
                   maxHeight={120}

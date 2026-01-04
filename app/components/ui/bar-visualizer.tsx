@@ -7,7 +7,6 @@ export type AgentState = "connecting" | "initializing" | "listening" | "speaking
 
 interface BarVisualizerProps {
   state: AgentState
-  demo?: boolean
   barCount?: number
   minHeight?: number
   maxHeight?: number
@@ -16,7 +15,6 @@ interface BarVisualizerProps {
 
 export function BarVisualizer({
   state,
-  demo = false,
   barCount = 20,
   minHeight = 15,
   maxHeight = 90,
@@ -44,9 +42,6 @@ export function BarVisualizer({
 
     resizeCanvas()
     window.addEventListener("resize", resizeCanvas)
-
-    const barWidth = canvas.width / window.devicePixelRatio / barCount
-    const barGap = barWidth * 0.2
 
     const getStateColor = (state: AgentState): string => {
       switch (state) {
@@ -110,6 +105,10 @@ export function BarVisualizer({
     const animate = () => {
       const rect = canvas.getBoundingClientRect()
       ctx.clearRect(0, 0, rect.width, rect.height)
+
+      // Recompute bar dimensions each frame to stay in sync after resize
+      const barWidth = rect.width / barCount
+      const barGap = barWidth * 0.2
 
       updateTargetBars()
 
