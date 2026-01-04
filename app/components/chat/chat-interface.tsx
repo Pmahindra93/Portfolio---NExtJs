@@ -29,6 +29,7 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [remainingMessages, setRemainingMessages] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
@@ -90,6 +91,12 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
         signal: abortControllerRef.current.signal,
       })
 
+      // Update remaining messages from rate limit headers
+      const remaining = response.headers.get('X-RateLimit-Remaining')
+      if (remaining !== null) {
+        setRemainingMessages(parseInt(remaining, 10))
+      }
+
       if (!response.ok) {
         if (response.status === 429) {
           // Try to parse JSON response for detailed rate limit info
@@ -103,6 +110,7 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
             )
           }
 
+          setRemainingMessages(0)
           // Successfully parsed JSON, throw specific error with limit details
           throw new Error(
             `Rate limit exceeded. You have ${data.limit} requests per 24 hours. Try again later.`
@@ -418,7 +426,9 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
             </Button>
           </div>
           <p className="text-[10px] sm:text-xs text-[#00ff00]/60 mt-2 font-mono">
-            10 messages per 24h · Press Enter to send
+            {remainingMessages !== null 
+              ? `${remainingMessages} message${remainingMessages !== 1 ? 's' : ''} remaining`
+              : '10 messages per 24h'} · Press Enter to send
           </p>
         </form>
           </>
