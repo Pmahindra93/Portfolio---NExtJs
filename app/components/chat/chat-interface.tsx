@@ -232,7 +232,9 @@ export function ChatInterface({ isOpen, setIsOpen }: ChatInterfaceProps) {
         onMessage: (message) => {
           console.log('Agent message:', message)
           const prefix = message.source === 'user' ? 'prateek@ai:~$' : '[AI]'
-          setVoiceTranscript((prev) => [...prev, `${prefix} ${message.message}`])
+          const text = typeof message.message === 'string' ? message.message : ''
+          if (!text) return
+          setVoiceTranscript((prev) => [...prev, `${prefix} ${text}`])
         },
         onError: (error: unknown) => {
           console.error('Voice agent error:', error)

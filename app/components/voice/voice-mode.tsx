@@ -53,7 +53,9 @@ export function VoiceMode({ isOpen, setIsOpen }: VoiceModeProps) {
         onMessage: (message) => {
           console.log('Agent message:', message)
           const prefix = message.source === 'user' ? 'USER:' : 'AI:'
-          setTranscript((prev) => [...prev, `${prefix} ${message.message}`])
+          const text = typeof message.message === 'string' ? message.message : ''
+          if (!text) return
+          setTranscript((prev) => [...prev, `${prefix} ${text}`])
         },
         onError: (error: unknown) => {
           console.error('Voice agent error:', error)
