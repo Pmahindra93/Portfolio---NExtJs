@@ -7,25 +7,7 @@ export async function middleware(req: NextRequest) {
     request: req,
   })
 
-  // Create a Supabase client with the new cookie interface
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return req.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  // Allow access to auth-related routes
+  // Allow access to auth-related routes without creating Supabase client
   if (req.nextUrl.pathname.startsWith('/auth')) {
     return response
   }
@@ -36,7 +18,26 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith(path)
   )
 
+  // Only create Supabase client for protected paths to reduce edge execution
   if (isProtectedPath) {
+    // Create a Supabase client with the new cookie interface
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              response.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
+
     // Use getUser() instead of getSession() to avoid session refresh issues
     const { data: { user }, error } = await supabase.auth.getUser()
 

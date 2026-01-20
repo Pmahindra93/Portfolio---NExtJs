@@ -4,7 +4,8 @@ import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 import type { ResponseStreamEvent } from 'openai/resources/responses/responses'
 
-export const runtime = 'edge'
+// Switched to Node.js runtime to reduce edge execution costs
+// export const runtime = 'edge'
 
 // Validate required environment variables
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
